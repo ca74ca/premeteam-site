@@ -8,9 +8,258 @@
   <meta name="CocoaVersion" content="2299.77">
   <style type="text/css">
     p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
   </style>
 </head>
 <body>
-<p class="p1">WE ARE GROWING PREMETEAM WORKOUTS COMING SOON!</p>
+<p class="p1">&lt;!doctype html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="utf-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width,initial-scale=1" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Premeteam Workouts — Coming Soon&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="description" content="Premeteam Workouts — Coming Soon. Follow for updates: IG premeteam_hyrox, YouTube @premeteamfit, TikTok PREMETEAMHYROX." /&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>:root{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--bg:#000;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--fg:#fff;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--muted: rgba(255,255,255,.72);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--stroke: rgba(255,255,255,.15);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>*{box-sizing:border-box}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>html,body{height:100%}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin:0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background:var(--bg);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>overflow:hidden;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color:var(--fg);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* Stage where the "pong words" bounce */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#stage{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position:fixed;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>inset:0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: radial-gradient(900px 700px at 25% 20%, rgba(255,255,255,.06), transparent 60%),</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>radial-gradient(800px 650px at 80% 25%, rgba(255,255,255,.035), transparent 60%),</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>#000;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.word{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position:absolute;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>left:0; top:0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 10px 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--stroke);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 999px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(255,255,255,.03);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>backdrop-filter: blur(6px);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>-webkit-backdrop-filter: blur(6px);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>user-select:none;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>white-space:nowrap;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: .6px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>/* subtle analog glow */</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-shadow: 0 0 18px rgba(255,255,255,.22);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 0 0 1px rgba(255,255,255,.04) inset;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transform: translate3d(0,0,0);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* Big hero words */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.word.big{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: clamp(34px, 4.4vw, 72px);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 14px 18px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 18px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* Medium words */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.word.med{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: clamp(18px, 2.2vw, 30px);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* Small words */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.word.small{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: .9px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-color: rgba(255,255,255,.12);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(255,255,255,.02);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-shadow: none;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* Bottom instruction */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#hint{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position: fixed;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>left: 18px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>bottom: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>z-index: 10;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: rgba(255,255,255,.6);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: .3px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>user-select:none;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#hint b{color: rgba(255,255,255,.85)}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="stage" aria-label="Premeteam Workouts coming soon"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="hint"&gt;&lt;b&gt;PREMETEAM WORKOUTS&lt;/b&gt; — Coming Soon • follow: IG &lt;b&gt;@premeteam_hyrox&lt;/b&gt; • YT &lt;b&gt;@premeteamfit&lt;/b&gt; • TikTok &lt;b&gt;PREMETEAMHYROX&lt;/b&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Pong / screensaver-like bouncing words</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const stage = document.getElementById("stage");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Tune these</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const SPEED_MIN = 0.20;<span class="Apple-converted-space">      </span>// slower</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const SPEED_MAX = 0.55;<span class="Apple-converted-space">      </span>// faster (still slow)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const WORD_PADDING = 8;<span class="Apple-converted-space">      </span>// boundary padding</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const FPS_CAP = 60;<span class="Apple-converted-space">          </span>// animation smoothness</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Words to scatter (edit freely)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const WORDS = [</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ text: "PREMETEAM", cls: "big" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ text: "WORKOUTS", cls: "big" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ text: "COMING", cls: "med" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ text: "SOON", cls: "med" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ text: "HYROX", cls: "med" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ text: "@premeteam_hyrox", cls: "small" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ text: "@premeteamfit", cls: "small" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ text: "PREMETEAMHYROX", cls: "small" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ text: "DETROIT", cls: "small" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ text: "ELITE TRAINING", cls: "small" },</p>
+<p class="p1"><span class="Apple-converted-space">    </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Create elements</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const items = WORDS.map((w) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const el = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>el.className = `word ${w.cls || "med"}`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>el.textContent = w.text;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>stage.appendChild(el);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>el,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>x: 0,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>y: 0,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>vx: 0,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>vy: 0,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>w: 0,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>h: 0,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function rand(min, max){ return Math.random() * (max - min) + min; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function choice(arr){ return arr[Math.floor(Math.random() * arr.length)]; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function measureAll(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>items.forEach(it =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const r = it.el.getBoundingClientRect();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>it.w = r.width;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>it.h = r.height;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function initPositions(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const W = window.innerWidth;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const H = window.innerHeight;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>items.forEach(it =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// random scattered placement</p>
+<p class="p1"><span class="Apple-converted-space">        </span>it.x = rand(WORD_PADDING, Math.max(WORD_PADDING, W - it.w - WORD_PADDING));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>it.y = rand(WORD_PADDING, Math.max(WORD_PADDING, H - it.h - WORD_PADDING));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// random slow velocity, with pong-like diagonal movement</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const speed = rand(SPEED_MIN, SPEED_MAX);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const dirX = choice([-1, 1]);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const dirY = choice([-1, 1]);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>it.vx = speed * dirX * rand(0.7, 1.2);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>it.vy = speed * dirY * rand(0.7, 1.2);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>it.el.style.transform = `translate3d(${it.x}px, ${it.y}px, 0)`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let last = performance.now();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let acc = 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const timestep = 1000 / FPS_CAP;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function tick(now){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const dt = now - last;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>last = now;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>acc += dt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>while (acc &gt;= timestep){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>step(timestep);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>acc -= timestep;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>requestAnimationFrame(tick);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function step(ms){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const W = window.innerWidth;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const H = window.innerHeight;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// convert ms to a "reasonable" movement multiplier</p>
+<p class="p1"><span class="Apple-converted-space">      </span>// (values tuned for slow drift)</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const m = ms / 16.6667;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>for (const it of items){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>it.x += it.vx * m;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>it.y += it.vy * m;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// bounce off walls (pong)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const maxX = W - it.w - WORD_PADDING;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const maxY = H - it.h - WORD_PADDING;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (it.x &lt;= WORD_PADDING){</p>
+<p class="p1"><span class="Apple-converted-space">          </span>it.x = WORD_PADDING;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>it.vx *= -1;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} else if (it.x &gt;= maxX){</p>
+<p class="p1"><span class="Apple-converted-space">          </span>it.x = maxX;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>it.vx *= -1;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (it.y &lt;= WORD_PADDING){</p>
+<p class="p1"><span class="Apple-converted-space">          </span>it.y = WORD_PADDING;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>it.vy *= -1;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} else if (it.y &gt;= maxY){</p>
+<p class="p1"><span class="Apple-converted-space">          </span>it.y = maxY;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>it.vy *= -1;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>it.el.style.transform = `translate3d(${it.x}px, ${it.y}px, 0)`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function boot(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>measureAll();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>initPositions();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>requestAnimationFrame(tick);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Re-measure on resize so boundaries stay correct</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let resizeTimer = null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>window.addEventListener("resize", () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>clearTimeout(resizeTimer);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>resizeTimer = setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>measureAll();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// clamp positions inside new bounds</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const W = window.innerWidth;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const H = window.innerHeight;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>items.forEach(it =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>it.x = Math.min(it.x, Math.max(WORD_PADDING, W - it.w - WORD_PADDING));</p>
+<p class="p1"><span class="Apple-converted-space">          </span>it.y = Math.min(it.y, Math.max(WORD_PADDING, H - it.h - WORD_PADDING));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}, 120);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>boot();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+<p class="p2"><br></p>
 </body>
 </html>
