@@ -261,3 +261,131 @@ body{
 .cardValue{
   text-align:center !important;
 }
+
+/* Daily workout zone */
+.workoutZone{
+  width:min(980px, 100%);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  align-items:center;
+}
+
+/* Ticker */
+.tickerShell{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 14px;
+  border-radius:14px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+    var(--glass2);
+  border:1px solid rgba(255,255,255,.14);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow:hidden;
+}
+
+.tickerLive{
+  font-size:11px;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.85);
+  flex:0 0 auto;
+}
+
+.tickerTrack{
+  position:relative;
+  flex:1;
+  overflow:hidden;
+}
+
+.tickerText{
+  display:inline-block;
+  white-space:nowrap;
+  will-change: transform;
+  animation: tickerScroll 22s linear infinite;
+  color: rgba(255,255,255,.88);
+  letter-spacing:.02em;
+}
+
+@keyframes tickerScroll{
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* Workout panel */
+.workoutPanel{
+  width:100%;
+  border-radius:16px;
+  padding:16px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+    radial-gradient(420px 140px at 20% 20%, rgba(0,190,255,.08), transparent 60%),
+    radial-gradient(420px 140px at 80% 80%, rgba(255,0,220,.08), transparent 60%),
+    var(--glass2);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow: 0 18px 44px rgba(0,0,0,.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.workoutHeader{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(255,255,255,.10);
+}
+
+.workoutTitle{
+  font-size:12px;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color: rgba(255,255,255,.86);
+}
+
+.workoutDate{
+  font-size:12px;
+  color: rgba(255,255,255,.60);
+}
+
+.workoutBody{
+  padding-top:14px;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:14px;
+  align-items:start;
+}
+
+.workoutCopy{
+  white-space:pre-wrap;
+  line-height:1.5;
+  color: rgba(255,255,255,.86);
+}
+
+.workoutImageWrap{
+  width:100%;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.25);
+}
+
+.workoutImageWrap img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+@media (max-width: 760px){
+  .workoutBody{ grid-template-columns: 1fr; }
+  .tickerText{ animation-duration: 18s; }
+}
