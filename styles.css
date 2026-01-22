@@ -247,3 +247,17 @@ body{
     liquidPulse 5s ease-in-out infinite,
     microPulseAggressive 2.2s ease-in-out infinite !important;
 }
+
+/* FINAL: hard lock centering inside social cards */
+.glassCard{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+}
+
+.cardLabel,
+.cardValue{
+  text-align:center !important;
+}
