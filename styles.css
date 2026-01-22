@@ -31,11 +31,12 @@ body{
   filter:saturate(1.05) contrast(1.05);
 }
 .bgOverlay{
-  position:absolute; inset:0;
-  background:
-    radial-gradient(900px 500px at 50% 40%, rgba(0,0,0,.20), rgba(0,0,0,.72)),
-    linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.72));
+  position:absolute;
+  inset:0;
+  background: transparent;
 }
+
+
 .bgGlow{
   position:absolute; inset:-20%;
   background:
@@ -65,33 +66,24 @@ body{
 /* Liquid letters: see-through fill + outline + glow */
 .liquidTitle{
   margin:0;
-  font-weight:800;
-  letter-spacing:.22em;
+  font-weight:700;
+  letter-spacing:.32em;
   text-transform:uppercase;
-  font-size: clamp(20px, 3.2vw, 44px);
-  line-height:1.12;
+  font-size: clamp(22px, 3.4vw, 48px);
+  line-height:1.15;
 
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-
-  -webkit-text-stroke: 1px rgba(255,255,255,.55);
+  color: rgba(255,255,255,.35);
 
   text-shadow:
-    0 0 10px rgba(255,255,255,.20),
-    0 0 24px rgba(0,190,255,.22),
-    0 0 34px rgba(255,0,220,.18);
+    0 0 4px rgba(255,255,255,.30),
+    0 0 14px rgba(0,190,255,.45),
+    0 0 22px rgba(255,0,220,.35),
+    0 0 36px rgba(0,190,255,.25);
 
-  background: linear-gradient(120deg,
-    rgba(255,255,255,.05),
-    rgba(0,190,255,.22),
-    rgba(255,0,220,.18),
-    rgba(255,255,255,.05)
-  );
-  -webkit-background-clip:text;
-  background-clip:text;
-  background-size: 240% 240%;
-  animation: shimmer 6.5s ease-in-out infinite;
+  -webkit-font-smoothing: antialiased;
 }
+
+
 @keyframes shimmer{
   0%{ background-position:0% 50%;}
   50%{ background-position:100% 50%;}
@@ -121,8 +113,14 @@ body{
   text-decoration:none;
   color:var(--text);
   width:min(320px, 100%);
-  padding:14px 16px;
+  padding:16px 18px;
   border-radius:14px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 
   background:
     linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
@@ -141,6 +139,7 @@ body{
   transform: translateY(0);
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
+
 .glassCard:hover{
   transform: translateY(-3px);
   border-color: rgba(255,255,255,.30);
@@ -166,4 +165,85 @@ body{
 @media (max-width: 520px){
   .liquidTitle{ letter-spacing:.14em; }
   .glassCard{ width:100%; }
+}
+
+/* Timed entrance animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Header: 2s delay */
+.hero {
+  opacity: 0;
+  animation: fadeUp 900ms ease forwards;
+  animation-delay: 2s;
+}
+
+/* Cards: default hidden, each gets its own delay */
+.glassCard {
+  opacity: 0;
+  animation: fadeUp 900ms ease forwards;
+}
+
+.socialRow .glassCard:nth-child(1) { animation-delay: 5s; }
+.socialRow .glassCard:nth-child(2) { animation-delay: 7s; }
+.socialRow .glassCard:nth-child(3) { animation-delay: 9s; }
+
+
+@keyframes liquidPulse {
+  0%   { text-shadow: 0 0 4px rgba(255,255,255,.25), 0 0 14px rgba(0,190,255,.35), 0 0 22px rgba(255,0,220,.25); }
+  50%  { text-shadow: 0 0 8px rgba(255,255,255,.35), 0 0 22px rgba(0,190,255,.55), 0 0 30px rgba(255,0,220,.40); }
+  100% { text-shadow: 0 0 4px rgba(255,255,255,.25), 0 0 14px rgba(0,190,255,.35), 0 0 22px rgba(255,0,220,.25); }
+}
+
+.liquidTitle {
+  animation: liquidPulse 5s ease-in-out infinite;
+}
+
+/* Micro size pulse (subtle energy vibration) */
+@keyframes microPulse {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.015); }
+  70%  { transform: scale(0.995); }
+  100% { transform: scale(1); }
+}
+
+/* Combine glow + micro movement */
+.liquidTitle {
+  animation:
+    liquidPulse 5s ease-in-out infinite,
+    microPulse 3.8s ease-in-out infinite;
+}
+
+/* FINAL: ensure transform works + slightly stronger micro pulse */
+.liquidTitle{
+  display:inline-block;
+  transform-origin:center;
+  will-change: transform;
+  animation:
+    liquidPulse 5s ease-in-out infinite,
+    microPulse 2.6s ease-in-out infinite !important;
+}
+
+@keyframes microPulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.028); }
+  65%  { transform: scale(0.992); }
+  100% { transform: scale(1); }
+}
+
+/* AGGRESSIVE energy pulse */
+@keyframes microPulseAggressive {
+  0%   { transform: scale(1) rotate(0deg); }
+  25%  { transform: scale(1.045) rotate(0.3deg); }
+  50%  { transform: scale(0.985) rotate(-0.3deg); }
+  75%  { transform: scale(1.035) rotate(0.2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.liquidTitle{
+  animation:
+    liquidPulse 5s ease-in-out infinite,
+    microPulseAggressive 2.2s ease-in-out infinite !important;
 }
