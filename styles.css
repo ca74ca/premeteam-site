@@ -310,7 +310,7 @@ body{
   display:inline-block;
   white-space:nowrap;
   will-change: transform;
-  animation: tickerScroll 22s linear infinite;
+  animation: tickerScroll 14s linear infinite;
   color: rgba(255,255,255,.88);
   letter-spacing:.02em;
 }
