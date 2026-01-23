@@ -389,3 +389,270 @@ body{
   .workoutBody{ grid-template-columns: 1fr; }
   .tickerText{ animation-duration: 18s; }
 }
+
+/* --- Clearer glass social cards (less smoke) --- */
+.glassCard{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)) !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  box-shadow: 0 14px 40px rgba(0,0,0,.28) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+}
+
+/* --- Footer ticker (news channel bar) --- */
+.footerTicker{
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.footerTickerInner{
+  pointer-events: auto;
+  width: 100%;
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)),
+    radial-gradient(380px 120px at 15% 50%, rgba(0,255,160,.10), transparent 60%),
+    radial-gradient(380px 120px at 85% 50%, rgba(0,190,255,.08), transparent 60%);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 18px 60px rgba(0,0,0,.45);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+}
+
+.footerLivePill{
+  flex: 0 0 auto;
+  font-size: 11px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  padding: 7px 12px;
+  border-radius: 999px;
+
+  color: rgba(0,255,170,.90);
+  border: 1px solid rgba(0,255,170,.35);
+  background: rgba(0,255,170,.10);
+  text-shadow:
+    0 0 10px rgba(0,255,170,.35),
+    0 0 18px rgba(0,255,170,.20);
+}
+
+.footerTickerTrack{
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.footerTickerText{
+  display:inline-block;
+  white-space: nowrap;
+  will-change: transform;
+  animation: footerScroll 18s linear infinite;
+
+  color: rgba(0,255,170,.92);
+  letter-spacing: .02em;
+  text-shadow:
+    0 0 10px rgba(0,255,170,.45),
+    0 0 22px rgba(0,255,170,.22),
+    0 0 30px rgba(0,255,170,.14);
+}
+
+/* smooth “liquid” glow pulse for the ticker text */
+@keyframes emeraldPulse {
+  0%   { filter: drop-shadow(0 0 8px rgba(0,255,170,.25)); }
+  50%  { filter: drop-shadow(0 0 16px rgba(0,255,170,.42)); }
+  100% { filter: drop-shadow(0 0 8px rgba(0,255,170,.25)); }
+}
+.footerTickerText{
+  animation: footerScroll 18s linear infinite, emeraldPulse 4.5s ease-in-out infinite;
+}
+
+@keyframes footerScroll{
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* keep footer from covering content on small screens */
+body{
+  padding-bottom: 92px;
+}
+
+@media (max-width: 560px){
+  .footerTicker{ left: 10px; right: 10px; bottom: 10px; }
+  .footerTickerText{ animation-duration: 14s, 4.5s; }
+  body{ padding-bottom: 102px; }
+}
+
+/* Clearer glass social cards (less smoke) */
+.glassCard{
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)) !important;
+  border: 1px solid rgba(255,255,255,.20) !important;
+  box-shadow: 0 14px 40px rgba(0,0,0,.28) !important;
+  backdrop-filter: blur(12px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(150%) !important;
+}
+
+/* Footer ticker (news channel bar) */
+.footerTicker{
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 9999;
+  pointer-events: none;
+}
+.footerTickerInner{
+  pointer-events: auto;
+  width: 100%;
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)),
+    radial-gradient(380px 120px at 15% 50%, rgba(0,255,160,.10), transparent 60%),
+    radial-gradient(380px 120px at 85% 50%, rgba(0,190,255,.08), transparent 60%);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 18px 60px rgba(0,0,0,.45);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+}
+
+.footerLivePill{
+  flex: 0 0 auto;
+  font-size: 11px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  padding: 7px 12px;
+  border-radius: 999px;
+
+  color: rgba(0,255,170,.92);
+  border: 1px solid rgba(0,255,170,.38);
+  background: rgba(0,255,170,.10);
+  text-shadow: 0 0 10px rgba(0,255,170,.35), 0 0 18px rgba(0,255,170,.20);
+}
+
+.footerTickerTrack{ flex: 1; overflow: hidden; }
+.footerTickerText{
+  display:inline-block;
+  white-space: nowrap;
+  will-change: transform;
+
+  color: rgba(0,255,170,.92);
+  letter-spacing: .02em;
+  text-shadow:
+    0 0 10px rgba(0,255,170,.45),
+    0 0 22px rgba(0,255,170,.22),
+    0 0 30px rgba(0,255,170,.14);
+  animation: footerScroll 18s linear infinite, emeraldPulse 4.5s ease-in-out infinite;
+}
+
+@keyframes footerScroll{
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+@keyframes emeraldPulse{
+  0%   { filter: drop-shadow(0 0 8px rgba(0,255,170,.25)); }
+  50%  { filter: drop-shadow(0 0 16px rgba(0,255,170,.42)); }
+  100% { filter: drop-shadow(0 0 8px rgba(0,255,170,.25)); }
+}
+
+body{ padding-bottom: 92px; }
+
+/* --- Top HYROX ticker (gold liquid glass) --- */
+.topTicker{
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  top: 16px;
+  z-index: 2147483647;
+  pointer-events: none;
+}
+
+.topTickerInner{
+  pointer-events: auto;
+  width: 100%;
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 16px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)),
+    radial-gradient(380px 120px at 15% 50%, rgba(255,210,110,.10), transparent 60%),
+    radial-gradient(380px 120px at 85% 50%, rgba(0,190,255,.06), transparent 60%);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 18px 60px rgba(0,0,0,.45);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+}
+
+.topLivePill{
+  flex: 0 0 auto;
+  font-size: 11px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  padding: 7px 12px;
+  border-radius: 999px;
+
+  color: rgba(255,215,120,.95);
+  border: 1px solid rgba(255,215,120,.40);
+  background: rgba(255,215,120,.10);
+  text-shadow: 0 0 10px rgba(255,215,120,.35), 0 0 18px rgba(255,215,120,.20);
+}
+
+.topTickerTrack{ flex: 1; overflow: hidden; }
+
+.topTickerText{
+  display:inline-block;
+  white-space: nowrap;
+  will-change: transform;
+
+  color: rgba(255,215,120,.95);
+  letter-spacing: .02em;
+  text-shadow:
+    0 0 10px rgba(255,215,120,.45),
+    0 0 22px rgba(255,215,120,.22),
+    0 0 30px rgba(255,215,120,.14);
+  animation: topScroll 20s linear infinite, goldPulse 4.6s ease-in-out infinite;
+}
+
+@keyframes topScroll{
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+@keyframes goldPulse{
+  0%   { filter: drop-shadow(0 0 8px rgba(255,215,120,.22)); }
+  50%  { filter: drop-shadow(0 0 16px rgba(255,215,120,.42)); }
+  100% { filter: drop-shadow(0 0 8px rgba(255,215,120,.22)); }
+}
+
+/* Prevent tickers covering content */
+body{
+  padding-top: 86px;
+}
+
+/* Mobile spacing */
+@media (max-width: 560px){
+  .topTicker{ left: 10px; right: 10px; top: 10px; }
+  .topTickerText{ animation-duration: 16s, 4.6s; }
+  body{ padding-top: 96px; }
+}
+
+/* topTickerOverride */
+.topTicker{
+  z-index: 2147483647 !important;
+  display: block !important;
+  opacity: 1 !important;
+}

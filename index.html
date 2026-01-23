@@ -8,6 +8,17 @@
   </head>
 
   <body>
+
+  <!-- TOP HYROX TICKER -->
+  <div class="topTicker" aria-label="HYROX live ticker">
+    <div class="topTickerInner">
+      <div class="topLivePill">HYROX</div>
+      <div class="topTickerTrack">
+        <div class="topTickerText" id="hyroxTicker">Loading HYROX workout...</div>
+      </div>
+    </div>
+  </div>
+
     <div class="bg">
       <video class="bgVideo" autoplay muted loop playsinline>
         <source src="./assets/premeteam_workouts_main.mp4" type="video/mp4" />
@@ -23,28 +34,7 @@
         <div class="subline">COMING SOON</div>
       </section>
 
-<!-- DAILY TICKER + WORKOUT PANEL -->
-<section class="workoutZone" aria-label="Daily workout">
-  <div class="tickerShell">
-    <div class="tickerLive">LIVE</div>
-    <div class="tickerTrack">
-      <div class="tickerText" id="workoutTicker">Loading today's workout...</div>
-    </div>
-  </div>
 
-  <div class="workoutPanel">
-    <div class="workoutHeader">
-      <div class="workoutTitle" id="workoutTitle">Daily Workout</div>
-      <div class="workoutDate" id="workoutDate"></div>
-    </div>
-    <div class="workoutBody">
-      <div class="workoutCopy" id="workoutCopy">Loading...</div>
-      <div class="workoutImageWrap">
-        <img id="workoutImage" alt="Written workout" loading="lazy" /> 
-      </div>
-    </div>
-  </div>
-</section>
 
 </section>
 
@@ -68,5 +58,56 @@
 
 </section>
     </main>
-  </body>
+    <script>
+  (async function(){
+    try {
+      const res = await fetch("./workout.json", { cache: "no-store" });
+      const data = await res.json();
+      const tickEl = document.getElementById("workoutTicker");
+      if (tickEl) tickEl.textContent = data.ticker || "";
+    } catch (e) {
+      const tickEl = document.getElementById("workoutTicker");
+      if (tickEl) tickEl.textContent = "Workout feed unavailable.";
+    }
+  })();
+  </script>
+  <!-- FOOTER LIVE TICKER -->
+  <div class="footerTicker" aria-label="Live workout ticker">
+    <div class="footerTickerInner">
+      <div class="footerLivePill">LIVE</div>
+      <div class="footerTickerTrack">
+        <div class="footerTickerText" id="workoutTicker">Loading today's workout...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (async function(){
+    try {
+      const res = await fetch("./workout.json", { cache: "no-store" });
+      const data = await res.json();
+      const tickEl = document.getElementById("workoutTicker");
+      if (tickEl) tickEl.textContent = data.ticker || "";
+    } catch (e) {
+      const tickEl = document.getElementById("workoutTicker");
+      if (tickEl) tickEl.textContent = "Workout feed unavailable.";
+    }
+  })();
+  </script>
+
+  <script>
+  (async function(){
+    try {
+      const res = await fetch("./hyrox.json", { cache: "no-store" });
+      const data = await res.json();
+      const el = document.getElementById("hyroxTicker");
+      if (el) el.textContent = data.ticker || "";
+    } catch (e) {
+      const el = document.getElementById("hyroxTicker");
+      if (el) el.textContent = "HYROX feed unavailable.";
+    }
+  })();
+  </script>
+
+</body>
 </html>
