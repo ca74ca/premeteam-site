@@ -113,13 +113,22 @@ body{
 
 /* Social cards row */
 .socialRow{
-position:absolute;
-top:110px;
-left:40px;
-display:flex;
-flex-direction:column;
-gap:14px;
-align-items:flex-start;
+  position:fixed !important;
+  top:92px !important;
+  left:20px !important;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  align-items:flex-start;
+  z-index:1200;
+}
+
+/* Anchor brand link in top-left so cards can stack directly below it */
+.deltaHomeLink{
+  position:fixed;
+  top:58px;
+  left:20px;
+  z-index:1201;
 }
 
 /* Glass / smoke cards */
