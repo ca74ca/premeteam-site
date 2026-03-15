@@ -9,16 +9,6 @@
 
 <body>
 
-<!-- TOP HYROX TICKER -->
-<div class="topTicker" aria-label="HYROX live ticker">
-<div class="topTickerInner">
-<div class="topLivePill">HYROX</div>
-<div class="topTickerTrack">
-<div class="topTickerText" id="hyroxTicker">Loading HYROX workout...</div>
-</div>
-</div>
-</div>
-
 <!-- BACKGROUND VIDEO -->
 <div class="bg">
   <video class="bgVideo" autoplay muted loop playsinline preload="auto">
@@ -34,62 +24,29 @@
   <!-- PDF DOWNLOAD LINKS -->
   <section class="socialRow" aria-label="Workout PDF downloads">
 
-    <a class="glassCard" href="./pdfs/hyrox-beginner-program.pdf" target="_blank" download>
+    <a class="glassCard" href="./pdfs/delta_zone_starter_week1_life_system.pdf" target="_blank" download>
       <div class="cardLabel">Download PDF</div>
       <div class="cardValue">DELTA ZONE Starter System</div>
     </a>
 
-    <a class="glassCard" href="./pdfs/strength-conditioning-workout.pdf" target="_blank" download>
+    <a class="glassCard" href="./pdfs/delta-zone-interediate-system.pdf" target="_blank" download>
       <div class="cardLabel">Download PDF</div>
       <div class="cardValue">DELTA ZONE Intermediate System</div>
     </a>
 
-    <a class="glassCard" href="./pdfs/delta-zone-run-build.pdf" target="_blank" download>
+    <a class="glassCard" href="./pdfs/delta_zone_endurance_system.pdf" target="_blank" download>
       <div class="cardLabel">Download PDF</div>
       <div class="cardValue">DELTA ZONE ENDURANCE System</div>
+    </a>
+
+    <a class="glassCard" href="./pdfs/hyrox-beginner-program.pdf" target="_blank" download>
+      <div class="cardLabel">Download PDF</div>
+      <div class="cardValue">DELTA ZONE SYSTEM FOR HYROX</div>
     </a>
 
   </section>
 
 </main>
-
-<!-- FOOTER TICKER -->
-<div class="footerTicker" aria-label="Live workout ticker">
-<div class="footerTickerInner">
-<div class="footerLivePill">LIVE</div>
-<div class="footerTickerTrack">
-<div class="footerTickerText" id="workoutTicker">Loading today's workout...</div>
-</div>
-</div>
-</div>
-
-<script>
-(async function(){
-try{
-const res = await fetch("./workout.json",{cache:"no-store"});
-const data = await res.json();
-const el = document.getElementById("workoutTicker");
-if(el) el.textContent = data.ticker || "";
-}catch(e){
-const el = document.getElementById("workoutTicker");
-if(el) el.textContent = "Workout feed unavailable.";
-}
-})();
-</script>
-
-<script>
-(async function(){
-try{
-const res = await fetch("./hyrox.json",{cache:"no-store"});
-const data = await res.json();
-const el = document.getElementById("hyroxTicker");
-if(el) el.textContent = data.ticker || "";
-}catch(e){
-const el = document.getElementById("hyroxTicker");
-if(el) el.textContent = "HYROX feed unavailable.";
-}
-})();
-</script>
 
 </body>
 </html>
