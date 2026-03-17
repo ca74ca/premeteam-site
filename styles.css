@@ -768,9 +768,9 @@ body{
 /* Contact Sections */
 .contactSection {
   text-align: center;
-  margin-top: 180px;
-  max-width: 600px;
-  padding: 0 20px;
+  margin-top: 10px;
+  width: min(320px, 100%);
+  padding: 0 8px;
 }
 
 .liquidContact {
@@ -780,7 +780,12 @@ body{
   text-transform: uppercase;
   font-size: clamp(16px, 2.2vw, 28px);
   line-height: 1.15;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.18);
+  background: linear-gradient(120deg, rgba(255,255,255,.22), rgba(0,190,255,.18), rgba(255,0,220,.16));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 0.7px rgba(255,255,255,.30);
   text-shadow:
     0 0 4px rgba(255, 255, 255, 0.30),
     0 0 14px rgba(0, 190, 255, 0.45),
@@ -797,10 +802,9 @@ body{
 
 .contactSectionSmall {
   text-align: center;
-  margin-top: 80px;
-  margin-bottom: 60px;
-  max-width: 600px;
-  padding: 0 20px;
+  margin-top: 6px;
+  width: min(320px, 100%);
+  padding: 0 8px;
 }
 
 .liquidContactSmall {
@@ -810,7 +814,12 @@ body{
   text-transform: uppercase;
   font-size: clamp(12px, 1.5vw, 18px);
   line-height: 1.15;
-  color: rgba(255, 255, 255, 0.40);
+  color: rgba(255, 255, 255, 0.16);
+  background: linear-gradient(120deg, rgba(255,255,255,.20), rgba(0,190,255,.16), rgba(255,0,220,.14));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 0.6px rgba(255,255,255,.28);
   text-shadow:
     0 0 3px rgba(255, 255, 255, 0.25),
     0 0 10px rgba(0, 190, 255, 0.35),
