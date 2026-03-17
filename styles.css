@@ -764,3 +764,62 @@ body{
       0 0 20px rgba(90,255,170,.18);
   }
 }
+
+/* Contact Sections */
+.contactSection {
+  text-align: center;
+  margin-top: 180px;
+  max-width: 600px;
+  padding: 0 20px;
+}
+
+.liquidContact {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  font-size: clamp(16px, 2.2vw, 28px);
+  line-height: 1.15;
+  color: rgba(255, 255, 255, 0.35);
+  text-shadow:
+    0 0 4px rgba(255, 255, 255, 0.30),
+    0 0 14px rgba(0, 190, 255, 0.45),
+    0 0 22px rgba(255, 0, 220, 0.35),
+    0 0 36px rgba(0, 190, 255, 0.25);
+  -webkit-font-smoothing: antialiased;
+  animation:
+    liquidPulse 5s ease-in-out infinite,
+    microPulseAggressive 2.2s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.contactSectionSmall {
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: 60px;
+  max-width: 600px;
+  padding: 0 20px;
+}
+
+.liquidContactSmall {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-size: clamp(12px, 1.5vw, 18px);
+  line-height: 1.15;
+  color: rgba(255, 255, 255, 0.40);
+  text-shadow:
+    0 0 3px rgba(255, 255, 255, 0.25),
+    0 0 10px rgba(0, 190, 255, 0.35),
+    0 0 16px rgba(255, 0, 220, 0.25);
+  -webkit-font-smoothing: antialiased;
+  animation:
+    liquidPulse 5s ease-in-out infinite,
+    microPulseAggressive 2.2s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  will-change: transform;
+}
