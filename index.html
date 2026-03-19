@@ -55,6 +55,11 @@
       <div class="paymentSubtext">Instant Download • Lifetime Access.</div>
     </a>
 
+    <a class="glassCard" href="./get-the-411.html" aria-label="Learn more about the Delta Zone System">
+      <div class="cardLabel">Learn More</div>
+      <div class="cardValue">Get the 411</div>
+    </a>
+
     <a class="glassCard supportEmailCard" href="mailto:support@deltazonesystem.com" aria-label="Email Delta Zone support">
       <div class="cardLabel supportEmailLabel">Support</div>
       <div class="cardValue supportEmailValue">support@deltazonesystem.com</div>
@@ -62,7 +67,131 @@
 
   </section>
 
+  <!-- Delta Zone Coaching Glass Card -->
+  <section class="delta-coaching-wrap">
+    <div class="delta-coaching-card">
+      <div class="delta-glow"></div>
+      <div class="delta-coaching-content">
+        <p class="delta-eyebrow">DELTA ZONE COACHING</p>
+        <h2>Want Coaching?</h2>
+        <p class="delta-subtext">
+          Train directly under the Delta Zone System.
+          Built for real performance — designed specifically for you.
+        </p>
+        <a href="/coaching" class="delta-coaching-btn">Apply for Coaching</a>
+      </div>
+    </div>
+  </section>
+
 </main>
+
+<style>
+  /* Push coaching section right of the fixed sidebar on desktop */
+  .delta-coaching-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 20px;
+    /* offset right of the fixed 320px sidebar + 20px left + 20px gap */
+    margin-left: min(360px, 40vw);
+    flex: 1;
+  }
+
+  @media (max-width: 640px) {
+    .delta-coaching-wrap {
+      margin-left: 0;
+      padding: 40px 20px 60px;
+    }
+  }
+
+  .delta-coaching-card {
+    position: relative;
+    width: min(520px, 92vw);
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px;
+    background: rgba(173, 216, 230, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .delta-glow {
+    position: absolute;
+    inset: 8%;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.45), transparent 35%),
+      radial-gradient(circle at 70% 70%, rgba(120,190,255,0.22), transparent 40%),
+      radial-gradient(circle, rgba(190,230,255,0.18), transparent 70%);
+    pointer-events: none;
+  }
+
+  .delta-coaching-content {
+    position: relative;
+    z-index: 2;
+    max-width: 300px;
+    color: #ffffff;
+  }
+
+  .delta-eyebrow {
+    margin: 0 0 10px;
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .delta-coaching-content h2 {
+    margin: 0 0 14px;
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.05;
+    font-weight: 700;
+  }
+
+  .delta-subtext {
+    margin: 0 0 24px;
+    font-size: clamp(15px, 2vw, 17px);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .delta-coaching-btn {
+    display: inline-block;
+    padding: 14px 24px;
+    border-radius: 999px;
+    text-decoration: none;
+    color: #081018;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .delta-coaching-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  @media (max-width: 640px) {
+    .delta-coaching-card {
+      padding: 42px;
+    }
+
+    .delta-coaching-content {
+      max-width: 240px;
+    }
+  }
+</style>
 
 </body>
 </html>
