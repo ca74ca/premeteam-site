@@ -11,7 +11,7 @@
 
 <!-- BACKGROUND VIDEO -->
 <div class="bg" id="bgWrap">
-  <video id="bgVid" class="bgVideo" muted loop playsinline preload="none" poster="./assets/mobile_delta1.webp" data-src-desktop="./assets/delta_homepage_3.mp4" data-src-mobile="./assets/mobile_video_1.mp4"></video>
+  <video id="bgVid" class="bgVideo" muted loop playsinline preload="none" data-src-desktop="./assets/delta_homepage_3.mp4" data-src-mobile="./assets/mobile_video_1.mp4"></video>
 
   <div class="bgOverlay"></div>
   <div class="bgGlow"></div>
@@ -25,10 +25,13 @@
 
     var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     var slowConn = navigator.connection && (['slow-2g','2g','3g'].indexOf(navigator.connection.effectiveType) !== -1 || navigator.connection.saveData);
+
+    // Always show image immediately on mobile — video plays on top when ready
+    if(isMobile){ setImageFallback(); }
+
     if(slowConn){
       var v = document.getElementById('bgVid');
       if(v){ v.remove(); }
-      setImageFallback();
     } else {
       var v2 = document.getElementById('bgVid');
       if(v2){
@@ -40,9 +43,7 @@
           v2.appendChild(sourceEl);
           v2.autoplay = true;
           v2.load();
-          v2.play().catch(function(){
-            setImageFallback();
-          });
+          v2.play().catch(function(){});
         }
       }
     }
