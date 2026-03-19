@@ -207,12 +207,25 @@
 
 <!-- BACKGROUND VIDEO -->
 <div class="bg">
-  <video class="bgVideo" autoplay muted loop playsinline preload="auto">
+  <video id="bgVid" class="bgVideo" autoplay muted loop playsinline preload="none">
     <source src="./assets/delta_homepage_3.mp4" type="video/mp4">
   </video>
   <div class="bgOverlay"></div>
   <div class="bgGlow"></div>
 </div>
+<script>
+  (function(){
+    var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    var slowConn = navigator.connection && (['slow-2g','2g','3g'].indexOf(navigator.connection.effectiveType) !== -1 || navigator.connection.saveData);
+    if(isMobile || slowConn){
+      var v = document.getElementById('bgVid');
+      if(v){ v.remove(); }
+    } else {
+      var v2 = document.getElementById('bgVid');
+      if(v2){ v2.load(); }
+    }
+  })();
+</script>
 
 <a class="backLink" href="./index.html">&larr; Back</a>
 
