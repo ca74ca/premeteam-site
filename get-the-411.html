@@ -17,12 +17,16 @@
     top: 22px;
     left: 22px;
     z-index: 1300;
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: .28em;
     text-transform: uppercase;
     color: var(--muted);
     text-decoration: none;
     transition: color .18s ease;
+    padding: 10px 6px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
   }
   .backLink:hover{ color: var(--text); }
 
@@ -52,7 +56,7 @@
   }
   .pageHero p{
     margin: 0;
-    font-size: 13px;
+    font-size: 14px;
     letter-spacing: .28em;
     text-transform: uppercase;
     color: var(--muted);
@@ -95,7 +99,7 @@
   .infoCard:nth-child(6){ animation-delay: 1.3s; }
 
   .infoCard .cardTitle{
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: .28em;
     text-transform: uppercase;
     color: var(--muted);
@@ -139,7 +143,7 @@
   }
   .stripCard p{
     margin: 0 0 20px;
-    font-size: 14px;
+    font-size: 15px;
     color: var(--muted);
     line-height: 1.7;
     max-width: 640px;
@@ -154,10 +158,13 @@
   }
   .ctaBtn{
     text-decoration: none;
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: .26em;
     text-transform: uppercase;
     padding: 14px 28px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
     border-radius: 999px;
     border: 1px solid rgba(255,255,255,.28);
     background: rgba(255,255,255,.08);
@@ -172,6 +179,22 @@
   .ctaBtn.primary{
     background: linear-gradient(135deg, rgba(0,190,255,.28), rgba(255,0,220,.22));
     border-color: rgba(255,255,255,.35);
+  }
+
+  @media (max-width: 768px){
+    .backLink{
+      font-size: 13px;
+      padding: 12px 8px;
+    }
+    .pageHero p{
+      font-size: 14px;
+    }
+    .ctaBtn{
+      font-size: 14px;
+      padding: 14px 20px;
+      width: 100%;
+      justify-content: center;
+    }
   }
 
   @media (max-width: 520px){

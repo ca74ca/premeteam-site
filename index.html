@@ -125,7 +125,7 @@
 
   .delta-eyebrow {
     margin: 0 0 5px;
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     opacity: 0.8;
@@ -140,18 +140,21 @@
 
   .delta-subtext {
     margin: 0 0 14px;
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1.55;
     color: rgba(255, 255, 255, 0.85);
   }
 
   .delta-coaching-btn {
-    display: inline-block;
-    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 8px 18px;
     border-radius: 999px;
     text-decoration: none;
     color: #081018;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     background: rgba(255, 255, 255, 0.82);
     border: 1px solid rgba(255, 255, 255, 0.65);
@@ -162,6 +165,23 @@
   .delta-coaching-btn:hover {
     transform: translateY(-2px);
     background: rgba(255, 255, 255, 0.95);
+  }
+
+  @media (max-width: 768px) {
+    .delta-coaching-card {
+      width: min(260px, 100%);
+      padding: 24px 20px;
+    }
+    .delta-coaching-content h2 {
+      font-size: 20px;
+    }
+    .delta-subtext {
+      font-size: 13px;
+    }
+    .delta-coaching-btn {
+      font-size: 14px;
+      width: 100%;
+    }
   }
 </style>
 
