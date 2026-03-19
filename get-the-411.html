@@ -207,7 +207,7 @@
 
 <!-- BACKGROUND VIDEO -->
 <div class="bg">
-  <video id="bgVid" class="bgVideo" muted loop playsinline preload="none" data-src="./assets/delta_homepage_3.mp4"></video>
+  <video id="bgVid" class="bgVideo" muted loop playsinline preload="none" data-src-desktop="./assets/delta_homepage_3.mp4" data-src-mobile="./assets/mobile_video_1.mp4"></video>
   <div class="bgOverlay"></div>
   <div class="bgGlow"></div>
 </div>
@@ -216,25 +216,21 @@
     var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     var slowConn = navigator.connection && (['slow-2g','2g','3g'].indexOf(navigator.connection.effectiveType) !== -1 || navigator.connection.saveData);
     var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if(isMobile || slowConn){
+    if(slowConn || reducedMotion){
       var v = document.getElementById('bgVid');
       if(v){ v.remove(); }
     } else {
       var v2 = document.getElementById('bgVid');
       if(v2){
-        var src = v2.getAttribute('data-src');
+        var src = isMobile ? v2.getAttribute('data-src-mobile') : v2.getAttribute('data-src-desktop');
         if(src){
           var sourceEl = document.createElement('source');
           sourceEl.src = src;
           sourceEl.type = 'video/mp4';
           v2.appendChild(sourceEl);
-          if(!reducedMotion){
-            v2.autoplay = true;
-          }
+          v2.autoplay = true;
           v2.load();
-          if(!reducedMotion){
-            v2.play().catch(function(){});
-          }
+          v2.play().catch(function(){});
         }
       }
     }
