@@ -20,8 +20,7 @@
   (function(){
     var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     var slowConn = navigator.connection && (['slow-2g','2g','3g'].indexOf(navigator.connection.effectiveType) !== -1 || navigator.connection.saveData);
-    var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if(slowConn || reducedMotion){
+    if(slowConn){
       var v = document.getElementById('bgVid');
       if(v){ v.remove(); }
     } else {
