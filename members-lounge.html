@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Members Lounge | Delta Zone Systems</title>
+<link rel="stylesheet" href="./styles.css" />
+<style>
+  /* ── Page layout ── */
+  .stage{
+    justify-content: flex-start;
+    padding-top: 90px;
+    gap: 32px;
+  }
+
+  /* ── Back link ── */
+  .backLink{
+    position: fixed;
+    top: 22px;
+    left: 22px;
+    z-index: 1300;
+    font-size: 13px;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color .18s ease;
+    padding: 10px 6px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .backLink:hover{ color: var(--text); }
+
+  /* ── Page hero ── */
+  .loungeHero{
+    text-align: center;
+    max-width: 860px;
+    padding: 0 20px;
+  }
+  .loungeHero h1{
+    margin: 0 0 12px;
+    font-size: clamp(28px, 5vw, 60px);
+    font-weight: 800;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.38);
+    text-shadow:
+      0 0 4px rgba(255,255,255,.28),
+      0 0 16px rgba(120,0,255,.55),
+      0 0 26px rgba(0,190,255,.40);
+    animation:
+      loungePulse 5s ease-in-out infinite,
+      microPulseAggressive 2.2s ease-in-out infinite;
+    display: inline-block;
+    transform-origin: center;
+  }
+  .loungeHero p{
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: .32em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── Divider ── */
+  .loungeDivider{
+    width: min(680px, 90%);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(120,0,255,.45), rgba(0,190,255,.45), transparent);
+  }
+
+  /* ── Section wrapper ── */
+  .loungeSection{
+    width: min(980px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 0 16px;
+  }
+
+  .sectionLabel{
+    font-size: 11px;
+    letter-spacing: .34em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.40);
+    padding-left: 4px;
+  }
+
+  /* ── Card grid ── */
+  .cardGrid{
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  /* ── Lounge panel (larger glass block) ── */
+  .loungePanel{
+    width: 100%;
+    border-radius: 18px;
+    padding: 28px 24px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
+      radial-gradient(500px 160px at 15% 20%, rgba(120,0,255,.10), transparent 60%),
+      radial-gradient(500px 160px at 85% 75%, rgba(0,190,255,.10), transparent 60%),
+      rgba(8,10,18,.58);
+    border: 1px solid rgba(255,255,255,.14);
+    box-shadow: 0 18px 44px rgba(0,0,0,.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .loungePanel h2{
+    margin: 0 0 8px;
+    font-size: 13px;
+    letter-spacing: .30em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.55);
+  }
+
+  .placeholderBlock{
+    border-radius: 12px;
+    background: rgba(255,255,255,.04);
+    border: 1px dashed rgba(255,255,255,.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    color: rgba(255,255,255,.22);
+    font-size: 12px;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .placeholderBlock.tall{ min-height: 180px; }
+  .placeholderBlock.short{ min-height: 80px; }
+
+  /* ── Member card variant (accent purple) ── */
+  .memberCard{
+    background:
+      linear-gradient(180deg, rgba(120,0,255,.18), rgba(80,0,200,.08)) !important;
+    border: 1px solid rgba(150,80,255,.38) !important;
+    box-shadow:
+      0 16px 40px rgba(0,0,0,.28),
+      0 0 20px rgba(120,0,255,.16),
+      inset 0 1px 0 rgba(255,255,255,.18) !important;
+  }
+  .memberCard:hover{
+    transform: translateY(-3px);
+    border-color: rgba(180,120,255,.58) !important;
+    box-shadow:
+      0 22px 54px rgba(0,0,0,.55),
+      0 0 28px rgba(120,0,255,.28),
+      0 0 32px rgba(0,190,255,.14) !important;
+  }
+  .memberCard .cardLabel{ color: rgba(200,170,255,.80); }
+  .memberCard .cardValue{
+    color: rgba(220,200,255,.95);
+    font-size: 16px;
+    letter-spacing: .04em;
+    text-shadow:
+      0 0 8px rgba(160,80,255,.40),
+      0 0 18px rgba(120,0,255,.28);
+  }
+
+  /* ── Announcement card ── */
+  .announcementPanel{
+    width: 100%;
+    border-radius: 18px;
+    padding: 22px 22px;
+    background:
+      linear-gradient(180deg, rgba(255,215,120,.08), rgba(255,215,120,.02)),
+      rgba(8,10,18,.60);
+    border: 1px solid rgba(255,215,120,.28);
+    box-shadow:
+      0 16px 40px rgba(0,0,0,.38),
+      0 0 18px rgba(255,215,120,.10),
+      inset 0 1px 0 rgba(255,255,255,.10);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .announcementPanel h2{
+    margin: 0 0 6px;
+    font-size: 11px;
+    letter-spacing: .32em;
+    text-transform: uppercase;
+    color: rgba(255,215,120,.70);
+  }
+
+  /* ── Access badge ── */
+  .accessBadge{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: rgba(120,255,190,.90);
+    border: 1px solid rgba(0,255,170,.30);
+    background: rgba(0,255,170,.08);
+    text-shadow: 0 0 10px rgba(0,255,170,.30);
+  }
+  .accessBadge::before{
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(0,255,170,.85);
+    box-shadow: 0 0 8px rgba(0,255,170,.60);
+    flex-shrink: 0;
+  }
+
+  /* ── Lounge pulse animation ── */
+  @keyframes loungePulse{
+    0%{
+      text-shadow:
+        0 0 4px rgba(255,255,255,.22),
+        0 0 14px rgba(120,0,255,.45),
+        0 0 22px rgba(0,190,255,.30);
+    }
+    50%{
+      text-shadow:
+        0 0 8px rgba(255,255,255,.35),
+        0 0 24px rgba(120,0,255,.68),
+        0 0 34px rgba(0,190,255,.48);
+    }
+    100%{
+      text-shadow:
+        0 0 4px rgba(255,255,255,.22),
+        0 0 14px rgba(120,0,255,.45),
+        0 0 22px rgba(0,190,255,.30);
+    }
+  }
+
+  /* ── Responsive ── */
+  @media(max-width: 768px){
+    .cardGrid{ grid-template-columns: 1fr; }
+    .loungePanel{ padding: 22px 16px; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- STATIC BACKGROUND — no video -->
+<div class="bg">
+  <div class="bgOverlay"></div>
+  <div class="bgGlow"></div>
+</div>
+
+<!-- TOP TICKER -->
+<div class="topTicker" aria-hidden="true">
+  <div class="topTickerInner">
+    <span class="topLivePill">Members</span>
+    <div class="topTickerTrack">
+      <span class="topTickerText">
+        MEMBERS LOUNGE &nbsp;·&nbsp; DELTA ZONE SYSTEMS &nbsp;·&nbsp; EXCLUSIVE ACCESS &nbsp;·&nbsp;
+        MEMBERS LOUNGE &nbsp;·&nbsp; DELTA ZONE SYSTEMS &nbsp;·&nbsp; EXCLUSIVE ACCESS &nbsp;·&nbsp;
+        MEMBERS LOUNGE &nbsp;·&nbsp; DELTA ZONE SYSTEMS &nbsp;·&nbsp; EXCLUSIVE ACCESS &nbsp;·&nbsp;
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- BACK LINK -->
+<a href="./index.html" class="backLink" aria-label="Back to Delta Zone home">← Home</a>
+
+<main class="stage">
+
+  <!-- HERO -->
+  <section class="loungeHero" aria-label="Members Lounge">
+    <h1>Members Lounge</h1>
+    <p>Delta Zone Systems &nbsp;·&nbsp; Exclusive Access</p>
+  </section>
+
+  <div class="loungeDivider" aria-hidden="true"></div>
+
+  <!-- ACCESS STATUS -->
+  <section class="loungeSection" aria-label="Member status">
+    <div class="announcementPanel">
+      <h2>Member Status</h2>
+      <div class="placeholderBlock short">[ Member authentication / status UI goes here ]</div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="loungeSection" aria-label="Dashboard">
+    <div class="sectionLabel">Dashboard</div>
+    <div class="cardGrid">
+
+      <div class="glassCard memberCard" style="cursor:default; animation:none; opacity:1;">
+        <div class="cardLabel">Placeholder</div>
+        <div class="cardValue">My Programs</div>
+      </div>
+
+      <div class="glassCard memberCard" style="cursor:default; animation:none; opacity:1;">
+        <div class="cardLabel">Placeholder</div>
+        <div class="cardValue">My Progress</div>
+      </div>
+
+      <div class="glassCard memberCard" style="cursor:default; animation:none; opacity:1;">
+        <div class="cardLabel">Placeholder</div>
+        <div class="cardValue">My Coaching</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- EXCLUSIVE CONTENT -->
+  <section class="loungeSection" aria-label="Exclusive content">
+    <div class="sectionLabel">Exclusive Content</div>
+    <div class="loungePanel">
+      <h2>Content Library</h2>
+      <div class="placeholderBlock tall">[ Exclusive videos / articles / programs go here ]</div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY / ANNOUNCEMENTS -->
+  <section class="loungeSection" aria-label="Announcements">
+    <div class="sectionLabel">Announcements</div>
+    <div class="announcementPanel">
+      <h2>Latest Updates</h2>
+      <div class="placeholderBlock tall">[ Community posts / announcements / coach messages go here ]</div>
+    </div>
+  </section>
+
+  <!-- MEMBER RESOURCES -->
+  <section class="loungeSection" aria-label="Member resources">
+    <div class="sectionLabel">Resources</div>
+    <div class="cardGrid">
+
+      <div class="glassCard" style="cursor:default; animation:none; opacity:1;">
+        <div class="cardLabel">Placeholder</div>
+        <div class="cardValue">Member PDFs</div>
+      </div>
+
+      <div class="glassCard" style="cursor:default; animation:none; opacity:1;">
+        <div class="cardLabel">Placeholder</div>
+        <div class="cardValue">Workout Plans</div>
+      </div>
+
+      <div class="glassCard" style="cursor:default; animation:none; opacity:1;">
+        <div class="cardLabel">Placeholder</div>
+        <div class="cardValue">Nutrition Guides</div>
+      </div>
+
+      <div class="glassCard" style="cursor:default; animation:none; opacity:1;">
+        <div class="cardLabel">Placeholder</div>
+        <div class="cardValue">Live Sessions</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section class="loungeSection" aria-label="Member support">
+    <div class="sectionLabel">Support</div>
+    <div class="loungePanel">
+      <h2>Member Support</h2>
+      <div class="placeholderBlock short">[ Chat / ticket / direct support UI goes here ]</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER TICKER -->
+<div class="footerTicker" aria-hidden="true">
+  <div class="footerTickerInner">
+    <span class="footerLivePill">Live</span>
+    <div class="footerTickerTrack">
+      <span class="footerTickerText">
+        DELTA ZONE SYSTEMS &nbsp;·&nbsp; MEMBERS LOUNGE &nbsp;·&nbsp; TRAIN. PERFORM. EVOLVE. &nbsp;·&nbsp;
+        DELTA ZONE SYSTEMS &nbsp;·&nbsp; MEMBERS LOUNGE &nbsp;·&nbsp; TRAIN. PERFORM. EVOLVE. &nbsp;·&nbsp;
+        DELTA ZONE SYSTEMS &nbsp;·&nbsp; MEMBERS LOUNGE &nbsp;·&nbsp; TRAIN. PERFORM. EVOLVE. &nbsp;·&nbsp;
+      </span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
