@@ -729,8 +729,11 @@ body{
   }
 
   .paymentCardMain{
-    width:min(272px, 100%);
+    width:272px;
+    max-width:272px;
     padding:24px 20px;
+    align-self:center;
+    flex:0 0 272px;
   }
 
   .cardLabel{
