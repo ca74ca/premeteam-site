@@ -151,8 +151,8 @@ body{
 .glassCard{
   text-decoration:none;
   color:var(--text);
-  width:min(320px, 100%);
-  padding:16px 18px;
+  width:min(248px, 100%);
+  padding:12px 14px;
   border-radius:14px;
   display:flex;
   flex-direction:column;
@@ -189,7 +189,7 @@ body{
 }
 
 .cardLabel{
-  font-size:11px;
+  font-size:10px;
   letter-spacing:.22em;
   text-transform:uppercase;
   color:var(--muted);
@@ -197,7 +197,7 @@ body{
 
 .cardValue{
   margin-top:6px;
-  font-size:15px;
+  font-size:13px;
   letter-spacing:.03em;
 }
 
@@ -330,6 +330,35 @@ body{
   transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease, background .22s ease !important;
 }
 
+.paymentCardMain{
+  position:relative;
+  width:min(300px, 100%);
+  aspect-ratio:1 / 1;
+  border-radius:50%;
+  overflow:hidden;
+  justify-content:center;
+  padding:30px;
+  margin-bottom:10px;
+  align-self:center;
+}
+
+.paymentGlow{
+  position:absolute;
+  inset:8%;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,.45), transparent 35%),
+    radial-gradient(circle at 70% 70%, rgba(120,255,190,.22), transparent 40%),
+    radial-gradient(circle, rgba(190,255,220,.18), transparent 70%);
+  pointer-events:none;
+}
+
+.paymentCardContent{
+  position:relative;
+  z-index:1;
+  max-width:210px;
+}
+
 .paymentCard:hover{
   transform:translateY(-4px) scale(1.045) !important;
   border-color:rgba(170,255,210,.78) !important;
@@ -350,7 +379,7 @@ body{
 
 .paymentValue{
   display:inline-block;
-  font-size:17px;
+  font-size:20px;
   letter-spacing:.05em;
   text-transform:none;
   color:rgba(232,255,240,.96) !important;
@@ -363,7 +392,7 @@ body{
 
 .paymentSubtext{
   margin-top:7px;
-  font-size:13px;
+  font-size:12px;
   letter-spacing:.16em;
   text-transform:uppercase;
   color:rgba(218,255,232,.84);
@@ -676,17 +705,22 @@ body{
   .glassCard{
     width:100%;
     max-width:100%;
-    padding:14px;
+    padding:12px;
     border-radius:14px;
   }
 
+  .paymentCardMain{
+    width:min(272px, 100%);
+    padding:24px 20px;
+  }
+
   .cardLabel{
-    font-size:11px;
+    font-size:10px;
     letter-spacing:.14em;
   }
 
   .cardValue{
-    font-size:15px;
+    font-size:13px;
     line-height:1.35;
   }
 
@@ -794,7 +828,7 @@ body{
   }
 
   .paymentValue{
-    font-size:15px;
+    font-size:18px;
   }
 
   .paymentSubtext,
