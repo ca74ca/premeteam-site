@@ -151,8 +151,8 @@ body{
 .glassCard{
   text-decoration:none;
   color:var(--text);
-  width:min(248px, 100%);
-  padding:12px 14px;
+  width:min(212px, 100%);
+  padding:10px 12px;
   border-radius:14px;
   display:flex;
   flex-direction:column;
@@ -179,9 +179,15 @@ body{
     0 0 26px rgba(255,0,220,.12);
 }
 
-.socialRow .glassCard:nth-child(1){ animation-delay:5s; }
-.socialRow .glassCard:nth-child(2){ animation-delay:7s; }
-.socialRow .glassCard:nth-child(3){ animation-delay:9s; }
+.socialRow .glassCard:nth-child(1){ animation-delay:.08s; }
+.socialRow .glassCard:nth-child(2){ animation-delay:.16s; }
+.socialRow .glassCard:nth-child(3){ animation-delay:.24s; }
+.socialRow .glassCard:nth-child(4){ animation-delay:.32s; }
+.socialRow .glassCard:nth-child(5){ animation-delay:.40s; }
+.socialRow .glassCard:nth-child(6){ animation-delay:.48s; }
+.socialRow .glassCard:nth-child(7){ animation-delay:.56s; }
+.socialRow .glassCard:nth-child(8){ animation-delay:.64s; }
+.socialRow .glassCard:nth-child(9){ animation-delay:.72s; }
 
 .cardLabel,
 .cardValue{
@@ -189,7 +195,7 @@ body{
 }
 
 .cardLabel{
-  font-size:10px;
+  font-size:9px;
   letter-spacing:.22em;
   text-transform:uppercase;
   color:var(--muted);
@@ -197,7 +203,7 @@ body{
 
 .cardValue{
   margin-top:6px;
-  font-size:13px;
+  font-size:12px;
   letter-spacing:.03em;
 }
 
@@ -336,10 +342,14 @@ body{
   aspect-ratio:1 / 1;
   border-radius:50%;
   overflow:hidden;
+  display:flex;
+  align-items:center;
   justify-content:center;
+  text-align:center;
   padding:30px;
   margin-bottom:10px;
   align-self:center;
+  flex-shrink:0;
 }
 
 .paymentGlow{
@@ -356,7 +366,16 @@ body{
 .paymentCardContent{
   position:relative;
   z-index:1;
-  max-width:210px;
+  max-width:200px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.paymentCardMain .cardLabel,
+.paymentCardMain .cardValue,
+.paymentCardMain .paymentSubtext{
+  text-align:center;
 }
 
 .paymentCard:hover{
@@ -704,8 +723,8 @@ body{
 
   .glassCard{
     width:100%;
-    max-width:100%;
-    padding:12px;
+    max-width:210px;
+    padding:10px 12px;
     border-radius:14px;
   }
 
@@ -715,12 +734,12 @@ body{
   }
 
   .cardLabel{
-    font-size:10px;
+    font-size:9px;
     letter-spacing:.14em;
   }
 
   .cardValue{
-    font-size:13px;
+    font-size:12px;
     line-height:1.35;
   }
 
