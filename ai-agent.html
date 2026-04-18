@@ -135,10 +135,14 @@
     border-radius: 20px;
     display: grid;
     place-items: center;
-    font-size: 30px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
     border: 1px solid rgba(255,255,255,0.16);
     flex-shrink: 0;
+    color: rgba(255,255,255,0.88);
   }
 
   .avatar-meta strong,
@@ -326,15 +330,62 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 50px;
+    min-height: 52px;
     padding: 14px 16px;
     border-radius: 18px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(185,238,255,0.94));
-    color: #051018;
+    background: linear-gradient(135deg, rgba(34,197,94,0.22), rgba(210,255,230,0.12));
+    color: rgba(240,255,244,0.98);
     font-weight: 800;
     text-decoration: none;
-    border: 1px solid rgba(255,255,255,0.32);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+    border: 1px solid rgba(96,255,161,0.34);
+    box-shadow:
+      0 12px 30px rgba(0,0,0,0.18),
+      inset 0 1px 0 rgba(255,255,255,0.24),
+      0 0 24px rgba(34,197,94,0.18);
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+
+  .brain-cta:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, rgba(34,197,94,0.28), rgba(225,255,236,0.18));
+    box-shadow:
+      0 18px 36px rgba(0,0,0,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.28),
+      0 0 28px rgba(34,197,94,0.28);
+  }
+
+  .brain-cta:disabled {
+    opacity: 0.82;
+    cursor: progress;
+  }
+
+  .api-live-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .api-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(34,197,94,0.12);
+    border: 1px solid rgba(96,255,161,0.18);
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(236,255,242,0.96);
+  }
+
+  .api-chip.secondary {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.84);
   }
 
   .right-stage {
@@ -434,6 +485,56 @@
     padding: 0;
   }
 
+  .metric-with-dots {
+    display: grid;
+    gap: 10px;
+  }
+
+  .metric-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .metric-score {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.72);
+  }
+
+  .progress-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .progress-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+  }
+
+  .progress-dot.active.red {
+    background: #ef4444;
+    box-shadow: 0 0 12px rgba(239,68,68,0.65);
+  }
+
+  .progress-dot.active.orange {
+    background: #f59e0b;
+    box-shadow: 0 0 12px rgba(245,158,11,0.65);
+  }
+
+  .progress-dot.active.green {
+    background: #22c55e;
+    box-shadow: 0 0 12px rgba(34,197,94,0.7);
+  }
+
   .coach-brief {
     display: grid;
     gap: 12px;
@@ -494,6 +595,34 @@
 
   .pohe-meta strong {
     font-size: 14px;
+  }
+
+  .api-result {
+    margin-top: 14px;
+    padding: 14px 15px;
+    border-radius: 18px;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(96,255,161,0.18);
+    display: grid;
+    gap: 8px;
+  }
+
+  .api-result strong {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(233,255,241,0.96);
+  }
+
+  .api-result span,
+  .api-result li {
+    color: rgba(255,255,255,0.90);
+    line-height: 1.45;
+  }
+
+  .api-result ul {
+    margin: 4px 0 0 18px;
+    padding: 0;
   }
 
   .page-links {
@@ -563,7 +692,7 @@
 
         <div class="identity-block">
           <div class="avatar-card">
-            <div class="avatar-placeholder">🧠</div>
+            <div class="avatar-placeholder">AI</div>
             <div class="avatar-meta">
               <strong class="name">Jordan Athlete</strong>
               <span class="sub">Placeholder athlete profile · coach-facing view</span>
@@ -645,9 +774,17 @@
           </div>
         </div>
 
-        <a class="brain-cta" href="mailto:support@deltazonesystem.com?subject=Build%20Today%E2%80%99s%20Session">
+        <button id="buildSessionBtn" class="brain-cta" type="button">
           Build Today’s Session
-        </a>
+        </button>
+
+        <div class="api-live-row" aria-label="API connection state">
+          <span class="api-chip">
+            <span class="dot green"></span>
+            <span id="connectionLabel">API connected</span>
+          </span>
+          <span class="api-chip secondary">User ready to build</span>
+        </div>
       </aside>
 
       <!-- RIGHT STAGE -->
@@ -672,19 +809,31 @@
           <div class="card">
             <h3>Snapshot Data</h3>
             <div class="snapshot-grid">
-              <div class="snapshot-item">
+              <div class="snapshot-item metric-with-dots" data-score="82">
                 <strong>Recovery Score</strong>
-                <span>82 / 100</span>
+                <div class="metric-topline">
+                  <span>82 / 100</span>
+                  <span class="metric-score">Readiness</span>
+                </div>
+                <div class="progress-dots" aria-label="Recovery score progression"></div>
               </div>
 
-              <div class="snapshot-item">
+              <div class="snapshot-item metric-with-dots" data-score="76">
                 <strong>Sleep Hours</strong>
-                <span>7.6 hours</span>
+                <div class="metric-topline">
+                  <span>7.6 hours</span>
+                  <span class="metric-score">76 / 100</span>
+                </div>
+                <div class="progress-dots" aria-label="Sleep progression"></div>
               </div>
 
-              <div class="snapshot-item">
+              <div class="snapshot-item metric-with-dots" data-score="61">
                 <strong>HRV</strong>
-                <span>61 ms</span>
+                <div class="metric-topline">
+                  <span>61 ms</span>
+                  <span class="metric-score">61 / 100</span>
+                </div>
+                <div class="progress-dots" aria-label="HRV progression"></div>
               </div>
 
               <div class="snapshot-item">
@@ -741,6 +890,11 @@
                 <span class="value">Push quality, not chaos. If movement speed drops or breathing gets sloppy, trim volume and keep the session honest.</span>
               </div>
             </div>
+
+            <div class="api-result" id="sessionOutput" aria-live="polite">
+              <strong>Workout Builder Ready</strong>
+              <span>Click Build Today’s Session to generate a workout from your backend connection.</span>
+            </div>
           </div>
         </div>
 
@@ -751,5 +905,116 @@
       </section>
     </section>
   </main>
+  <script>
+    const buildSessionBtn = document.getElementById('buildSessionBtn');
+    const sessionOutput = document.getElementById('sessionOutput');
+    const connectionLabel = document.getElementById('connectionLabel');
+
+    const athletePayload = {
+      athleteName: 'Jordan Athlete',
+      recoveryScore: 82,
+      sleepHours: 7.6,
+      hrv: 61,
+      goal: 'Improve race-day stamina while maintaining strength output.',
+      recentWorkouts: [
+        'Tempo Run · 35 min',
+        'Sled Push Intervals · 6 rounds',
+        'Upper Body Strength · 45 min'
+      ],
+      lastStrengthRecorded: 'Back Squat · 225 lb x 3',
+      previousWeekClassSessions: 4
+    };
+
+    const apiEndpoint = window.DELTA_AGENT_API_URL || '/api/generate-workout';
+
+    function getScoreColor(score) {
+      if (score <= 40) return 'red';
+      if (score <= 75) return 'orange';
+      return 'green';
+    }
+
+    function renderMetricDots() {
+      const metrics = document.querySelectorAll('.metric-with-dots');
+
+      metrics.forEach((metric) => {
+        const score = Number(metric.dataset.score || 0);
+        const dotWrap = metric.querySelector('.progress-dots');
+        if (!dotWrap) return;
+
+        const activeDots = Math.max(1, Math.min(6, Math.round(score / 100 * 6)));
+        const colorClass = getScoreColor(score);
+        dotWrap.innerHTML = '';
+
+        for (let i = 0; i < 6; i += 1) {
+          const dot = document.createElement('span');
+          dot.className = 'progress-dot';
+          if (i < activeDots) {
+            dot.classList.add('active', colorClass);
+          }
+          dotWrap.appendChild(dot);
+        }
+      });
+    }
+
+    function renderWorkoutCard(data, sourceLabel) {
+      const mainSet = Array.isArray(data.mainSet) ? data.mainSet : [
+        '3 rounds · 500m row',
+        '8 front squats',
+        '10 burpees over erg'
+      ];
+
+      sessionOutput.innerHTML = `
+        <strong>${sourceLabel}</strong>
+        <span><strong>Objective:</strong> ${data.sessionObjective || 'Hybrid engine and strength development.'}</span>
+        <span><strong>Warm-up:</strong> ${data.warmup || '8 minutes easy cardio and dynamic prep.'}</span>
+        <ul>${mainSet.map(item => `<li>${item}</li>`).join('')}</ul>
+        <span><strong>Finisher:</strong> ${data.finisher || '5 minutes downregulation and cooldown.'}</span>
+      `;
+    }
+
+    async function buildSession() {
+      buildSessionBtn.disabled = true;
+      buildSessionBtn.textContent = 'Generating Workout...';
+      connectionLabel.textContent = 'Building session';
+      sessionOutput.innerHTML = '<strong>Generating Workout</strong><span>Calling your backend and assembling the athlete session now.</span>';
+
+      try {
+        const response = await fetch(apiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(athletePayload)
+        });
+
+        if (!response.ok) {
+          throw new Error('Backend request failed');
+        }
+
+        const data = await response.json();
+        connectionLabel.textContent = 'API connected';
+        renderWorkoutCard(data, 'Workout Generated');
+      } catch (error) {
+        connectionLabel.textContent = 'API fallback ready';
+        renderWorkoutCard({
+          sessionObjective: 'Protect quality while progressing threshold work.',
+          warmup: '6 min bike, mobility flow, 2 progressive accelerations.',
+          mainSet: [
+            '4 x 3 min threshold effort / 90 sec easy',
+            '3 sets · 6 front squat + 8 push press',
+            '6 min easy cooldown walk'
+          ],
+          finisher: 'Breathing reset and posterior-chain recovery.'
+        }, 'Preview Workout Ready');
+      } finally {
+        buildSessionBtn.disabled = false;
+        buildSessionBtn.textContent = 'Build Today’s Session';
+      }
+    }
+
+    renderMetricDots();
+    buildSessionBtn.addEventListener('click', buildSession);
+  </script>
 </body>
 </html>
