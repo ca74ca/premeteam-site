@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Agent | Delta Zone Systems</title>
+<link rel="stylesheet" href="./styles.css" />
+<style>
+  :root {
+    --bg-1: #030712;
+    --bg-2: #071120;
+    --bg-3: #0b1020;
+    --text: rgba(255,255,255,0.96);
+    --muted: rgba(255,255,255,0.68);
+    --soft: rgba(255,255,255,0.10);
+    --soft-2: rgba(255,255,255,0.14);
+    --border: rgba(255,255,255,0.16);
+    --card: linear-gradient(180deg, rgba(255,255,255,0.13), rgba(255,255,255,0.05));
+    --shadow: 0 24px 80px rgba(0,0,0,0.38);
+    --green: #22c55e;
+    --red: #ef4444;
+    --blue: #5ee7ff;
+    --purple: #9f67ff;
+    --amber: #f59e0b;
+  }
+
+  * { box-sizing: border-box; }
+
+  body.ai-agent-body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(900px 540px at 10% 16%, rgba(0, 208, 255, 0.16), transparent 62%),
+      radial-gradient(900px 500px at 88% 8%, rgba(155, 92, 255, 0.16), transparent 58%),
+      linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+    color: var(--text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  .ai-agent-shell {
+    min-height: 100vh;
+    padding: 28px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-agent-layout {
+    width: min(1320px, 100%);
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .glass-panel {
+    position: relative;
+    overflow: hidden;
+    border-radius: 30px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.14);
+    backdrop-filter: blur(20px) saturate(145%);
+    -webkit-backdrop-filter: blur(20px) saturate(145%);
+  }
+
+  .glass-panel::before {
+    content: "";
+    position: absolute;
+    inset: -20% auto auto -12%;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.22), transparent 66%);
+    pointer-events: none;
+  }
+
+  .left-rail {
+    padding: 26px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .eyebrow {
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .rail-title {
+    margin: 2px 0 0;
+    font-size: 34px;
+    line-height: 0.98;
+    letter-spacing: -0.05em;
+    font-weight: 800;
+  }
+
+  .rail-subtitle {
+    margin: 0;
+    color: rgba(255,255,255,0.82);
+    line-height: 1.55;
+    font-size: 14px;
+  }
+
+  .identity-block,
+  .status-stack,
+  .metric-strip,
+  .decision-card {
+    position: relative;
+    z-index: 1;
+  }
+
+  .identity-block {
+    display: grid;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  .avatar-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .avatar-placeholder {
+    width: 66px;
+    height: 66px;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+    font-size: 30px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+    border: 1px solid rgba(255,255,255,0.16);
+    flex-shrink: 0;
+  }
+
+  .avatar-meta strong,
+  .avatar-meta span {
+    display: block;
+  }
+
+  .avatar-meta .name {
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  .avatar-meta .sub {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 6px;
+  }
+
+  .stack-card {
+    padding: 14px 15px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .stack-label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .stack-value {
+    display: block;
+    font-size: 16px;
+    line-height: 1.35;
+    font-weight: 700;
+  }
+
+  .status-stack {
+    display: grid;
+    gap: 10px;
+    margin-top: 2px;
+  }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 13px 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+
+  .status-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .status-copy .top {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .status-copy .bottom {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.25;
+    word-break: break-word;
+  }
+
+  .status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.04);
+    flex-shrink: 0;
+  }
+
+  .dot.green {
+    background: var(--green);
+    box-shadow:
+      0 0 0 4px rgba(34,197,94,0.10),
+      0 0 14px rgba(34,197,94,0.65);
+    animation: pulseGreen 1.6s infinite;
+  }
+
+  .dot.red {
+    background: var(--red);
+    box-shadow:
+      0 0 0 4px rgba(239,68,68,0.10),
+      0 0 14px rgba(239,68,68,0.45);
+  }
+
+  .dot.amber {
+    background: var(--amber);
+    box-shadow:
+      0 0 0 4px rgba(245,158,11,0.10),
+      0 0 14px rgba(245,158,11,0.45);
+  }
+
+  @keyframes pulseGreen {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.18); opacity: 0.82; }
+  }
+
+  .metric-strip {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .mini-metric {
+    padding: 14px 14px 15px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+
+  .mini-metric .k {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+
+  .mini-metric .v {
+    display: block;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .mini-metric .hint {
+    display: block;
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .decision-card {
+    padding: 16px 16px 18px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(94,231,255,0.10), rgba(255,255,255,0.06));
+    border: 1px solid rgba(94,231,255,0.18);
+  }
+
+  .decision-title {
+    margin: 0 0 9px;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.74);
+  }
+
+  .decision-text {
+    margin: 0;
+    line-height: 1.55;
+    font-size: 15px;
+    color: rgba(255,255,255,0.92);
+  }
+
+  .brain-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 50px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(185,238,255,0.94));
+    color: #051018;
+    font-weight: 800;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.32);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  }
+
+  .right-stage {
+    padding: 26px;
+    display: grid;
+    gap: 18px;
+  }
+
+  .stage-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .stage-top h2 {
+    margin: 4px 0 0;
+    font-size: 30px;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .stage-top p {
+    margin: 10px 0 0;
+    color: var(--muted);
+    max-width: 760px;
+    line-height: 1.55;
+  }
+
+  .stage-badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .badge {
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .output-grid {
+    display: grid;
+    grid-template-columns: 1.04fr 0.96fr;
+    gap: 16px;
+  }
+
+  .card {
+    padding: 18px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+
+  .card h3 {
+    margin: 0 0 12px;
+    font-size: 13px;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.70);
+  }
+
+  .snapshot-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .snapshot-item {
+    padding: 14px 15px;
+    border-radius: 18px;
+    background: rgba(8, 14, 28, 0.42);
+    border: 1px solid rgba(255,255,255,0.09);
+  }
+
+  .snapshot-item strong {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 11px;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .snapshot-item span,
+  .snapshot-item ul {
+    color: rgba(255,255,255,0.92);
+    line-height: 1.45;
+  }
+
+  .snapshot-item ul {
+    margin: 8px 0 0 18px;
+    padding: 0;
+  }
+
+  .coach-brief {
+    display: grid;
+    gap: 12px;
+  }
+
+  .brief-block {
+    padding: 14px 15px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+
+  .brief-block .label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 11px;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .brief-block .value {
+    display: block;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 700;
+  }
+
+  .pohe-score {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+
+  .pohe-number {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+  }
+
+  .pohe-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pohe-meta small {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .pohe-meta strong {
+    font-size: 14px;
+  }
+
+  .page-links {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  .page-links a {
+    text-decoration: none;
+    color: #061018;
+    background: rgba(255,255,255,0.90);
+    border: 1px solid rgba(255,255,255,0.38);
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-weight: 800;
+  }
+
+  .page-links a.secondary {
+    color: rgba(255,255,255,0.92);
+    background: rgba(255,255,255,0.08);
+  }
+
+  @media (max-width: 1100px) {
+    .ai-agent-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .output-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .left-rail,
+    .right-stage {
+      padding: 20px;
+    }
+
+    .metric-strip {
+      grid-template-columns: 1fr;
+    }
+
+    .stage-top {
+      flex-direction: column;
+    }
+
+    .stage-badges {
+      justify-content: flex-start;
+    }
+  }
+</style>
+</head>
+<body class="ai-agent-body">
+  <main class="ai-agent-shell">
+    <section class="ai-agent-layout" aria-label="Delta Zone AI Agent dashboard">
+      <!-- LEFT RAIL -->
+      <aside class="glass-panel left-rail">
+        <div>
+          <p class="eyebrow">Delta Zone AI Agent</p>
+          <h1 class="rail-title">Today’s Adaptive Session</h1>
+          <p class="rail-subtitle">
+            Live athlete readiness, connection state, and coaching logic are being interpreted before the session is built.
+          </p>
+        </div>
+
+        <div class="identity-block">
+          <div class="avatar-card">
+            <div class="avatar-placeholder">🧠</div>
+            <div class="avatar-meta">
+              <strong class="name">Jordan Athlete</strong>
+              <span class="sub">Placeholder athlete profile · coach-facing view</span>
+            </div>
+          </div>
+
+          <div class="stack-card">
+            <span class="stack-label">Gym / Location</span>
+            <span class="stack-value">Delta Zone Systems · Placeholder Gym</span>
+          </div>
+
+          <div class="stack-card">
+            <span class="stack-label">Coach / Trainer</span>
+            <span class="stack-value">Coach Delta · ID #DZ-2048</span>
+          </div>
+        </div>
+
+        <div class="status-stack">
+          <div class="status-row">
+            <div class="status-copy">
+              <span class="top">Wearable Connection</span>
+              <span class="bottom">WHOOP 5.0 Connected</span>
+            </div>
+            <div class="status-indicator">
+              <span class="dot green"></span>
+              Live
+            </div>
+          </div>
+
+          <div class="status-row">
+            <div class="status-copy">
+              <span class="top">Gym Membership</span>
+              <span class="bottom">Active Member Status</span>
+            </div>
+            <div class="status-indicator">
+              <span class="dot green"></span>
+              Active
+            </div>
+          </div>
+
+          <div class="status-row">
+            <div class="status-copy">
+              <span class="top">Current Engagement</span>
+              <span class="bottom">Currently engaged with agent workflow</span>
+            </div>
+            <div class="status-indicator">
+              <span class="dot green"></span>
+              Engaged
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-strip">
+          <div class="mini-metric">
+            <span class="k">Sessions Used</span>
+            <span class="v">18</span>
+            <span class="hint">Current cycle</span>
+          </div>
+
+          <div class="mini-metric">
+            <span class="k">Session Window</span>
+            <span class="v">45m</span>
+            <span class="hint">Today’s allocation</span>
+          </div>
+        </div>
+
+        <div class="decision-card">
+          <p class="decision-title">Agent Decision</p>
+          <p class="decision-text">
+            Recovery is stable enough to train. Recent workload supports a controlled hybrid session, but the build should stay honest to fatigue and avoid junk volume.
+          </p>
+
+          <div class="pohe-score">
+            <span class="pohe-number">91</span>
+            <div class="pohe-meta">
+              <small>POHE Score</small>
+              <strong>Verified / High trust signal</strong>
+            </div>
+          </div>
+        </div>
+
+        <a class="brain-cta" href="mailto:support@deltazonesystem.com?subject=Build%20Today%E2%80%99s%20Session">
+          Build Today’s Session
+        </a>
+      </aside>
+
+      <!-- RIGHT STAGE -->
+      <section class="glass-panel right-stage">
+        <div class="stage-top">
+          <div>
+            <p class="eyebrow">Live Athlete Context</p>
+            <h2>Athlete Snapshot</h2>
+            <p>
+              This surface is ready to receive API data from Varacis. The left rail handles identity and connection status. The right stage handles readiness, training history, and session intelligence.
+            </p>
+          </div>
+
+          <div class="stage-badges">
+            <span class="badge">API Ready</span>
+            <span class="badge">Coach Facing</span>
+            <span class="badge">POHE Enabled</span>
+          </div>
+        </div>
+
+        <div class="output-grid">
+          <div class="card">
+            <h3>Snapshot Data</h3>
+            <div class="snapshot-grid">
+              <div class="snapshot-item">
+                <strong>Recovery Score</strong>
+                <span>82 / 100</span>
+              </div>
+
+              <div class="snapshot-item">
+                <strong>Sleep Hours</strong>
+                <span>7.6 hours</span>
+              </div>
+
+              <div class="snapshot-item">
+                <strong>HRV</strong>
+                <span>61 ms</span>
+              </div>
+
+              <div class="snapshot-item">
+                <strong>Goal</strong>
+                <span>Improve race-day stamina while maintaining strength output.</span>
+              </div>
+
+              <div class="snapshot-item">
+                <strong>Last Strength Recorded</strong>
+                <span>Back Squat · 225 lb x 3</span>
+              </div>
+
+              <div class="snapshot-item">
+                <strong>Previous Week Class Sessions</strong>
+                <span>4 completed sessions</span>
+              </div>
+
+              <div class="snapshot-item">
+                <strong>Last 3 Workouts</strong>
+                <ul>
+                  <li>Tempo Run · 35 min</li>
+                  <li>Sled Push Intervals · 6 rounds</li>
+                  <li>Upper Body Strength · 45 min</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Coach Brief</h3>
+            <div class="coach-brief">
+              <div class="brief-block">
+                <span class="label">Session Objective</span>
+                <span class="value">Build aerobic power without flattening lower-body output.</span>
+              </div>
+
+              <div class="brief-block">
+                <span class="label">Why Today</span>
+                <span class="value">Readiness is good enough to progress quality work, but recent class density means the session should stay sharp, not bloated.</span>
+              </div>
+
+              <div class="brief-block">
+                <span class="label">Recommended Mode</span>
+                <span class="value">Hybrid strength + threshold control.</span>
+              </div>
+
+              <div class="brief-block">
+                <span class="label">Primary Constraint</span>
+                <span class="value">Watch posterior-chain fatigue and avoid unnecessary volume spikes after the main lift.</span>
+              </div>
+
+              <div class="brief-block">
+                <span class="label">Coach Note</span>
+                <span class="value">Push quality, not chaos. If movement speed drops or breathing gets sloppy, trim volume and keep the session honest.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-links">
+          <a href="./index.html">Back to Home</a>
+          <a class="secondary" href="mailto:support@deltazonesystem.com?subject=Refresh%20Athlete%20Data">Refresh Athlete Data</a>
+        </div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>
