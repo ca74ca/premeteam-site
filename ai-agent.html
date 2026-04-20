@@ -744,6 +744,19 @@
     margin-top: 10px;
   }
 
+  .todays-program-output .result-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .todays-program-output .result-meta-item small,
+  .todays-program-output .result-meta-item strong,
+  .todays-program-output .program-block-objective,
+  .todays-program-output .tight-list li {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
   .result-meta-item {
     padding: 10px 12px;
     border-radius: 14px;
@@ -959,6 +972,10 @@
     }
 
     .coach-form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .result-meta-grid {
       grid-template-columns: 1fr;
     }
   }
