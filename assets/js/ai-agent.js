@@ -814,8 +814,6 @@ async function loadAthleteContextForSelection() {
     }
   }
 
-  hydrateCoachPromptFromCache(athleteId);
-
   const cachedResponse = getCachedAgentResponse(athleteId);
   if (cachedResponse) {
     const cachedData = normalizeWorkoutResponse(cachedResponse, selectedAthlete);
