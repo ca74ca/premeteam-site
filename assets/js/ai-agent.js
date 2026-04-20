@@ -602,6 +602,7 @@ function renderWorkoutCard(data, sourceLabel) {
   const warmupItems = Array.isArray(session.warmup)
     ? session.warmup.flatMap((block) => (block.items || []).map((item) => `${block.title}: ${item}`))
     : [];
+
   const cooldownItems = Array.isArray(session.cooldown)
     ? session.cooldown.flatMap((block) => (block.items || []).map((item) => `${block.title}: ${item}`))
     : [];
@@ -657,6 +658,7 @@ function renderWorkoutCard(data, sourceLabel) {
     ${tags.length ? `<div class="compact-tags">${tags.map((item) => `<span>${item}</span>`).join("")}</div>` : ""}
   `;
 }
+
 
 function buildPayload() {
   const selectedAthleteId = athleteSelectInput?.value?.trim();
