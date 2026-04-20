@@ -887,6 +887,14 @@
     gap: 12px;
   }
 
+  .left-rail .coach-corner {
+    margin-top: 2px;
+  }
+
+  .left-rail .coach-form-row {
+    grid-template-columns: 1fr;
+  }
+
   .coach-field {
     display: grid;
     gap: 7px;
@@ -1085,24 +1093,6 @@
           </span>
           <span class="api-chip secondary">User ready to build</span>
         </div>
-      </aside>
-
-      <!-- RIGHT STAGE -->
-      <section class="glass-panel right-stage">
-        <div class="stage-top">
-          <div>
-            <p class="eyebrow">Live Athlete Context</p>
-            <h2>Athlete Snapshot</h2>
-          </div>
-        </div>
-
-        <div class="card todays-program-card">
-          <h3>TODAYS PROGRAM</h3>
-          <div class="api-result todays-program-output" id="sessionOutput" aria-live="polite">
-            <strong>Workout Builder Ready</strong>
-            <span>Click Build Today’s Session to generate a workout from your backend connection.</span>
-          </div>
-        </div>
 
         <div class="card coach-corner">
           <div class="coach-pill">Coach's Corner</div>
@@ -1143,6 +1133,26 @@
             </div>
           </div>
         </div>
+      </aside>
+
+      <!-- RIGHT STAGE -->
+      <section class="glass-panel right-stage">
+        <div class="stage-top">
+          <div>
+            <p class="eyebrow">Live Athlete Context</p>
+            <h2>Athlete Snapshot</h2>
+          </div>
+        </div>
+
+        <div class="card todays-program-card">
+          <h3>TODAYS PROGRAM</h3>
+          <div class="api-result todays-program-output" id="sessionOutput" aria-live="polite">
+            <strong>Workout Builder Ready</strong>
+            <span>Click Build Today’s Session to generate a workout from your backend connection.</span>
+          </div>
+        </div>
+
+
 
         <div class="output-grid">
           <div class="card">
