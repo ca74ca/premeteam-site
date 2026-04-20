@@ -324,6 +324,7 @@
     font-size: 15px;
     color: rgba(255,255,255,0.92);
     display: -webkit-box;
+    line-clamp: 4;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -565,6 +566,7 @@
     font-size: 16px;
     line-height: 1.5;
     font-weight: 700;
+    line-clamp: 3;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -763,7 +765,7 @@
 
   .coach-form-row {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
   }
 
@@ -849,6 +851,10 @@
 
     .stage-badges {
       justify-content: flex-start;
+    }
+
+    .coach-form-row {
+      grid-template-columns: 1fr;
     }
   }
 </style>
@@ -990,8 +996,12 @@
           <div class="coach-form">
             <div class="coach-form-row">
               <label class="coach-field">
-                <span>Member ID</span>
-                <input id="memberIdInput" value="delta-athlete-001" />
+                <span>Gym</span>
+                <select id="gymSelectInput" aria-label="Select gym"></select>
+              </label>
+              <label class="coach-field">
+                <span>Athlete</span>
+                <select id="athleteSelectInput" aria-label="Select athlete"></select>
               </label>
               <label class="coach-field">
                 <span>Coach</span>
@@ -1007,7 +1017,7 @@
               </label>
             </div>
 
-            <label class="coach-field">
+            <label id="backendUrlField" class="coach-field">
               <span>Direct Backend URL</span>
               <input id="backendUrlInput" placeholder="https://www.varacis.com/api/coach-prompt-agent" />
             </label>
@@ -1129,9 +1139,11 @@
     const buildSessionBtn = document.getElementById('buildSessionBtn');
     const sessionOutput = document.getElementById('sessionOutput');
     const connectionLabel = document.getElementById('connectionLabel');
-    const memberIdInput = document.getElementById('memberIdInput');
+    const gymSelectInput = document.getElementById('gymSelectInput');
+    const athleteSelectInput = document.getElementById('athleteSelectInput');
     const coachNameInput = document.getElementById('coachNameInput');
     const durationInput = document.getElementById('durationInput');
+    const backendUrlField = document.getElementById('backendUrlField');
     const backendUrlInput = document.getElementById('backendUrlInput');
     const coachPromptInput = document.getElementById('coachPromptInput');
 
@@ -1222,6 +1234,36 @@
     };
 
     const BACKEND_URL_STORAGE_KEY = 'deltaAgentBackendUrl';
+    const fallbackGyms = [
+      { id: 'gym-delta-zone', name: 'Delta Zone Systems' }
+    ];
+    const fallbackAthletesByGym = {
+      'gym-delta-zone': [
+        {
+          id: 'delta-athlete-001',
+          name: 'Jordan Athlete',
+          coach_name: 'Coach Delta',
+          experience_level: 'intermediate',
+          primary_goal: 'HYROX performance'
+        },
+        {
+          id: 'delta-athlete-002',
+          name: 'Avery Runner',
+          coach_name: 'Coach Delta',
+          experience_level: 'advanced',
+          primary_goal: 'Race-day stamina'
+        }
+      ]
+    };
+
+    let currentApiRoot = '';
+    let currentAthleteContext = null;
+    let loadedAthletes = [];
+
+    function isProductionHost() {
+      const { hostname } = window.location;
+      return hostname.includes('deltazonesystem.com');
+    }
 
     function resolveVaracisEndpoint() {
       const savedUrl = typeof window !== 'undefined'
@@ -1240,6 +1282,326 @@
         return `${protocol}//${backendHost}/api/coach-prompt-agent`;
       }
       return 'http://localhost:3000/api/coach-prompt-agent';
+    }
+
+    function getApiRoot(apiEndpoint) {
+      try {
+        const url = new URL(apiEndpoint, window.location.origin);
+        return `${url.protocol}//${url.host}`;
+      } catch (error) {
+        return window.location.origin;
+      }
+    }
+
+    function safeId(value, fallbackValue) {
+      const text = String(value || '').trim();
+      return text || fallbackValue;
+    }
+
+    function normalizeGym(rawGym, index) {
+      return {
+        id: safeId(rawGym?.id || rawGym?.gym_id || rawGym?.slug, `gym-${index + 1}`),
+        name: String(rawGym?.name || rawGym?.gym_name || rawGym?.title || `Gym ${index + 1}`)
+      };
+    }
+
+    function normalizeAthlete(rawAthlete, index) {
+      const athleteId = safeId(rawAthlete?.id || rawAthlete?.member_id || rawAthlete?.athlete_id, `athlete-${index + 1}`);
+      return {
+        id: athleteId,
+        name: String(rawAthlete?.name || rawAthlete?.full_name || rawAthlete?.member_name || athleteId),
+        coach_name: String(rawAthlete?.coach_name || rawAthlete?.coach || coachNameInput.value || athletePayload.coach_name),
+        experience_level: String(rawAthlete?.experience_level || athletePayload.intake.experience_level),
+        primary_goal: String(rawAthlete?.primary_goal || athletePayload.intake.primary_goal)
+      };
+    }
+
+    function setSelectOptions(selectNode, options, placeholderLabel) {
+      if (!selectNode) return;
+
+      const renderedOptions = [`<option value="">${placeholderLabel}</option>`]
+        .concat(options.map((option) => `<option value="${option.id}">${option.name}</option>`));
+      selectNode.innerHTML = renderedOptions.join('');
+    }
+
+    async function fetchJson(url) {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { Accept: 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed (${response.status})`);
+      }
+
+      return response.json();
+    }
+
+    function unwrapPayload(result) {
+      if (!result || typeof result !== 'object') return result;
+      if (result.data && typeof result.data === 'object') return result.data;
+      if (result.payload && typeof result.payload === 'object') return result.payload;
+      return result;
+    }
+
+    function firstArrayFromObject(result, keys) {
+      const payload = unwrapPayload(result);
+      if (Array.isArray(payload)) return payload;
+      for (const key of keys) {
+        if (Array.isArray(payload?.[key])) return payload[key];
+      }
+      return [];
+    }
+
+    async function fetchJsonFromCandidates(urls) {
+      let lastError = null;
+      for (const url of urls) {
+        try {
+          return await fetchJson(url);
+        } catch (error) {
+          lastError = error;
+        }
+      }
+      throw lastError || new Error('No valid endpoint candidates');
+    }
+
+    function normalizeAthleteContext(result, fallbackAthlete) {
+      const payload = unwrapPayload(result) || {};
+      if (payload.member_context || payload.session_output || payload.programming_logic) {
+        return payload;
+      }
+
+      const fallback = fallbackContextForAthlete(fallbackAthlete);
+      const member = payload.member || payload.athlete || payload.user || payload.profile || {};
+      const recovery = payload.recovery_signals || payload.recovery || member.recovery_signals || member.recovery || {};
+      const session = payload.session || payload.workout || payload.plan || payload.session_plan || {};
+      const logic = payload.logic || payload.programming || payload.programming_logic || {};
+      const sessionMainWorkout = Array.isArray(session.main_workout)
+        ? session.main_workout
+        : (Array.isArray(session.blocks) ? session.blocks : fallback.session_output.main_workout);
+
+      return {
+        member_context: {
+          ...fallback.member_context,
+          member_id: member.member_id || member.id || member.athlete_id || fallback.member_context.member_id,
+          coach_name: member.coach_name || member.coach || fallback.member_context.coach_name,
+          duration_min: member.duration_min || payload.duration_min || fallback.member_context.duration_min,
+          experience_level: member.experience_level || member.level || fallback.member_context.experience_level,
+          primary_goal: member.primary_goal || member.goal || fallback.member_context.primary_goal,
+          readiness_score: member.readiness_score ?? recovery.readiness_score ?? recovery.recovery_score ?? fallback.member_context.readiness_score,
+          pohe_engagement_score: member.pohe_engagement_score ?? payload.pohe_engagement_score ?? fallback.member_context.pohe_engagement_score,
+          recovery_signals: {
+            sleep_hours: recovery.sleep_hours ?? recovery.sleep ?? fallback.member_context.recovery_signals.sleep_hours,
+            hrv_score: recovery.hrv_score ?? recovery.hrv ?? fallback.member_context.recovery_signals.hrv_score
+          },
+          previous_lifts: Array.isArray(member.previous_lifts) && member.previous_lifts.length
+            ? member.previous_lifts
+            : fallback.member_context.previous_lifts,
+          recent_training_balance: {
+            strength_heavy_sessions_this_week:
+              member.recent_training_balance?.strength_heavy_sessions_this_week
+              ?? payload.recent_training_balance?.strength_heavy_sessions_this_week
+              ?? fallback.member_context.recent_training_balance.strength_heavy_sessions_this_week
+          }
+        },
+        session_output: {
+          ...fallback.session_output,
+          session_focus: session.session_focus || session.focus || session.objective || fallback.session_output.session_focus,
+          session_intensity: session.session_intensity || session.intensity || fallback.session_output.session_intensity,
+          coach_summary: session.coach_summary || session.summary || payload.coach_summary || fallback.session_output.coach_summary,
+          session_intent: session.session_intent || session.intent || fallback.session_output.session_intent,
+          constraints_applied: Array.isArray(session.constraints_applied) ? session.constraints_applied : fallback.session_output.constraints_applied,
+          coach_cues: Array.isArray(session.coach_cues) ? session.coach_cues : fallback.session_output.coach_cues,
+          data_insights: {
+            readiness_score: session.data_insights?.readiness_score ?? payload.readiness_score ?? fallback.session_output.data_insights.readiness_score,
+            pohe_engagement_score: session.data_insights?.pohe_engagement_score ?? payload.pohe_engagement_score ?? fallback.session_output.data_insights.pohe_engagement_score,
+            pohe_verified: Boolean(session.data_insights?.pohe_verified ?? payload.pohe_verified ?? false)
+          },
+          coach_prompt_agent: {
+            prompt_summary: session.coach_prompt_agent?.prompt_summary || session.prompt_summary || fallback.session_output.coach_prompt_agent.prompt_summary
+          },
+          main_workout: sessionMainWorkout
+        },
+        programming_logic: {
+          ...fallback.programming_logic,
+          training_mode: logic.training_mode || logic.mode || payload.training_mode || fallback.programming_logic.training_mode,
+          intensity: logic.intensity || payload.intensity || fallback.programming_logic.intensity,
+          session_objective: logic.session_objective || logic.objective || payload.session_objective || fallback.programming_logic.session_objective,
+          recovery_status: logic.recovery_status || payload.recovery_status || fallback.programming_logic.recovery_status,
+          constraints_applied: Array.isArray(logic.constraints_applied) ? logic.constraints_applied : fallback.programming_logic.constraints_applied
+        }
+      };
+    }
+
+    function fallbackContextForAthlete(athlete) {
+      const selectedAthlete = athlete || {};
+      const durationMin = Number(durationInput.value || athletePayload.duration_min);
+      const readinessScore = athletePayload.wearable.recovery_score;
+
+      return {
+        member_context: {
+          member_id: selectedAthlete.id || athletePayload.member_id,
+          coach_name: selectedAthlete.coach_name || coachNameInput.value || athletePayload.coach_name,
+          duration_min: durationMin,
+          experience_level: selectedAthlete.experience_level || athletePayload.intake.experience_level,
+          primary_goal: selectedAthlete.primary_goal || athletePayload.intake.primary_goal,
+          readiness_score: readinessScore,
+          pohe_engagement_score: 91,
+          recovery_signals: {
+            sleep_hours: athletePayload.wearable.sleep_hours,
+            hrv_score: athletePayload.wearable.hrv_score
+          },
+          previous_lifts: athletePayload.previous_lifts,
+          recent_training_balance: {
+            strength_heavy_sessions_this_week: athletePayload.recent_training.strength_heavy_sessions_this_week
+          }
+        },
+        session_output: {
+          session_focus: 'Hybrid strength + threshold control',
+          session_intensity: 'MODERATE',
+          coach_summary: 'Preview context loaded. Connect API endpoints for full live roster and session history.',
+          session_intent: 'Train quality while protecting fatigue limits.',
+          constraints_applied: ['Keep posterior chain volume controlled'],
+          coach_cues: ['Respect RPE caps', 'Trim volume if quality drops'],
+          data_insights: {
+            readiness_score: readinessScore,
+            pohe_engagement_score: 91,
+            pohe_verified: false
+          },
+          coach_prompt_agent: {
+            prompt_summary: 'Preview mode context generated locally.'
+          },
+          main_workout: [
+            {
+              block: 'Block A',
+              exercises: [
+                { name: 'SkiErg threshold interval', reps: '5 minutes', effort: 'RPE 6-7' },
+                { name: 'Sled push', reps: '4 x 20m', effort: 'Controlled hard effort' }
+              ]
+            }
+          ]
+        },
+        programming_logic: {
+          training_mode: 'HYROX',
+          intensity: 'MODERATE',
+          session_objective: 'Engine quality with controlled strength work',
+          recovery_status: 'Preview Readiness',
+          constraints_applied: ['Avoid junk volume']
+        }
+      };
+    }
+
+    async function fetchGyms(apiRoot) {
+      const result = await fetchJsonFromCandidates([
+        `${apiRoot}/api/gyms`,
+        `${apiRoot}/gyms`,
+        `${apiRoot}/api/v1/gyms`
+      ]);
+      const gyms = firstArrayFromObject(result, ['gyms', 'items', 'results', 'data']);
+      return gyms.map(normalizeGym).filter((gym) => gym.id);
+    }
+
+    async function fetchAthletes(apiRoot, gymId) {
+      const encodedGymId = encodeURIComponent(gymId);
+      const result = await fetchJsonFromCandidates([
+        `${apiRoot}/api/gyms/${encodedGymId}/athletes`,
+        `${apiRoot}/api/gyms/${encodedGymId}/members`,
+        `${apiRoot}/gyms/${encodedGymId}/athletes`,
+        `${apiRoot}/api/athletes?gym_id=${encodedGymId}`,
+        `${apiRoot}/api/members?gym_id=${encodedGymId}`
+      ]);
+      const athletes = firstArrayFromObject(result, ['athletes', 'members', 'items', 'results', 'data']);
+      return athletes.map(normalizeAthlete).filter((athlete) => athlete.id);
+    }
+
+    async function fetchAthleteContext(apiRoot, athleteId) {
+      const encodedAthleteId = encodeURIComponent(athleteId);
+      return fetchJsonFromCandidates([
+        `${apiRoot}/api/athletes/${encodedAthleteId}/context`,
+        `${apiRoot}/api/members/${encodedAthleteId}/context`,
+        `${apiRoot}/api/athlete-context/${encodedAthleteId}`,
+        `${apiRoot}/api/athletes/${encodedAthleteId}`
+      ]);
+    }
+
+    function setRosterStatus(label, tone) {
+      if (!label) return;
+      connectionLabel.textContent = label;
+
+      const chip = connectionLabel.closest('.api-chip');
+      if (!chip) return;
+
+      chip.style.background = tone === 'warning' ? 'rgba(245,158,11,0.16)' : 'rgba(34,197,94,0.12)';
+      chip.style.borderColor = tone === 'warning' ? 'rgba(245,158,11,0.3)' : 'rgba(96,255,161,0.18)';
+    }
+
+    async function loadAthleteContextForSelection() {
+      const athleteId = athleteSelectInput?.value?.trim();
+      if (!athleteId) {
+        currentAthleteContext = null;
+        return;
+      }
+
+      const selectedAthlete = loadedAthletes.find((athlete) => athlete.id === athleteId);
+      if (selectedAthlete) {
+        setText(athleteNameEl, selectedAthlete.name);
+        setText(athleteSubEl, `${selectedAthlete.experience_level} athlete · coach-facing view`);
+        if (!coachNameInput.value.trim()) {
+          coachNameInput.value = selectedAthlete.coach_name;
+        }
+      }
+
+      try {
+        const liveContext = await fetchAthleteContext(currentApiRoot, athleteId);
+        currentAthleteContext = normalizeAthleteContext(liveContext, selectedAthlete);
+        applyLiveContext(currentAthleteContext);
+        setRosterStatus('Athlete context synced', 'ok');
+      } catch (error) {
+        currentAthleteContext = fallbackContextForAthlete(selectedAthlete);
+        applyLiveContext(currentAthleteContext);
+        setRosterStatus('Preview athlete context', 'warning');
+      }
+    }
+
+    async function loadAthletesForGymSelection() {
+      const gymId = gymSelectInput?.value?.trim();
+      if (!gymId) {
+        loadedAthletes = [];
+        setSelectOptions(athleteSelectInput, [], 'Select athlete');
+        return;
+      }
+
+      try {
+        loadedAthletes = await fetchAthletes(currentApiRoot, gymId);
+      } catch (error) {
+        loadedAthletes = (fallbackAthletesByGym[gymId] || fallbackAthletesByGym['gym-delta-zone'] || []).map(normalizeAthlete);
+      }
+
+      setSelectOptions(athleteSelectInput, loadedAthletes, 'Select athlete');
+      if (loadedAthletes[0]) {
+        athleteSelectInput.value = loadedAthletes[0].id;
+      }
+
+      await loadAthleteContextForSelection();
+    }
+
+    async function initializeDynamicRoster() {
+      const apiEndpoint = getApiEndpoint();
+      currentApiRoot = getApiRoot(apiEndpoint);
+
+      let gyms;
+      try {
+        gyms = await fetchGyms(currentApiRoot);
+      } catch (error) {
+        gyms = fallbackGyms;
+      }
+
+      setSelectOptions(gymSelectInput, gyms, 'Select gym');
+      if (gyms[0]) {
+        gymSelectInput.value = gyms[0].id;
+      }
+
+      await loadAthletesForGymSelection();
     }
 
     function getApiEndpoint() {
@@ -1297,12 +1659,32 @@
     }
 
     function buildPayload() {
+      const selectedAthleteId = athleteSelectInput?.value?.trim();
+      const selectedGymId = gymSelectInput?.value?.trim();
+      const member = currentAthleteContext?.member_context || {};
+      const recovery = member.recovery_signals || {};
+
       return {
         ...athletePayload,
         booking_id: `dz-${Date.now()}`,
-        member_id: memberIdInput.value.trim() || athletePayload.member_id,
-        coach_name: coachNameInput.value.trim() || athletePayload.coach_name,
+        gym_id: selectedGymId || 'gym-delta-zone',
+        member_id: selectedAthleteId || member.member_id || athletePayload.member_id,
+        coach_name: coachNameInput.value.trim() || member.coach_name || athletePayload.coach_name,
         duration_min: Number(durationInput.value || athletePayload.duration_min),
+        intake: {
+          ...athletePayload.intake,
+          experience_level: member.experience_level || athletePayload.intake.experience_level,
+          primary_goal: member.primary_goal || athletePayload.intake.primary_goal
+        },
+        wearable: {
+          ...athletePayload.wearable,
+          recovery_score: member.readiness_score ?? athletePayload.wearable.recovery_score,
+          sleep_hours: recovery.sleep_hours ?? athletePayload.wearable.sleep_hours,
+          hrv_score: recovery.hrv_score ?? athletePayload.wearable.hrv_score
+        },
+        previous_lifts: Array.isArray(member.previous_lifts) && member.previous_lifts.length
+          ? member.previous_lifts
+          : athletePayload.previous_lifts,
         coach_prompt: coachPromptInput.value.trim(),
         coach_notes: coachPromptInput.value.trim()
       };
@@ -1449,18 +1831,45 @@
     }
 
     const initialEndpoint = resolveVaracisEndpoint();
+    if (isProductionHost() && backendUrlField) {
+      backendUrlField.hidden = true;
+      if (backendUrlInput) {
+        backendUrlInput.setAttribute('aria-hidden', 'true');
+        backendUrlInput.tabIndex = -1;
+      }
+    }
+
     if (backendUrlInput) {
       backendUrlInput.value = initialEndpoint;
-      backendUrlInput.addEventListener('change', () => {
+      backendUrlInput.addEventListener('change', async () => {
         const nextUrl = backendUrlInput.value.trim();
         if (nextUrl && /^https?:\/\//i.test(nextUrl)) {
           window.localStorage.setItem(BACKEND_URL_STORAGE_KEY, nextUrl);
           connectionLabel.textContent = 'Custom backend saved';
+          await initializeDynamicRoster();
+        }
+      });
+    }
+
+    if (gymSelectInput) {
+      gymSelectInput.addEventListener('change', loadAthletesForGymSelection);
+    }
+
+    if (athleteSelectInput) {
+      athleteSelectInput.addEventListener('change', loadAthleteContextForSelection);
+    }
+
+    if (coachNameInput) {
+      coachNameInput.addEventListener('change', () => {
+        const nextCoach = coachNameInput.value.trim();
+        if (nextCoach && coachDisplayEl) {
+          setText(coachDisplayEl, `${nextCoach} · Session ready`);
         }
       });
     }
 
     renderMetricDots();
+    initializeDynamicRoster();
     buildSessionBtn.addEventListener('click', buildSession);
   </script>
 </body>
