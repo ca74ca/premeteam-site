@@ -228,13 +228,6 @@ function getCachedAgentResponse(athleteId) {
   return getCachedAgentBundle(athleteId)?.response || null;
 }
 
-function hydrateCoachPromptFromCache(athleteId) {
-  if (coachPromptDirty) return;
-  const cachedPrompt = getCachedAgentBundle(athleteId)?.coachPrompt;
-  if (!cachedPrompt || !coachPromptInput) return;
-  coachPromptInput.value = cachedPrompt;
-}
-
 function collectCoachNotes(data) {
   const member = data?.member_context || {};
   const session = data?.session_output || {};
@@ -252,7 +245,6 @@ function collectCoachNotes(data) {
 function persistAgentBundle(athleteId, payload, response) {
   writeStorageJson(storageKey(athleteId), {
     savedAt: new Date().toISOString(),
-    coachPrompt: payload.coach_prompt || '',
     notes: collectCoachNotes(response),
     response
   });
@@ -606,38 +598,63 @@ function renderWorkoutCard(data, sourceLabel) {
   const promptAgent = session?.coach_prompt_agent || {};
   const logic = data?.programming_logic || {};
   const notes = collectCoachNotes(data).slice(0, 6);
-  const warmupMarkup = Array.isArray(session.warmup) && session.warmup.length
-    ? `<span><strong>Warmup:</strong> ${session.warmup.map((block) => `${block.title} (${block.duration_min || '?'}m)`).join(' · ')}</span>`
-    : '';
-  const cooldownMarkup = Array.isArray(session.cooldown) && session.cooldown.length
-    ? `<span><strong>Cooldown:</strong> ${session.cooldown.map((block) => `${block.title} (${block.duration_min || '?'}m)`).join(' · ')}</span>`
-    : '';
-  const mainSet = Array.isArray(session.main_workout)
-    ? session.main_workout.flatMap((block) => (block.exercises || []).map((exercise) => `${block.block} · ${exercise.name} · ${exercise.sets || exercise.rounds || '-'} sets · ${exercise.reps || exercise.duration || '-'} · ${exercise.effort || 'Controlled'}`))
-    : ['3 rounds · 500m row', '8 front squats', '10 burpees over erg'];
+
+  const warmupItems = Array.isArray(session.warmup)
+    ? session.warmup.flatMap((block) => (block.items || []).map((item) => `${block.title}: ${item}`))
+    : [];
+  const cooldownItems = Array.isArray(session.cooldown)
+    ? session.cooldown.flatMap((block) => (block.items || []).map((item) => `${block.title}: ${item}`))
+    : [];
+
+  const mainBlocks = Array.isArray(session.main_workout)
+    ? session.main_workout
+    : [];
+
   const tags = [
     ...(promptAgent.workout_adjustments || []).slice(0, 3),
-    ...(session.constraints_applied || []).slice(0, 1),
-    ...(session.delta_zone_notes || []).slice(0, 2)
-  ].slice(0, 4);
+    ...(session.constraints_applied || []).slice(0, 2)
+  ].slice(0, 5);
+
+  const blockMarkup = mainBlocks.length
+    ? `<div class="program-block-grid">${mainBlocks.map((block) => {
+      const exercises = (block.exercises || []).map((exercise) => {
+        const sets = exercise.sets || exercise.rounds || '-';
+        const reps = exercise.reps || exercise.duration || '-';
+        const effort = exercise.effort || 'Controlled';
+        const note = exercise.note ? `<span class="program-exercise-note">${exercise.note}</span>` : "";
+        return `<li><strong>${exercise.name}</strong> · ${sets} sets · ${reps} · ${effort}${note}</li>`;
+      }).join("");
+      return `<article class="program-block">
+        <div class="program-block-title">
+          <span>${block.block || 'Main Block'}</span>
+          <span>${(block.exercises || []).length} drills</span>
+        </div>
+        ${block.objective ? `<p class="program-block-objective">${block.objective}</p>` : ""}
+        <ul class="tight-list">${exercises}</ul>
+      </article>`;
+    }).join("")}</div>`
+    : `<ul class="tight-list"><li>3 rounds · 500m row</li><li>8 front squats</li><li>10 burpees over erg</li></ul>`;
 
   applyLiveContext(data);
 
   sessionOutput.innerHTML = `
     <strong>${sourceLabel}</strong>
-    <span><strong>Session objective:</strong> ${session.session_focus || logic.session_objective || 'Hybrid engine and strength development.'}</span>
-    <span><strong>Why today:</strong> ${promptAgent.prompt_summary || session.coach_summary || 'Varacis returned a session build.'}</span>
-    ${warmupMarkup}
-    ${cooldownMarkup}
     <div class="result-meta-grid">
-      <div class="result-meta-item"><small>Mode</small><strong>${logic.training_mode || '-'}</strong></div>
-      <div class="result-meta-item"><small>Intensity</small><strong>${session.session_intensity || logic.intensity || '-'}</strong></div>
-      <div class="result-meta-item"><small>Coach opening</small><strong>${session.coach_opening || 'Session ready'}</strong></div>
-      <div class="result-meta-item"><small>Coach closing</small><strong>${session.coach_closing || 'Rest is mandatory.'}</strong></div>
+      <div class="result-meta-item"><small>Mode</small><strong>${logic.training_mode || "-"}</strong></div>
+      <div class="result-meta-item"><small>Intensity</small><strong>${session.session_intensity || logic.intensity || "-"}</strong></div>
+      <div class="result-meta-item"><small>Objective</small><strong>${session.session_focus || logic.session_objective || 'Hybrid engine and strength development.'}</strong></div>
+      <div class="result-meta-item"><small>Why Today</small><strong>${promptAgent.prompt_summary || session.coach_summary || 'Varacis returned a session build.'}</strong></div>
     </div>
-    <ul class="tight-list">${mainSet.map((item) => `<li>${item}</li>`).join('')}</ul>
-    ${notes.length ? `<ul class="tight-list">${notes.map((item) => `<li>${item}</li>`).join('')}</ul>` : ''}
-    ${tags.length ? `<div class="compact-tags">${tags.map((item) => `<span>${item}</span>`).join('')}</div>` : ''}
+
+    <section class="program-section">
+      <h4>Main Workout</h4>
+      ${blockMarkup}
+    </section>
+
+    ${warmupItems.length ? `<section class="program-section"><h4>Warmup</h4><ul class="tight-list">${warmupItems.map((item) => `<li>${item}</li>`).join("")}</ul></section>` : ""}
+    ${cooldownItems.length ? `<section class="program-section"><h4>Cooldown</h4><ul class="tight-list">${cooldownItems.map((item) => `<li>${item}</li>`).join("")}</ul></section>` : ""}
+    ${notes.length ? `<section class="program-section"><h4>Coach Notes</h4><ul class="tight-list">${notes.map((item) => `<li>${item}</li>`).join("")}</ul></section>` : ""}
+    ${tags.length ? `<div class="compact-tags">${tags.map((item) => `<span>${item}</span>`).join("")}</div>` : ""}
   `;
 }
 
@@ -923,6 +940,8 @@ if (coachNameInput) {
 }
 
 if (coachPromptInput) {
+  // Force a clean input on every load to avoid stale browser/cache restoration.
+  coachPromptInput.value = '';
   coachPromptInput.addEventListener('input', () => {
     coachPromptDirty = true;
   });
