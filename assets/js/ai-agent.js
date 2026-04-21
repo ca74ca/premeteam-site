@@ -796,15 +796,11 @@ async function buildSession(options = {}) {
   const selectedAthlete = getSelectedAthlete();
   const payload = buildPayload();
   const athleteId = payload.member_id || athletePayload.member_id;
-  const apiEndpoint = trigger === 'manual'
-    ? 'https://www.varacis.com/api/coach-prompt-agent'
-    : 'https://www.varacis.com/api/get-adaptive-session';
-  const requestPayload = trigger === 'manual'
-    ? payload
-    : {
-        gym_id: selectedAthlete?.gym_id || 'delta-zone-systems',
-        member_id: selectedAthlete?.member_id || athleteId || 'delta-athlete-001'
-      };
+  const apiEndpoint = 'https://www.varacis.com/api/get-adaptive-session';
+  const requestPayload = {
+    gym_id: selectedAthlete?.gym_id || 'delta-zone-systems',
+    member_id: selectedAthlete?.member_id || athleteId || 'delta-athlete-001'
+  };
 
   if (!silent) {
     buildSessionBtn.disabled = true;
