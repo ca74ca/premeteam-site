@@ -345,8 +345,12 @@ async function fetchJsonFromCandidates(urls) {
   throw lastError || new Error('No valid endpoint candidates');
 }
 
-function setText(node, value) {
-  if (!node || value === undefined || value === null || value === '') return;
+function setText(node, value, emptyFallback = '-') {
+  if (!node) return;
+  if (value === undefined || value === null || value === '') {
+    node.textContent = emptyFallback;
+    return;
+  }
   node.textContent = String(value);
 }
 
@@ -445,6 +449,48 @@ function renderMetricDots() {
   });
 }
 
+function resetLiveContext(reason = 'Waiting for live data...') {
+  setText(athleteSubEl, reason, reason);
+  setText(gymLocationValueEl, '-', '-');
+  setText(coachDisplayEl, '-', '-');
+  setText(wearableValueEl, 'WHOOP data unavailable', 'WHOOP data unavailable');
+  setDotState(wearableDotEl, wearableIndicatorTextEl, 'red', 'Unavailable');
+  setText(membershipValueEl, '-', '-');
+  setDotState(membershipDotEl, membershipIndicatorTextEl, 'amber', 'Pending');
+  setText(engagementValueEl, '-', '-');
+  setDotState(engagementDotEl, engagementIndicatorTextEl, 'amber', 'Pending');
+  setText(sessionsUsedValueEl, 0);
+  setText(sessionWindowEl, `${durationInput?.value || 40}m`);
+  setText(decisionTextEl, 'Live agent decision unavailable until API data is returned.', 'Live agent decision unavailable until API data is returned.');
+  setText(poheNumberEl, 0);
+  setText(poheStatusEl, 'Unavailable');
+
+  setText(recoveryValueEl, '0 / 100');
+  setText(recoveryLabelEl, 'Unavailable');
+  setText(sleepValueEl, '0 hours');
+  setText(sleepScoreEl, '0 / 100');
+  setText(hrvValueEl, '0 ms');
+  setText(hrvScoreEl, '0 / 100');
+  setText(goalValueEl, '-');
+  setText(lastStrengthValueEl, '-');
+  setText(classSessionValueEl, '0 tracked sessions in the current cycle');
+  setText(objectiveValueEl, '-');
+  setText(whyTodayValueEl, '-');
+  setText(modeValueEl, '-');
+  setText(constraintValueEl, '-');
+  setText(coachNoteValueEl, '-');
+
+  if (recentWorkoutsListEl) {
+    recentWorkoutsListEl.innerHTML = '<li>No session history returned by API.</li>';
+  }
+
+  const metricBlocks = document.querySelectorAll('.metric-with-dots');
+  if (metricBlocks[0]) metricBlocks[0].dataset.score = '0';
+  if (metricBlocks[1]) metricBlocks[1].dataset.score = '0';
+  if (metricBlocks[2]) metricBlocks[2].dataset.score = '0';
+  renderMetricDots();
+}
+
 function normalizeWorkoutResponse(result, fallbackAthlete) {
   const payload = unwrapPayload(result) || {};
   const fallbackMember = {
@@ -453,7 +499,7 @@ function normalizeWorkoutResponse(result, fallbackAthlete) {
     coach_name: fallbackAthlete?.coach_name ?? athletePayload.coach_name,
     duration_min: Number(durationInput?.value || athletePayload.duration_min),
     experience_level: fallbackAthlete?.experience_level ?? athletePayload.intake.experience_level,
-    primary_goal: fallbackAthlete?.primary_goal ?? athletePayload.intake.primary_goal,
+    primary_goal: fallbackAthlete?.primary_goal ?? '',
     readiness_score: 0,
     pohe_engagement_score: 0,
     engagement_score: 0,
@@ -464,10 +510,10 @@ function normalizeWorkoutResponse(result, fallbackAthlete) {
       sleep_hours: 0,
       hrv_score: 0
     },
-    previous_lifts: athletePayload.previous_lifts,
+    previous_lifts: [],
     recent_training_balance: {
-      cardio_heavy_sessions_this_week: athletePayload.recent_training.cardio_heavy_sessions_this_week,
-      strength_heavy_sessions_this_week: athletePayload.recent_training.strength_heavy_sessions_this_week
+      cardio_heavy_sessions_this_week: 0,
+      strength_heavy_sessions_this_week: 0
     },
     context_summary: ''
   };
@@ -640,7 +686,7 @@ function formatSessionCount(member, session) {
   const derivedCount = Number(balance.cardio_heavy_sessions_this_week || 0) + Number(balance.strength_heavy_sessions_this_week || 0);
   if (derivedCount > 0) return derivedCount;
 
-  return Number(athletePayload.class_history.classes_attended_30_days || 0);
+  return 0;
 }
 
 function getWorkoutItems(session, sessionHistory) {
@@ -945,6 +991,7 @@ async function buildSession(options = {}) {
     renderWorkoutCard(dataForUi, trigger === 'manual' ? 'Workout Generated' : 'Live Session Synced');
   } catch (error) {
     setRosterStatus('API unavailable', 'warning', error?.message || 'Unable to reach required endpoints');
+    resetLiveContext('Live context unavailable');
     if (sessionOutput) {
       sessionOutput.innerHTML = `
         <strong>Unable to load live session</strong>
@@ -974,6 +1021,7 @@ async function loadAthleteContextForSelection() {
   }
 
   setRosterStatus('Syncing live session', 'warning');
+  resetLiveContext('Loading live context...');
 
   if (sessionOutput) {
     sessionOutput.innerHTML = `
@@ -1095,5 +1143,6 @@ if (durationInput) {
 }
 
 renderMetricDots();
+resetLiveContext('Waiting for live data...');
 initializeDynamicRoster();
 buildSessionBtn.addEventListener('click', () => buildSession({ silent: false, trigger: 'manual' }));
