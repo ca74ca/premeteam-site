@@ -8,6 +8,8 @@ const statusText = document.getElementById('statusText');
 const liveWhoopPill = document.getElementById('liveWhoopPill');
 const liveWhoopLabel = document.getElementById('liveWhoopLabel');
 const heroAthleteName = document.getElementById('heroAthleteName');
+const outlookLabel = document.getElementById('outlookLabel');
+const biometricsHeading = document.getElementById('biometricsHeading');
 
 const readinessChip = document.getElementById('readinessChip');
 const sourceChip = document.getElementById('sourceChip');
@@ -43,6 +45,11 @@ const whoopRawPre = document.getElementById('whoopRawPre');
 
 const STORAGE_KEY = 'adaptiveSessionLiveUserId';
 const DEFAULT_WHOOP_USER_ID = String(window.DELTA_WHOOP_USER_ID || '1243444');
+
+const UI_COPY = {
+  outlookLabel: 'TODAYS OUTLOOK',
+  biometricsHeading: 'LIVE POHE BIOMETRICS SNAPSHOT'
+};
 
 function resolveApiBase() {
   const explicitRoot = window.DELTA_AGENT_API_ROOT || '';
@@ -84,6 +91,15 @@ function setStatus(kind, label, message) {
 function setAthleteName(value) {
   if (!heroAthleteName) return;
   heroAthleteName.textContent = value || 'Athlete';
+}
+
+function applyUiCopy() {
+  if (outlookLabel) {
+    outlookLabel.textContent = UI_COPY.outlookLabel;
+  }
+  if (biometricsHeading) {
+    biometricsHeading.textContent = UI_COPY.biometricsHeading;
+  }
 }
 
 function getCurrentWhoopUserId() {
@@ -536,6 +552,7 @@ if (showWhoopRawToggle) {
 
 initUserId();
 setWorkflowMeta('Workflow ID: not generated');
+applyUiCopy();
 syncWhoopRawVisibility();
 loadLiveData();
 
