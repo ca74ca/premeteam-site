@@ -824,21 +824,17 @@ async function buildSession(options = {}) {
     }
 
     const rawData = await response.json();
+    console.log('LIVE RAW DATA', rawData);
 
     setSessionData(rawData);
 
     const normalizedData = normalizeWorkoutResponse(rawData, selectedAthlete);
+    console.log('NORMALIZED DATA', normalizedData);
+    const dataForUi = rawData?.member_context && rawData?.session_output ? rawData : normalizedData;
     persistAgentBundle(athleteId, requestPayload, rawData);
     setRosterStatus('Varacis connected', 'ok');
-    renderWorkoutCard(normalizedData, trigger === 'manual' ? 'Workout Generated' : 'Live Session Synced');
+    renderWorkoutCard(dataForUi, trigger === 'manual' ? 'Workout Generated' : 'Live Session Synced');
   } catch (error) {
-    const cachedResponse = getCachedAgentResponse(athleteId);
-    if (cachedResponse) {
-      setRosterStatus('Cached session loaded', 'warning');
-      renderWorkoutCard(normalizeWorkoutResponse(cachedResponse, selectedAthlete), 'Cached Session Ready');
-      return;
-    }
-
     setRosterStatus('Preview mode', 'warning');
     renderWorkoutCard(normalizeWorkoutResponse({
       member_context: {
@@ -912,21 +908,12 @@ async function loadAthleteContextForSelection() {
     }
   }
 
-  const cachedResponse = getCachedAgentResponse(athleteId);
-  if (cachedResponse) {
-    const cachedData = normalizeWorkoutResponse(cachedResponse, selectedAthlete);
-    applyLiveContext(cachedData);
-    setRosterStatus('Syncing live session', 'warning');
-  } else {
-    const previewData = fallbackContextForAthlete(selectedAthlete);
-    applyLiveContext(previewData);
-    setRosterStatus('Syncing live session', 'warning');
-  }
+  setRosterStatus('Syncing live session', 'warning');
 
   if (sessionOutput) {
     sessionOutput.innerHTML = `
       <strong>Syncing Live Session</strong>
-      <span>Fetching the latest workout from Varacis. Cached context is loaded in the snapshot until sync completes.</span>
+      <span>Fetching the latest workout from Varacis. Live data will replace the current view when the request completes.</span>
     `;
   }
 
