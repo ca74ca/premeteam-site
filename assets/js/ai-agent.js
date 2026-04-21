@@ -139,6 +139,11 @@ let currentApiRoot = '';
 let currentAthleteContext = null;
 let loadedAthletes = [];
 let coachPromptDirty = false;
+let sessionData = null;
+
+function setSessionData(nextData) {
+  sessionData = nextData;
+}
 
 function isProductionHost() {
   return window.location.hostname.includes('deltazonesystem.com');
@@ -261,6 +266,8 @@ function normalizeAthlete(rawAthlete, index) {
   const athleteId = safeId(rawAthlete?.id || rawAthlete?.member_id || rawAthlete?.athlete_id, `athlete-${index + 1}`);
   return {
     id: athleteId,
+    member_id: safeId(rawAthlete?.member_id || rawAthlete?.id || rawAthlete?.athlete_id, athleteId),
+    gym_id: safeId(rawAthlete?.gym_id || rawAthlete?.gymId || gymSelectInput?.value, 'delta-zone-systems'),
     name: String(rawAthlete?.name || rawAthlete?.full_name || rawAthlete?.member_name || athleteId),
     coach_name: String(rawAthlete?.coach_name || rawAthlete?.coach || athletePayload.coach_name),
     experience_level: String(rawAthlete?.experience_level || athletePayload.intake.experience_level),
@@ -442,70 +449,136 @@ function fallbackContextForAthlete(athlete) {
 function normalizeWorkoutResponse(result, fallbackAthlete) {
   const payload = unwrapPayload(result) || {};
   const fallback = fallbackContextForAthlete(fallbackAthlete);
+  const fallbackMember = fallback.member_context || {};
+  const fallbackSession = fallback.session_output || {};
+  const fallbackLogic = fallback.programming_logic || {};
   const member = payload.member_context || payload.member || payload.athlete || payload.profile || {};
   const session = payload.session_output || payload.session || payload.workout || payload.plan || {};
   const logic = payload.programming_logic || payload.logic || payload.programming || {};
   const recovery = member.recovery_signals || member.recovery || {};
+
+  const athlete = {
+    memberId: member.member_id ?? fallbackAthlete?.member_id ?? fallbackMember.member_id,
+    name: member.name ?? fallbackAthlete?.name ?? 'Unknown Athlete',
+    coachName: member.coach_name ?? fallbackAthlete?.coach_name ?? 'Coach Delta',
+    durationMin: member.duration_min ?? payload.duration_min ?? fallbackMember.duration_min ?? 40,
+    experienceLevel: member.experience_level ?? fallbackAthlete?.experience_level ?? 'intermediate',
+    primaryGoal: member.primary_goal ?? fallbackAthlete?.primary_goal ?? 'General Performance',
+    readinessScore: member.readiness_score ?? 0,
+    sleepHours: recovery.sleep_hours ?? 0,
+    hrvScore: recovery.hrv_score ?? 0,
+    poheEngagementScore:
+      session?.data_insights?.pohe_engagement_score ??
+      member.pohe_engagement_score ??
+      0,
+    poheVerified: session?.data_insights?.pohe_verified ?? false,
+    engagementScore: member.engagement_score ?? 0,
+    engagementFocus: member.engagement_focus ?? 'UNKNOWN',
+    memberType: member.member_type ?? 'Member',
+    dataSourcesUsed: member.data_sources_used ?? [],
+    previousLifts: Array.isArray(member.previous_lifts) ? member.previous_lifts : [],
+    recentTrainingBalance: member.recent_training_balance ?? {}
+  };
+
+  const normalizedSession = {
+    focus: session.session_focus ?? '',
+    intensity: logic.intensity ?? session.session_intensity ?? 'MODERATE',
+    coachSummary: session.coach_summary ?? '',
+    sessionIntent: session.session_intent ?? '',
+    deliveryTarget: session.delivery_target ?? '',
+    trainingMode: logic.training_mode ?? session.training_mode ?? '',
+    constraintsApplied: logic.constraints_applied ?? session.constraints_applied ?? [],
+    coachCues: session.coach_cues ?? [],
+    deltaZoneNotes: session.delta_zone_notes ?? [],
+    whyToday: session?.coach_prompt_agent?.prompt_summary ?? '',
+    assistantReply: session?.coach_prompt_agent?.assistant_reply ?? '',
+    workoutAdjustments: session?.coach_prompt_agent?.workout_adjustments ?? [],
+    warmup: session.warmup ?? [],
+    mainWorkout: session.main_workout ?? [],
+    cooldown: session.cooldown ?? [],
+    analytics: session.analytics ?? {}
+  };
 
   return {
     workflow_id: payload.workflow_id || null,
     trigger_status: payload.trigger_status || null,
     booking: payload.booking || null,
     persisted: Boolean(payload.persisted),
+    athlete,
+    session: normalizedSession,
     member_context: {
-      ...fallback.member_context,
+      ...fallbackMember,
       ...member,
-      member_id: member.member_id || member.id || fallback.member_context.member_id,
-      coach_name: member.coach_name || member.coach || fallback.member_context.coach_name,
-      duration_min: member.duration_min || payload.duration_min || fallback.member_context.duration_min,
-      experience_level: member.experience_level || fallback.member_context.experience_level,
-      primary_goal: member.primary_goal || fallback.member_context.primary_goal,
-      readiness_score: member.readiness_score ?? session.readiness_score ?? recovery.recovery_score ?? fallback.member_context.readiness_score,
-      pohe_engagement_score: member.pohe_engagement_score ?? payload.pohe_engagement_score ?? fallback.member_context.pohe_engagement_score,
+      member_id: athlete.memberId,
+      name: athlete.name,
+      coach_name: athlete.coachName,
+      duration_min: athlete.durationMin,
+      experience_level: athlete.experienceLevel,
+      primary_goal: athlete.primaryGoal,
+      readiness_score: athlete.readinessScore,
+      pohe_engagement_score: athlete.poheEngagementScore,
+      engagement_score: athlete.engagementScore,
+      engagement_focus: athlete.engagementFocus,
+      member_type: athlete.memberType,
+      data_sources_used: athlete.dataSourcesUsed,
       recovery_signals: {
-        ...fallback.member_context.recovery_signals,
-        ...recovery
+        ...fallbackMember.recovery_signals,
+        ...recovery,
+        sleep_hours: athlete.sleepHours,
+        hrv_score: athlete.hrvScore
       },
-      previous_lifts: Array.isArray(member.previous_lifts) && member.previous_lifts.length
-        ? member.previous_lifts
-        : fallback.member_context.previous_lifts,
+      previous_lifts: athlete.previousLifts.length ? athlete.previousLifts : fallbackMember.previous_lifts,
       recent_training_balance: {
-        ...fallback.member_context.recent_training_balance,
-        ...(member.recent_training_balance || {})
+        ...fallbackMember.recent_training_balance,
+        ...athlete.recentTrainingBalance
       }
     },
     session_output: {
-      ...fallback.session_output,
+      ...fallbackSession,
       ...session,
+      session_focus: normalizedSession.focus,
+      session_intensity: normalizedSession.intensity,
+      coach_summary: normalizedSession.coachSummary,
+      session_intent: normalizedSession.sessionIntent,
+      delivery_target: normalizedSession.deliveryTarget,
+      training_mode: normalizedSession.trainingMode,
       coach_prompt_agent: {
-        ...fallback.session_output.coach_prompt_agent,
-        ...(session.coach_prompt_agent || {})
+        ...fallbackSession.coach_prompt_agent,
+        ...(session.coach_prompt_agent || {}),
+        prompt_summary: normalizedSession.whyToday,
+        assistant_reply: normalizedSession.assistantReply,
+        workout_adjustments: normalizedSession.workoutAdjustments
       },
       data_insights: {
-        ...fallback.session_output.data_insights,
-        ...(session.data_insights || {})
+        ...fallbackSession.data_insights,
+        ...(session.data_insights || {}),
+        pohe_engagement_score: athlete.poheEngagementScore,
+        pohe_verified: athlete.poheVerified
       },
-      constraints_applied: Array.isArray(session.constraints_applied)
-        ? session.constraints_applied
-        : fallback.session_output.constraints_applied,
-      coach_cues: Array.isArray(session.coach_cues)
-        ? session.coach_cues
-        : fallback.session_output.coach_cues,
-      delta_zone_notes: Array.isArray(session.delta_zone_notes)
-        ? session.delta_zone_notes
-        : fallback.session_output.delta_zone_notes,
-      main_workout: Array.isArray(session.main_workout)
-        ? session.main_workout
-        : fallback.session_output.main_workout,
-      warmup: Array.isArray(session.warmup) ? session.warmup : [],
-      cooldown: Array.isArray(session.cooldown) ? session.cooldown : []
+      constraints_applied: Array.isArray(normalizedSession.constraintsApplied)
+        ? normalizedSession.constraintsApplied
+        : fallbackSession.constraints_applied,
+      coach_cues: Array.isArray(normalizedSession.coachCues)
+        ? normalizedSession.coachCues
+        : fallbackSession.coach_cues,
+      delta_zone_notes: Array.isArray(normalizedSession.deltaZoneNotes)
+        ? normalizedSession.deltaZoneNotes
+        : fallbackSession.delta_zone_notes,
+      main_workout: Array.isArray(normalizedSession.mainWorkout)
+        ? normalizedSession.mainWorkout
+        : fallbackSession.main_workout,
+      warmup: Array.isArray(normalizedSession.warmup) ? normalizedSession.warmup : [],
+      cooldown: Array.isArray(normalizedSession.cooldown) ? normalizedSession.cooldown : [],
+      analytics: normalizedSession.analytics
     },
     programming_logic: {
-      ...fallback.programming_logic,
+      ...fallbackLogic,
       ...logic,
-      constraints_applied: Array.isArray(logic.constraints_applied)
-        ? logic.constraints_applied
-        : fallback.programming_logic.constraints_applied
+      training_mode: normalizedSession.trainingMode || fallbackLogic.training_mode,
+      intensity: normalizedSession.intensity || fallbackLogic.intensity,
+      constraints_applied: Array.isArray(normalizedSession.constraintsApplied)
+        ? normalizedSession.constraintsApplied
+        : fallbackLogic.constraints_applied
     }
   };
 }
@@ -538,30 +611,29 @@ function applyLiveContext(data) {
   const dataInsights = session?.data_insights || {};
   const recovery = member?.recovery_signals || {};
   const lifts = Array.isArray(member.previous_lifts) ? member.previous_lifts : [];
-  const selectedAthlete = getSelectedAthlete();
   const selectedGym = getSelectedGym();
   const recentWorkoutItems = getWorkoutPreviewItems(session);
   const engagementScore = Number(member.engagement_score ?? 0);
-  const readiness = dataInsights.readiness_score ?? session.readiness_score ?? member.readiness_score ?? athletePayload.wearable.recovery_score;
-  const sleepHours = recovery.sleep_hours ?? athletePayload.wearable.sleep_hours;
-  const hrvScore = recovery.hrv_score ?? athletePayload.wearable.hrv_score;
+  const readiness = Number(member.readiness_score ?? 0);
+  const sleepHours = Number(recovery.sleep_hours ?? 0);
+  const hrvScore = Number(recovery.hrv_score ?? 0);
   const liveWearable = !(member.data_sources_used || []).includes('no_live_wearable');
   const sessionCount = formatSessionCount(member, session);
   const noteSummary = collectCoachNotes(data);
   const engagementLabel = member.engagement_focus || (engagementScore >= 60 ? 'ENGAGED' : 'NEEDS_ATTENTION');
 
-  setText(athleteNameEl, selectedAthlete?.name || member.name || member.full_name || member.member_id || athletePayload.member_id);
-  setText(athleteSubEl, `${member.experience_level || selectedAthlete?.experience_level || athletePayload.intake.experience_level} · ${logic.training_mode || session.training_mode || 'coach-facing view'}`);
+  setText(athleteNameEl, member.name);
+  setText(athleteSubEl, `${member.experience_level || '-'} · ${logic.training_mode || '-'}`);
   setText(gymLocationValueEl, `${selectedGym.name} · ${session.delivery_target || member.session_type || 'Personal coaching'}`);
-  setText(coachDisplayEl, `${member.coach_name || coachNameInput?.value || athletePayload.coach_name} · ${logic.training_mode || session.training_mode || 'Session ready'}`);
+  setText(coachDisplayEl, `${member.coach_name || '-'} · ${logic.training_mode || '-'}`);
   setText(sessionWindowEl, `${member.duration_min || durationInput?.value || athletePayload.duration_min}m`);
-  setText(decisionTextEl, clipText(session.coach_summary || session.session_intent || 'Session built from live Varacis context.', 190));
-  setText(poheNumberEl, dataInsights.pohe_engagement_score ?? member.pohe_engagement_score ?? 0);
+  setText(decisionTextEl, clipText(session.coach_summary, 190));
+  setText(poheNumberEl, dataInsights.pohe_engagement_score ?? 0);
   setText(poheStatusEl, dataInsights.pohe_verified ? 'Verified / high trust signal' : 'Proxy / live data signal');
 
   setText(wearableValueEl, liveWearable ? 'Live recovery signal connected' : 'Proxy recovery signal only');
   setDotState(wearableDotEl, wearableIndicatorTextEl, liveWearable ? 'green' : 'amber', liveWearable ? 'Live' : 'Proxy');
-  setText(membershipValueEl, member.member_type || 'Active member profile');
+  setText(membershipValueEl, member.member_type);
   setDotState(membershipDotEl, membershipIndicatorTextEl, data?.persisted ? 'green' : 'amber', data?.persisted ? 'Active' : 'Preview');
   setText(engagementValueEl, `${engagementLabel.replace(/_/g, ' ').toLowerCase()} · score ${engagementScore || 0}`);
   setDotState(engagementDotEl, engagementIndicatorTextEl, engagementScore >= 60 ? 'green' : (engagementScore >= 30 ? 'amber' : 'red'), engagementScore >= 60 ? 'Engaged' : (engagementScore >= 30 ? 'Watch' : 'Low'));
@@ -573,13 +645,13 @@ function applyLiveContext(data) {
   setText(sleepScoreEl, `${Math.round((Number(sleepHours || 0) / 8.5) * 100)} / 100`);
   setText(hrvValueEl, `${hrvScore} ms`);
   setText(hrvScoreEl, `${hrvScore} / 100`);
-  setText(goalValueEl, member.primary_goal || athletePayload.intake.primary_goal);
-  setText(lastStrengthValueEl, lifts[0] ? `${lifts[0].name} · ${lifts[0].last_load || '-'} lb x ${lifts[0].last_reps || '-'}` : `${athletePayload.previous_lifts[0].name} · 175 lb x 1`);
+  setText(goalValueEl, member.primary_goal);
+  setText(lastStrengthValueEl, lifts[0] ? `${lifts[0].name} · ${lifts[0].last_load || '-'} lb x ${lifts[0].last_reps || '-'}` : '-');
   setText(classSessionValueEl, `${sessionCount} tracked sessions in the current cycle`);
-  setText(objectiveValueEl, session.session_focus || logic.session_objective || 'Session ready');
-  setText(whyTodayValueEl, clipText(promptAgent.prompt_summary || member.context_summary || session.coach_summary || 'Built from readiness, training history, and coach input.', 170));
+  setText(objectiveValueEl, session.session_focus);
+  setText(whyTodayValueEl, clipText(promptAgent.prompt_summary, 170));
   setText(modeValueEl, `${logic.training_mode || '-'} · ${session.session_intensity || logic.intensity || '-'}`);
-  setText(constraintValueEl, (session.constraints_applied || [])[0] || (logic.constraints_applied || [])[0] || 'Keep the session honest to fatigue.');
+  setText(constraintValueEl, (logic.constraints_applied || [])[0] || '-');
   setText(coachNoteValueEl, clipText(noteSummary[0] || (session.coach_cues || []).slice(0, 2).join(' · ') || 'Focus on RPE. Rest is mandatory.', 150));
 
   if (recentWorkoutsListEl) {
@@ -721,10 +793,18 @@ async function fetchAthletes(apiRoot, gymId) {
 
 async function buildSession(options = {}) {
   const { silent = false, trigger = 'manual' } = options;
-  const apiEndpoint = getApiEndpoint();
+  const selectedAthlete = getSelectedAthlete();
   const payload = buildPayload();
   const athleteId = payload.member_id || athletePayload.member_id;
-  const selectedAthlete = getSelectedAthlete();
+  const apiEndpoint = trigger === 'manual'
+    ? 'https://www.varacis.com/api/coach-prompt-agent'
+    : 'https://www.varacis.com/api/get-adaptive-session';
+  const requestPayload = trigger === 'manual'
+    ? payload
+    : {
+        gym_id: selectedAthlete?.gym_id || 'delta-zone-systems',
+        member_id: selectedAthlete?.member_id || athleteId || 'delta-athlete-001'
+      };
 
   if (!silent) {
     buildSessionBtn.disabled = true;
@@ -740,7 +820,7 @@ async function buildSession(options = {}) {
         'Content-Type': 'application/json',
         Accept: 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(requestPayload)
     });
 
     if (!response.ok) {
@@ -748,10 +828,13 @@ async function buildSession(options = {}) {
     }
 
     const rawData = await response.json();
-    const data = normalizeWorkoutResponse(rawData, selectedAthlete);
-    persistAgentBundle(athleteId, payload, rawData);
+
+    setSessionData(rawData);
+
+    const normalizedData = normalizeWorkoutResponse(rawData, selectedAthlete);
+    persistAgentBundle(athleteId, requestPayload, rawData);
     setRosterStatus('Varacis connected', 'ok');
-    renderWorkoutCard(data, trigger === 'manual' ? 'Workout Generated' : 'Live Session Synced');
+    renderWorkoutCard(normalizedData, trigger === 'manual' ? 'Workout Generated' : 'Live Session Synced');
   } catch (error) {
     const cachedResponse = getCachedAgentResponse(athleteId);
     if (cachedResponse) {
