@@ -837,12 +837,18 @@ async function loadAthleteContextForSelection() {
   if (cachedResponse) {
     const cachedData = normalizeWorkoutResponse(cachedResponse, selectedAthlete);
     applyLiveContext(cachedData);
-    renderWorkoutCard(cachedData, 'Cached Session Ready');
-    setRosterStatus('Cached context loaded', 'warning');
+    setRosterStatus('Syncing live session', 'warning');
   } else {
     const previewData = fallbackContextForAthlete(selectedAthlete);
     applyLiveContext(previewData);
-    setRosterStatus('Loading live session', 'warning');
+    setRosterStatus('Syncing live session', 'warning');
+  }
+
+  if (sessionOutput) {
+    sessionOutput.innerHTML = `
+      <strong>Syncing Live Session</strong>
+      <span>Fetching the latest workout from Varacis. Cached context is loaded in the snapshot until sync completes.</span>
+    `;
   }
 
   await buildSession({ silent: true, trigger: 'selection' });

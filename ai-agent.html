@@ -655,6 +655,10 @@
   .todays-program-output {
     margin-top: 0;
     gap: 10px;
+    max-height: clamp(320px, 58vh, 680px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
   }
 
   .program-section {
