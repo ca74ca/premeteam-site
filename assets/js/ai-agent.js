@@ -1,6 +1,7 @@
 const buildSessionBtn = document.getElementById('buildSessionBtn');
 const sessionOutput = document.getElementById('sessionOutput');
 const connectionLabel = document.getElementById('connectionLabel');
+const connectionDetailLabel = document.getElementById('connectionDetailLabel');
 const gymSelectInput = document.getElementById('gymSelectInput');
 const athleteSelectInput = document.getElementById('athleteSelectInput');
 const coachNameInput = document.getElementById('coachNameInput');
@@ -355,13 +356,57 @@ function clipText(value, maxLength = 180) {
   return text.length > maxLength ? `${text.slice(0, maxLength - 1).trim()}...` : text;
 }
 
-function setRosterStatus(label, tone) {
+function setRosterStatus(label, tone, detail) {
   if (!connectionLabel) return;
   connectionLabel.textContent = label;
+  if (connectionDetailLabel) {
+    connectionDetailLabel.textContent = detail || 'User ready to build';
+  }
   const chip = connectionLabel.closest('.api-chip');
   if (!chip) return;
   chip.style.background = tone === 'warning' ? 'rgba(245,158,11,0.16)' : 'rgba(34,197,94,0.12)';
   chip.style.borderColor = tone === 'warning' ? 'rgba(245,158,11,0.3)' : 'rgba(96,255,161,0.18)';
+}
+
+function historyItemsFromResponse(historyResponse) {
+  const payload = unwrapPayload(historyResponse);
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.history)) return payload.history;
+  if (Array.isArray(payload?.sessions)) return payload.sessions;
+  if (Array.isArray(payload?.data)) return payload.data;
+  return [];
+}
+
+async function endpointResult(fetchPromise, endpointName) {
+  try {
+    const response = await fetchPromise;
+    if (!response.ok) {
+      return {
+        ok: false,
+        endpoint: endpointName,
+        status: response.status,
+        data: null,
+        error: `${endpointName} ${response.status}`
+      };
+    }
+
+    const data = await response.json();
+    return {
+      ok: true,
+      endpoint: endpointName,
+      status: response.status,
+      data,
+      error: null
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      endpoint: endpointName,
+      status: 0,
+      data: null,
+      error: `${endpointName} unavailable`
+    };
+  }
 }
 
 function setDotState(dotNode, labelNode, tone, text) {
@@ -598,11 +643,24 @@ function formatSessionCount(member, session) {
   return Number(athletePayload.class_history.classes_attended_30_days || 0);
 }
 
-function getWorkoutItems(session) {
-  if (!Array.isArray(session?.main_workout)) return [];
-  return session.main_workout
-    .flatMap((block) => (block.exercises || []).slice(0, 2).map((exercise) => `${block.block} · ${exercise.name}`))
-    .slice(0, 3);
+function getWorkoutItems(session, sessionHistory) {
+  if (Array.isArray(session?.main_workout) && session.main_workout.length) {
+    return session.main_workout
+      .flatMap((block) => (block.exercises || []).slice(0, 2).map((exercise) => `${block.block} · ${exercise.name}`))
+      .slice(0, 3);
+  }
+
+  if (Array.isArray(sessionHistory) && sessionHistory.length) {
+    return sessionHistory
+      .slice(0, 3)
+      .map((item, index) => {
+        const title = item?.title || item?.name || item?.session_focus || item?.focus || item?.type || `Session ${index + 1}`;
+        const date = item?.date || item?.completed_at || item?.created_at || '';
+        return date ? `${title} · ${new Date(date).toLocaleDateString()}` : title;
+      });
+  }
+
+  return [];
 }
 
 function applyLiveContext(data) {
@@ -616,12 +674,12 @@ function applyLiveContext(data) {
   const recovery = member?.recovery_signals || {};
   const lifts = Array.isArray(member.previous_lifts) ? member.previous_lifts : [];
   const selectedGym = getSelectedGym();
-  const recentWorkoutItems = getWorkoutItems(session);
+  const recentWorkoutItems = getWorkoutItems(session, data?.session_history_items || []);
   const engagementScore = Number(member.engagement_score ?? 0);
   const readiness = Number(member.readiness_score ?? 0);
   const sleepHours = Number(recovery.sleep_hours ?? 0);
   const hrvScore = Number(recovery.hrv_score ?? 0);
-  const liveWearable = !(member.data_sources_used || []).includes('no_live_wearable');
+  const liveWearable = Boolean(data?.whoop_data) || !(member.data_sources_used || []).includes('no_live_wearable');
   const sessionCount = formatSessionCount(member, session);
   const noteSummary = collectCoachNotes(data);
   const engagementLabel = member.engagement_focus || (engagementScore >= 60 ? 'ENGAGED' : 'NEEDS_ATTENTION');
@@ -799,23 +857,26 @@ async function fetchAthletes(apiRoot, gymId) {
 
 async function fetchWhoopData(apiRoot, whoopUserId) {
   const encodedWhoopUserId = encodeURIComponent(whoopUserId);
-  return fetchJsonFromCandidates([
-    `${apiRoot}/api/whoop-data?whoopUserId=${encodedWhoopUserId}`
-  ]);
+  return fetch(`${apiRoot}/api/whoop-data?whoopUserId=${encodedWhoopUserId}`, {
+    method: 'GET',
+    headers: { Accept: 'application/json' }
+  });
 }
 
 async function fetchSessionHistory(apiRoot, whoopUserId) {
   const encodedWhoopUserId = encodeURIComponent(whoopUserId);
-  return fetchJsonFromCandidates([
-    `${apiRoot}/api/session-history?whoopUserId=${encodedWhoopUserId}`
-  ]);
+  return fetch(`${apiRoot}/api/session-history?whoopUserId=${encodedWhoopUserId}`, {
+    method: 'GET',
+    headers: { Accept: 'application/json' }
+  });
 }
 
 async function fetchAdaptiveSession(apiRoot, whoopUserId) {
   const encodedWhoopUserId = encodeURIComponent(whoopUserId);
-  return fetchJsonFromCandidates([
-    `${apiRoot}/api/get-adaptive-session?whoopUserId=${encodedWhoopUserId}`
-  ]);
+  return fetch(`${apiRoot}/api/get-adaptive-session?whoopUserId=${encodedWhoopUserId}`, {
+    method: 'GET',
+    headers: { Accept: 'application/json' }
+  });
 }
 
 async function buildSession(options = {}) {
@@ -835,21 +896,38 @@ async function buildSession(options = {}) {
   if (!silent) {
     buildSessionBtn.disabled = true;
     buildSessionBtn.textContent = 'Building Live Session...';
-    connectionLabel.textContent = 'Calling adaptive APIs';
+    setRosterStatus('Syncing live data', 'warning', 'Loading WHOOP, session, and history...');
     sessionOutput.innerHTML = `<strong>Generating Workout</strong><span>Fetching WHOOP data, session history, and adaptive plan via ${clipText(apiEndpoint, 100)}.</span>`;
   }
 
   try {
-    const [whoopDataResponse, sessionHistoryResponse, adaptiveSessionResponse] = await Promise.all([
-      fetchWhoopData(apiRoot, whoopUserId),
-      fetchSessionHistory(apiRoot, whoopUserId),
-      fetchAdaptiveSession(apiRoot, whoopUserId)
+    const [whoopResult, historyResult, adaptiveResult] = await Promise.all([
+      endpointResult(fetchWhoopData(apiRoot, whoopUserId), 'whoop-data'),
+      endpointResult(fetchSessionHistory(apiRoot, whoopUserId), 'session-history'),
+      endpointResult(fetchAdaptiveSession(apiRoot, whoopUserId), 'get-adaptive-session')
     ]);
 
+    if (!adaptiveResult.ok) {
+      const adaptiveError = adaptiveResult.error || 'get-adaptive-session unavailable';
+      throw new Error(adaptiveError);
+    }
+
+    const sourceCount = [whoopResult.ok, historyResult.ok, adaptiveResult.ok].filter(Boolean).length;
+    const failures = [whoopResult, historyResult, adaptiveResult]
+      .filter((result) => !result.ok)
+      .map((result) => result.error)
+      .filter(Boolean);
+
     const rawData = {
-      ...(adaptiveSessionResponse || {}),
-      whoop_data: unwrapPayload(whoopDataResponse),
-      session_history: unwrapPayload(sessionHistoryResponse)
+      ...(adaptiveResult.data || {}),
+      whoop_data: whoopResult.ok ? unwrapPayload(whoopResult.data) : null,
+      session_history: historyResult.ok ? unwrapPayload(historyResult.data) : null,
+      session_history_items: historyResult.ok ? historyItemsFromResponse(historyResult.data) : [],
+      source_status: {
+        whoop: whoopResult.ok,
+        history: historyResult.ok,
+        adaptive: adaptiveResult.ok
+      }
     };
     console.log('LIVE RAW DATA', rawData);
 
@@ -859,10 +937,14 @@ async function buildSession(options = {}) {
     console.log('NORMALIZED DATA', normalizedData);
     const dataForUi = rawData?.member_context && rawData?.session_output ? rawData : normalizedData;
     persistAgentBundle(athleteId, requestPayload, rawData);
-    setRosterStatus('Adaptive APIs connected', 'ok');
+    if (sourceCount === 3) {
+      setRosterStatus('Adaptive APIs connected', 'ok', 'WHOOP + session + history synced');
+    } else {
+      setRosterStatus('Partially synced', 'warning', `Loaded ${sourceCount}/3 sources${failures.length ? ` (${failures.join(', ')})` : ''}`);
+    }
     renderWorkoutCard(dataForUi, trigger === 'manual' ? 'Workout Generated' : 'Live Session Synced');
   } catch (error) {
-    setRosterStatus('API unavailable', 'warning');
+    setRosterStatus('API unavailable', 'warning', error?.message || 'Unable to reach required endpoints');
     if (sessionOutput) {
       sessionOutput.innerHTML = `
         <strong>Unable to load live session</strong>
@@ -973,7 +1055,7 @@ if (backendUrlInput) {
     const nextUrl = backendUrlInput.value.trim();
     if (nextUrl && /^https?:\/\//i.test(nextUrl)) {
       window.localStorage.setItem(BACKEND_URL_STORAGE_KEY, nextUrl);
-      setRosterStatus('Custom backend saved', 'ok');
+      setRosterStatus('Custom backend saved', 'ok', 'Reconnecting with new backend URL');
       await initializeDynamicRoster();
     }
   });
