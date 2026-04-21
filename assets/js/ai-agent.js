@@ -120,6 +120,7 @@ const fallbackAthletesByGym = {
   'gym-delta-zone': [
     {
       id: 'delta-athlete-001',
+      whoopUserId: 'delta-athlete-001',
       name: 'Jordan Athlete',
       coach_name: 'Coach Delta',
       experience_level: 'intermediate',
@@ -127,6 +128,7 @@ const fallbackAthletesByGym = {
     },
     {
       id: 'delta-athlete-002',
+      whoopUserId: 'delta-athlete-002',
       name: 'Avery Runner',
       coach_name: 'Coach Delta',
       experience_level: 'advanced',
@@ -149,7 +151,7 @@ function isProductionHost() {
   return window.location.hostname.includes('deltazonesystem.com');
 }
 
-function resolveVaracisEndpoint() {
+function resolveBackendEndpoint() {
   const savedUrl = typeof window !== 'undefined'
     ? window.localStorage.getItem(BACKEND_URL_STORAGE_KEY)
     : '';
@@ -215,6 +217,20 @@ function getSelectedAthlete() {
   return loadedAthletes.find((athlete) => athlete.id === athleteId) || null;
 }
 
+function getSelectedWhoopUserId() {
+  const selectedAthlete = getSelectedAthlete();
+  const member = currentAthleteContext?.member_context || {};
+  return (
+    selectedAthlete?.whoopUserId ||
+    selectedAthlete?.whoop_user_id ||
+    selectedAthlete?.member_id ||
+    member.whoopUserId ||
+    member.whoop_user_id ||
+    member.member_id ||
+    athletePayload.member_id
+  );
+}
+
 function toArray(value) {
   if (Array.isArray(value)) return value.filter(Boolean);
   if (value === undefined || value === null || value === '') return [];
@@ -264,8 +280,13 @@ function normalizeGym(rawGym, index) {
 
 function normalizeAthlete(rawAthlete, index) {
   const athleteId = safeId(rawAthlete?.id || rawAthlete?.member_id || rawAthlete?.athlete_id, `athlete-${index + 1}`);
+  const whoopUserId = safeId(
+    rawAthlete?.whoopUserId || rawAthlete?.whoop_user_id || rawAthlete?.member_id || rawAthlete?.id,
+    athleteId
+  );
   return {
     id: athleteId,
+    whoopUserId,
     member_id: safeId(rawAthlete?.member_id || rawAthlete?.id || rawAthlete?.athlete_id, athleteId),
     gym_id: safeId(rawAthlete?.gym_id || rawAthlete?.gymId || gymSelectInput?.value, 'delta-zone-systems'),
     name: String(rawAthlete?.name || rawAthlete?.full_name || rawAthlete?.member_name || athleteId),
@@ -379,79 +400,62 @@ function renderMetricDots() {
   });
 }
 
-function fallbackContextForAthlete(athlete) {
-  const selectedAthlete = athlete || {};
-  const durationMin = Number(durationInput?.value || athletePayload.duration_min);
-  const readinessScore = athletePayload.wearable.recovery_score;
-
-  return {
-    persisted: false,
-    member_context: {
-      member_id: selectedAthlete.id || athletePayload.member_id,
-      coach_name: selectedAthlete.coach_name || coachNameInput?.value || athletePayload.coach_name,
-      duration_min: durationMin,
-      experience_level: selectedAthlete.experience_level || athletePayload.intake.experience_level,
-      primary_goal: selectedAthlete.primary_goal || athletePayload.intake.primary_goal,
-      readiness_score: readinessScore,
-      pohe_engagement_score: 91,
-      engagement_score: 62,
-      engagement_focus: 'ENGAGED',
-      member_type: 'Preview athlete',
-      data_sources_used: ['preview_mode'],
-      recovery_signals: {
-        sleep_hours: athletePayload.wearable.sleep_hours,
-        hrv_score: athletePayload.wearable.hrv_score
-      },
-      previous_lifts: athletePayload.previous_lifts,
-      recent_training_balance: {
-        cardio_heavy_sessions_this_week: athletePayload.recent_training.cardio_heavy_sessions_this_week,
-        strength_heavy_sessions_this_week: athletePayload.recent_training.strength_heavy_sessions_this_week
-      },
-      context_summary: 'Preview mode context generated locally.'
-    },
-    session_output: {
-      session_focus: 'Hybrid strength + threshold control',
-      session_intensity: 'MODERATE',
-      coach_summary: 'Preview context loaded. Connect API endpoints for full live roster and session history.',
-      session_intent: 'Train quality while protecting fatigue limits.',
-      constraints_applied: ['Keep posterior chain volume controlled'],
-      coach_cues: ['Respect RPE caps', 'Trim volume if quality drops'],
-      delta_zone_notes: ['Preview mode active', 'Live backend response not available yet'],
-      data_insights: {
-        readiness_score: readinessScore,
-        pohe_engagement_score: 91,
-        pohe_verified: false
-      },
-      coach_prompt_agent: {
-        prompt_summary: 'Preview mode context generated locally.',
-        assistant_reply: 'Use cached notes and live backend sync to replace this preview.'
-      },
-      main_workout: [
-        {
-          block: 'Block A',
-          exercises: [
-            { name: 'SkiErg threshold interval', sets: '4', reps: '5 minutes', effort: 'RPE 6-7' },
-            { name: 'Sled push', sets: '4', reps: '20m', effort: 'Controlled hard effort' }
-          ]
-        }
-      ]
-    },
-    programming_logic: {
-      training_mode: 'HYROX',
-      intensity: 'MODERATE',
-      session_objective: 'Engine quality with controlled strength work',
-      recovery_status: 'Preview Readiness',
-      constraints_applied: ['Avoid junk volume']
-    }
-  };
-}
-
 function normalizeWorkoutResponse(result, fallbackAthlete) {
   const payload = unwrapPayload(result) || {};
-  const fallback = fallbackContextForAthlete(fallbackAthlete);
-  const fallbackMember = fallback.member_context || {};
-  const fallbackSession = fallback.session_output || {};
-  const fallbackLogic = fallback.programming_logic || {};
+  const fallbackMember = {
+    member_id: fallbackAthlete?.member_id ?? athletePayload.member_id,
+    name: fallbackAthlete?.name ?? 'Unknown Athlete',
+    coach_name: fallbackAthlete?.coach_name ?? athletePayload.coach_name,
+    duration_min: Number(durationInput?.value || athletePayload.duration_min),
+    experience_level: fallbackAthlete?.experience_level ?? athletePayload.intake.experience_level,
+    primary_goal: fallbackAthlete?.primary_goal ?? athletePayload.intake.primary_goal,
+    readiness_score: 0,
+    pohe_engagement_score: 0,
+    engagement_score: 0,
+    engagement_focus: 'UNKNOWN',
+    member_type: 'Member',
+    data_sources_used: [],
+    recovery_signals: {
+      sleep_hours: 0,
+      hrv_score: 0
+    },
+    previous_lifts: athletePayload.previous_lifts,
+    recent_training_balance: {
+      cardio_heavy_sessions_this_week: athletePayload.recent_training.cardio_heavy_sessions_this_week,
+      strength_heavy_sessions_this_week: athletePayload.recent_training.strength_heavy_sessions_this_week
+    },
+    context_summary: ''
+  };
+  const fallbackSession = {
+    session_focus: '',
+    session_intensity: '',
+    coach_summary: '',
+    session_intent: '',
+    constraints_applied: [],
+    coach_cues: [],
+    delta_zone_notes: [],
+    data_insights: {
+      readiness_score: 0,
+      pohe_engagement_score: 0,
+      pohe_verified: false
+    },
+    coach_prompt_agent: {
+      prompt_summary: '',
+      assistant_reply: '',
+      workout_adjustments: []
+    },
+    main_workout: [],
+    warmup: [],
+    cooldown: [],
+    analytics: {}
+  };
+  const fallbackLogic = {
+    training_mode: '',
+    intensity: '',
+    session_objective: '',
+    recovery_status: '',
+    constraints_applied: []
+  };
   const member = payload.member_context || payload.member || payload.athlete || payload.profile || {};
   const session = payload.session_output || payload.session || payload.workout || payload.plan || {};
   const logic = payload.programming_logic || payload.logic || payload.programming || {};
@@ -594,8 +598,8 @@ function formatSessionCount(member, session) {
   return Number(athletePayload.class_history.classes_attended_30_days || 0);
 }
 
-function getWorkoutPreviewItems(session) {
-  if (!Array.isArray(session?.main_workout)) return athletePayload.recentWorkouts;
+function getWorkoutItems(session) {
+  if (!Array.isArray(session?.main_workout)) return [];
   return session.main_workout
     .flatMap((block) => (block.exercises || []).slice(0, 2).map((exercise) => `${block.block} · ${exercise.name}`))
     .slice(0, 3);
@@ -612,7 +616,7 @@ function applyLiveContext(data) {
   const recovery = member?.recovery_signals || {};
   const lifts = Array.isArray(member.previous_lifts) ? member.previous_lifts : [];
   const selectedGym = getSelectedGym();
-  const recentWorkoutItems = getWorkoutPreviewItems(session);
+  const recentWorkoutItems = getWorkoutItems(session);
   const engagementScore = Number(member.engagement_score ?? 0);
   const readiness = Number(member.readiness_score ?? 0);
   const sleepHours = Number(recovery.sleep_hours ?? 0);
@@ -631,10 +635,10 @@ function applyLiveContext(data) {
   setText(poheNumberEl, dataInsights.pohe_engagement_score ?? 0);
   setText(poheStatusEl, dataInsights.pohe_verified ? 'Verified / high trust signal' : 'Proxy / live data signal');
 
-  setText(wearableValueEl, liveWearable ? 'Live recovery signal connected' : 'Proxy recovery signal only');
-  setDotState(wearableDotEl, wearableIndicatorTextEl, liveWearable ? 'green' : 'amber', liveWearable ? 'Live' : 'Proxy');
+  setText(wearableValueEl, liveWearable ? 'Live recovery signal connected' : 'WHOOP data unavailable');
+  setDotState(wearableDotEl, wearableIndicatorTextEl, liveWearable ? 'green' : 'red', liveWearable ? 'Live' : 'Unavailable');
   setText(membershipValueEl, member.member_type);
-  setDotState(membershipDotEl, membershipIndicatorTextEl, data?.persisted ? 'green' : 'amber', data?.persisted ? 'Active' : 'Preview');
+  setDotState(membershipDotEl, membershipIndicatorTextEl, data?.persisted ? 'green' : 'amber', data?.persisted ? 'Active' : 'Synced');
   setText(engagementValueEl, `${engagementLabel.replace(/_/g, ' ').toLowerCase()} · score ${engagementScore || 0}`);
   setDotState(engagementDotEl, engagementIndicatorTextEl, engagementScore >= 60 ? 'green' : (engagementScore >= 30 ? 'amber' : 'red'), engagementScore >= 60 ? 'Engaged' : (engagementScore >= 30 ? 'Watch' : 'Low'));
   setText(sessionsUsedValueEl, sessionCount);
@@ -655,7 +659,9 @@ function applyLiveContext(data) {
   setText(coachNoteValueEl, clipText(noteSummary[0] || (session.coach_cues || []).slice(0, 2).join(' · ') || 'Focus on RPE. Rest is mandatory.', 150));
 
   if (recentWorkoutsListEl) {
-    recentWorkoutsListEl.innerHTML = recentWorkoutItems.map((item) => `<li>${item}</li>`).join('');
+    recentWorkoutsListEl.innerHTML = recentWorkoutItems.length
+      ? recentWorkoutItems.map((item) => `<li>${item}</li>`).join('')
+      : '<li>No session history returned by API.</li>';
   }
 
   const metricBlocks = document.querySelectorAll('.metric-with-dots');
@@ -716,7 +722,7 @@ function renderWorkoutCard(data, sourceLabel) {
       <div class="result-meta-item"><small>Mode</small><strong>${logic.training_mode || "-"}</strong></div>
       <div class="result-meta-item"><small>Intensity</small><strong>${session.session_intensity || logic.intensity || "-"}</strong></div>
       <div class="result-meta-item"><small>Objective</small><strong>${session.session_focus || logic.session_objective || 'Hybrid engine and strength development.'}</strong></div>
-      <div class="result-meta-item"><small>Why Today</small><strong>${promptAgent.prompt_summary || session.coach_summary || 'Varacis returned a session build.'}</strong></div>
+      <div class="result-meta-item"><small>Why Today</small><strong>${promptAgent.prompt_summary || session.coach_summary || 'Adaptive API returned a session build.'}</strong></div>
     </div>
 
     <section class="program-section">
@@ -791,39 +797,60 @@ async function fetchAthletes(apiRoot, gymId) {
   return firstArrayFromObject(result, ['athletes', 'members', 'items', 'results', 'data']).map(normalizeAthlete).filter((athlete) => athlete.id);
 }
 
+async function fetchWhoopData(apiRoot, whoopUserId) {
+  const encodedWhoopUserId = encodeURIComponent(whoopUserId);
+  return fetchJsonFromCandidates([
+    `${apiRoot}/api/whoop-data?whoopUserId=${encodedWhoopUserId}`
+  ]);
+}
+
+async function fetchSessionHistory(apiRoot, whoopUserId) {
+  const encodedWhoopUserId = encodeURIComponent(whoopUserId);
+  return fetchJsonFromCandidates([
+    `${apiRoot}/api/session-history?whoopUserId=${encodedWhoopUserId}`
+  ]);
+}
+
+async function fetchAdaptiveSession(apiRoot, whoopUserId) {
+  const encodedWhoopUserId = encodeURIComponent(whoopUserId);
+  return fetchJsonFromCandidates([
+    `${apiRoot}/api/get-adaptive-session?whoopUserId=${encodedWhoopUserId}`
+  ]);
+}
+
 async function buildSession(options = {}) {
   const { silent = false, trigger = 'manual' } = options;
   const selectedAthlete = getSelectedAthlete();
   const payload = buildPayload();
   const athleteId = payload.member_id || athletePayload.member_id;
-  const apiEndpoint = 'https://www.varacis.com/api/get-adaptive-session';
+  const whoopUserId = getSelectedWhoopUserId();
+  const apiRoot = currentApiRoot || getApiRoot(getApiEndpoint());
   const requestPayload = {
     gym_id: selectedAthlete?.gym_id || 'delta-zone-systems',
-    member_id: selectedAthlete?.member_id || athleteId || 'delta-athlete-001'
+    member_id: selectedAthlete?.member_id || athleteId || 'delta-athlete-001',
+    whoopUserId
   };
+  const apiEndpoint = `${apiRoot}/api/get-adaptive-session?whoopUserId=${encodeURIComponent(whoopUserId)}`;
 
   if (!silent) {
     buildSessionBtn.disabled = true;
-    buildSessionBtn.textContent = 'Building Through Varacis...';
-    connectionLabel.textContent = 'Calling Varacis';
-    sessionOutput.innerHTML = `<strong>Generating Workout</strong><span>Varacis is reading wearable state, POHE, and coach input now via ${clipText(apiEndpoint, 80)}.</span>`;
+    buildSessionBtn.textContent = 'Building Live Session...';
+    connectionLabel.textContent = 'Calling adaptive APIs';
+    sessionOutput.innerHTML = `<strong>Generating Workout</strong><span>Fetching WHOOP data, session history, and adaptive plan via ${clipText(apiEndpoint, 100)}.</span>`;
   }
 
   try {
-    const response = await fetch(apiEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify(requestPayload)
-    });
+    const [whoopDataResponse, sessionHistoryResponse, adaptiveSessionResponse] = await Promise.all([
+      fetchWhoopData(apiRoot, whoopUserId),
+      fetchSessionHistory(apiRoot, whoopUserId),
+      fetchAdaptiveSession(apiRoot, whoopUserId)
+    ]);
 
-    if (!response.ok) {
-      throw new Error(`Backend request failed with ${response.status}`);
-    }
-
-    const rawData = await response.json();
+    const rawData = {
+      ...(adaptiveSessionResponse || {}),
+      whoop_data: unwrapPayload(whoopDataResponse),
+      session_history: unwrapPayload(sessionHistoryResponse)
+    };
     console.log('LIVE RAW DATA', rawData);
 
     setSessionData(rawData);
@@ -832,60 +859,16 @@ async function buildSession(options = {}) {
     console.log('NORMALIZED DATA', normalizedData);
     const dataForUi = rawData?.member_context && rawData?.session_output ? rawData : normalizedData;
     persistAgentBundle(athleteId, requestPayload, rawData);
-    setRosterStatus('Varacis connected', 'ok');
+    setRosterStatus('Adaptive APIs connected', 'ok');
     renderWorkoutCard(dataForUi, trigger === 'manual' ? 'Workout Generated' : 'Live Session Synced');
   } catch (error) {
-    setRosterStatus('Preview mode', 'warning');
-    renderWorkoutCard(normalizeWorkoutResponse({
-      member_context: {
-        member_id: athleteId,
-        coach_name: payload.coach_name,
-        duration_min: payload.duration_min,
-        experience_level: payload.intake.experience_level,
-        primary_goal: payload.intake.primary_goal,
-        readiness_score: payload.wearable.recovery_score,
-        pohe_engagement_score: 0,
-        engagement_score: 27,
-        engagement_focus: 'NEEDS_ATTENTION',
-        member_type: 'Preview profile',
-        recovery_signals: {
-          sleep_hours: payload.wearable.sleep_hours,
-          hrv_score: payload.wearable.hrv_score
-        },
-        previous_lifts: payload.previous_lifts,
-        recent_training_balance: {
-          cardio_heavy_sessions_this_week: athletePayload.recent_training.cardio_heavy_sessions_this_week,
-          strength_heavy_sessions_this_week: athletePayload.recent_training.strength_heavy_sessions_this_week
-        },
-        data_sources_used: ['preview_mode', 'cached_notes']
-      },
-      session_output: {
-        session_focus: 'Deload strength into HYROX engine work',
-        session_intensity: 'MODERATE',
-        coach_summary: 'Lower-body fatigue stays protected. Keep the engine focus high and work to target RPE.',
-        coach_cues: ['Focus on RPE for movement', 'Rest is mandatory'],
-        delta_zone_notes: toArray(payload.cached_notes).slice(0, 4),
-        coach_prompt_agent: {
-          prompt_summary: coachPromptInput?.value?.trim() || 'Coach note captured.',
-          assistant_reply: 'Preview mode used the last cached notes because the backend was unavailable.'
-        },
-        main_workout: [
-          {
-            block: 'Block A',
-            exercises: [
-              { name: 'SkiErg threshold interval', sets: '4', reps: '5-6 minutes', effort: 'RPE 6-7' },
-              { name: 'Single-arm DB row + suitcase carry', sets: '4', reps: '8-10 reps + 30s', effort: 'RPE 6-7' }
-            ]
-          }
-        ]
-      },
-      programming_logic: {
-        training_mode: 'HYROX',
-        intensity: 'MODERATE',
-        session_objective: 'Threshold engine with protected legs',
-        recovery_status: 'Preview Readiness'
-      }
-    }, selectedAthlete), 'Preview Workout Ready');
+    setRosterStatus('API unavailable', 'warning');
+    if (sessionOutput) {
+      sessionOutput.innerHTML = `
+        <strong>Unable to load live session</strong>
+        <span>Adaptive APIs did not return a valid response for this athlete. Check /api/get-adaptive-session, /api/whoop-data, and /api/session-history for availability and try again.</span>
+      `;
+    }
   } finally {
     buildSessionBtn.disabled = false;
     buildSessionBtn.textContent = 'Build Today’s Session';
@@ -913,7 +896,7 @@ async function loadAthleteContextForSelection() {
   if (sessionOutput) {
     sessionOutput.innerHTML = `
       <strong>Syncing Live Session</strong>
-      <span>Fetching the latest workout from Varacis. Live data will replace the current view when the request completes.</span>
+      <span>Fetching the latest workout from adaptive APIs. Live data will replace the current view when the request completes.</span>
     `;
   }
 
@@ -967,7 +950,7 @@ function getApiEndpoint() {
     window.localStorage.setItem(BACKEND_URL_STORAGE_KEY, typedUrl);
     return typedUrl;
   }
-  const fallback = resolveVaracisEndpoint();
+  const fallback = resolveBackendEndpoint();
   if (backendUrlInput && !backendUrlInput.value.trim()) {
     backendUrlInput.value = fallback;
   }
@@ -975,7 +958,7 @@ function getApiEndpoint() {
   return fallback;
 }
 
-const initialEndpoint = resolveVaracisEndpoint();
+const initialEndpoint = resolveBackendEndpoint();
 if (isProductionHost() && backendUrlField) {
   backendUrlField.hidden = true;
   if (backendUrlInput) {
