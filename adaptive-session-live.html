@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Adaptive Session Live | Delta Zone Systems</title>
+<link rel="stylesheet" href="./styles.css" />
+<style>
+  :root {
+    --bg: #f5faf8;
+    --ink: #0b1727;
+    --muted: #476078;
+    --panel: #ffffff;
+    --line: #d5e4e8;
+    --ok: #0f8f68;
+    --warn: #bf6d0a;
+    --bad: #c53030;
+    --chip: #e6f4ee;
+    --shadow: 0 16px 44px rgba(10, 30, 44, 0.10);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background: radial-gradient(900px 420px at 8% -12%, rgba(6, 182, 212, 0.12), transparent 60%), radial-gradient(820px 420px at 98% 0%, rgba(20, 184, 166, 0.16), transparent 56%), var(--bg);
+    font-family: "Plus Jakarta Sans", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .wrap {
+    width: min(1220px, calc(100% - 32px));
+    margin: 22px auto 36px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .hero {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+    display: grid;
+    gap: 10px;
+  }
+
+  .hero-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .eyebrow {
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .title {
+    margin: 0;
+    font-size: clamp(24px, 2.8vw, 34px);
+    letter-spacing: -0.02em;
+  }
+
+  .hero-sub {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .hero-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    padding: 6px 11px;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--chip);
+    border: 1px solid rgba(15,23,42,0.08);
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #64748b;
+  }
+
+  .ok .dot { background: var(--ok); }
+  .warn .dot { background: var(--warn); }
+  .bad .dot { background: var(--bad); }
+
+  .status-line {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 10px;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+
+  .panel-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    margin: 10px 0 0;
+    font-size: 16px;
+  }
+
+  .label-chip,
+  .source-chip,
+  .readiness-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: #ecf3f4;
+  }
+
+  .readiness-chip.high { color: #047857; background: #d1fae5; }
+  .readiness-chip.moderate { color: #b45309; background: #fef3c7; }
+  .readiness-chip.low { color: #b91c1c; background: #fee2e2; }
+  .readiness-chip.unknown { color: #334155; background: #e2e8f0; }
+
+  .source-chip.live { color: #065f46; background: #d1fae5; }
+  .source-chip.fallback { color: #92400e; background: #fef3c7; }
+
+  .context-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .context-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: #edf4f6;
+    color: #1f3c4d;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .detail-item {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px;
+    display: grid;
+    gap: 4px;
+  }
+
+  .detail-item small {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .detail-item strong {
+    font-size: 17px;
+    letter-spacing: -0.02em;
+  }
+
+  .history-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .line {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+    margin: 8px 0 0;
+  }
+
+  .blocks,
+  .history-list {
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 8px;
+  }
+
+  .block-item,
+  .history-item {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px;
+  }
+
+  .coach-form {
+    display: grid;
+    gap: 8px;
+    margin: 12px 0;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #f8fbfc;
+  }
+
+  .coach-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 120px;
+    gap: 8px;
+  }
+
+  textarea,
+  input[type="date"],
+  input[type="number"] {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 11px;
+    font-size: 14px;
+    color: var(--ink);
+    background: #fff;
+    font-family: inherit;
+  }
+
+  textarea {
+    min-height: 88px;
+    resize: vertical;
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .metric {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px;
+    display: grid;
+    gap: 5px;
+  }
+
+  .metric small {
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .metric strong {
+    font-size: 21px;
+    letter-spacing: -0.02em;
+  }
+
+  .history-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .history-meta {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .empty {
+    color: var(--muted);
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  .actions {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .field {
+    display: grid;
+    gap: 5px;
+  }
+
+  .field span {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  input[type="text"] {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 11px;
+    font-size: 14px;
+    color: var(--ink);
+    background: #fff;
+  }
+
+  button {
+    border: 0;
+    background: linear-gradient(135deg, #0f766e, #0e7490);
+    color: #fff;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .btn-alt {
+    background: linear-gradient(135deg, #0369a1, #0284c7);
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  details {
+    margin-top: 8px;
+    grid-column: 1 / -1;
+  }
+
+  .hidden-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .raw-panel[hidden] {
+    display: none;
+  }
+
+  pre {
+    max-height: 240px;
+    overflow: auto;
+    background: #0b1322;
+    color: #d1e7ff;
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .links {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .links a {
+    color: #0f766e;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  @media (max-width: 940px) {
+    .layout { grid-template-columns: 1fr; }
+    .actions { grid-template-columns: 1fr; }
+    .metrics { grid-template-columns: 1fr 1fr; }
+    .coach-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 620px) {
+    .metrics { grid-template-columns: 1fr; }
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <p class="eyebrow">Today&apos;s Decision</p>
+          <h1 id="heroAthleteName" class="title">Athlete</h1>
+          <p class="hero-sub">Daily adaptive session built from live readiness and training history.</p>
+        </div>
+        <div class="hero-badges">
+          <span id="readinessChip" class="readiness-chip unknown">Readiness Unknown</span>
+          <span id="liveWhoopPill" class="pill warn"><span class="dot"></span><span id="liveWhoopLabel">Live WHOOP checking...</span></span>
+        </div>
+      </div>
+      <p id="statusText" class="status-line">Ready to sync.</p>
+    </section>
+
+    <section class="layout">
+      <article class="card" aria-label="Today session panel">
+        <div class="panel-head">
+          <h2>Today&apos;s Session</h2>
+          <span id="sourceChip" class="source-chip fallback">Fallback</span>
+        </div>
+
+        <button id="refreshBtn" type="button">Generate Today&apos;s Session</button>
+
+        <div class="coach-form" aria-label="AI Coach manual trigger">
+          <label class="field">
+            <span>Coach prompt</span>
+            <textarea id="coachPromptInput" placeholder="Member trained hard yesterday. Focus on mobility and low strain today."></textarea>
+          </label>
+          <div class="coach-grid">
+            <label class="field">
+              <span>Sport</span>
+              <input id="sportInput" type="text" value="functional-fitness" />
+            </label>
+            <label class="field">
+              <span>Booking date</span>
+              <input id="bookingDateInput" type="date" value="2026-04-21" />
+            </label>
+            <label class="field">
+              <span>Minutes</span>
+              <input id="bookingDurationInput" type="number" min="1" value="45" />
+            </label>
+          </div>
+          <button id="coachAgentBtn" class="btn-alt" type="button">Generate With AI Coach</button>
+          <p id="workflowMeta" class="line">Workflow ID: not generated</p>
+        </div>
+
+        <p id="sessionTitle" class="history-title">No session loaded</p>
+        <p class="line"><strong>Intensity:</strong> <span id="sessionIntensity">-</span></p>
+        <p class="line"><strong>Focus:</strong> <span id="sessionFocus">-</span></p>
+        <p class="line"><strong>Finisher:</strong> <span id="sessionFinisher">-</span></p>
+
+        <h3>Blocks</h3>
+        <ul id="sessionBlocks" class="blocks">
+          <li class="block-item">Waiting for session blocks...</li>
+        </ul>
+      </article>
+
+      <article class="card" aria-label="Physiology and history panel">
+        <h2>Live Physiology Snapshot</h2>
+        <div class="metrics">
+          <div class="metric">
+            <small>Readiness Score</small>
+            <strong id="readinessScoreValue">0.0</strong>
+          </div>
+          <div class="metric">
+            <small>Recovery Score</small>
+            <strong id="whoopRecovery">-</strong>
+          </div>
+          <div class="metric">
+            <small>Sleep Performance</small>
+            <strong id="whoopSleep">-</strong>
+          </div>
+          <div class="metric">
+            <small>Strain</small>
+            <strong id="whoopStrain">-</strong>
+          </div>
+          <div class="metric">
+            <small>Resting HR</small>
+            <strong id="whoopRhr">-</strong>
+          </div>
+          <div class="metric">
+            <small>HRV</small>
+            <strong id="whoopHrv">-</strong>
+          </div>
+        </div>
+
+        <div class="context-chips">
+          <span id="zoneClassifierChip" class="context-chip">Zone Classifier Unavailable</span>
+          <span id="loadTierChip" class="context-chip">Load Tier Unavailable</span>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-item">
+            <small>Sport</small>
+            <strong id="sportNameValue">-</strong>
+          </div>
+          <div class="detail-item">
+            <small>Avg / Max HR</small>
+            <strong id="heartRateValue">-</strong>
+          </div>
+          <div class="detail-item">
+            <small>Delta Zone Minutes</small>
+            <strong id="deltaZoneMinutesValue">0.0</strong>
+          </div>
+          <div class="detail-item">
+            <small>Delta Zone Ratio</small>
+            <strong id="deltaZoneRatioValue">0.000</strong>
+          </div>
+          <div class="detail-item">
+            <small>Load Penalty</small>
+            <strong id="loadPenaltyValue">0.0</strong>
+          </div>
+          <div class="detail-item">
+            <small>Recovery / Sleep / Load</small>
+            <strong id="scoringBreakdownValue">0.0 / 0.0 / 0.0</strong>
+          </div>
+        </div>
+
+        <div class="panel-head" style="margin-top:12px;">
+          <h2 style="margin:0; font-size:18px;">Recent Training History</h2>
+          <span class="label-chip">Last 5 sessions</span>
+        </div>
+        <ul id="historyList" class="history-list"></ul>
+        <div id="historyEmpty" class="empty">No session history returned by API.</div>
+      </article>
+    </section>
+
+    <section class="actions" aria-label="Page actions">
+      <input id="whoopUserIdInput" class="hidden-input" type="text" value="" autocomplete="off" aria-hidden="true" tabindex="-1" />
+      <button id="reconnectBtn" class="btn-alt" type="button">Reconnect WHOOP</button>
+      <label class="toggle" for="showWhoopRawToggle">
+        <input id="showWhoopRawToggle" type="checkbox" />
+        Show raw WHOOP payload
+      </label>
+
+      <details id="whoopRawPanel" class="raw-panel" hidden>
+        <summary>WHOOP raw payload</summary>
+        <pre id="whoopRawPre">Not loaded.</pre>
+      </details>
+    </section>
+
+    <nav class="links">
+      <a href="./index.html">Back to Home</a>
+      <a href="./ai-agent.html">AI Agent Dashboard</a>
+    </nav>
+  </main>
+
+  <script src="./assets/js/adaptive-session-live.js?v=20260421-2"></script>
+</body>
+</html>

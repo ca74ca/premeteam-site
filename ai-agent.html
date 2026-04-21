@@ -1007,18 +1007,18 @@
             <div class="avatar-placeholder">AI</div>
             <div class="avatar-meta">
               <strong id="athleteName" class="name">Jordan Athlete</strong>
-              <span id="athleteSub" class="sub">Placeholder athlete profile · coach-facing view</span>
+              <span id="athleteSub" class="sub">Waiting for live athlete context...</span>
             </div>
           </div>
 
           <div class="stack-card">
             <span class="stack-label">Gym / Location</span>
-            <span id="gymLocationValue" class="stack-value">Delta Zone Systems · Personal Coaching</span>
+            <span id="gymLocationValue" class="stack-value">-</span>
           </div>
 
           <div class="stack-card">
             <span class="stack-label">Coach / Trainer</span>
-            <span id="coachDisplay" class="stack-value">Coach Delta · ID #DZ-2048</span>
+            <span id="coachDisplay" class="stack-value">-</span>
           </div>
         </div>
 
@@ -1074,14 +1074,14 @@
         <div class="decision-card">
           <p class="decision-title">Agent Decision</p>
           <p id="decisionText" class="decision-text">
-            Recovery is stable enough to train. Recent workload supports a controlled hybrid session, but the build should stay honest to fatigue and avoid junk volume.
+            Live agent decision unavailable until API data is returned.
           </p>
 
           <div class="pohe-score">
-            <span id="poheNumber" class="pohe-number">91</span>
+            <span id="poheNumber" class="pohe-number">0</span>
             <div class="pohe-meta">
               <small>POHE Score</small>
-              <strong id="poheStatus">Verified / High trust signal</strong>
+              <strong id="poheStatus">Unavailable</strong>
             </div>
           </div>
         </div>
@@ -1093,7 +1093,7 @@
         <div class="api-live-row" aria-label="API connection state">
           <span class="api-chip">
             <span class="dot green"></span>
-            <span id="connectionLabel">API connected</span>
+            <span id="connectionLabel">Waiting for API sync</span>
           </span>
           <span id="connectionDetailLabel" class="api-chip secondary">User ready to build</span>
         </div>
@@ -1162,54 +1162,52 @@
           <div class="card">
             <h3>Snapshot Data</h3>
             <div class="snapshot-grid">
-              <div class="snapshot-item metric-with-dots" data-score="82">
+              <div class="snapshot-item metric-with-dots" data-score="0">
                 <strong>Recovery Score</strong>
                 <div class="metric-topline">
-                  <span id="recoveryValue">82 / 100</span>
-                  <span id="recoveryLabel" class="metric-score">Readiness</span>
+                  <span id="recoveryValue">0 / 100</span>
+                  <span id="recoveryLabel" class="metric-score">Unavailable</span>
                 </div>
                 <div class="progress-dots" aria-label="Recovery score progression"></div>
               </div>
 
-              <div class="snapshot-item metric-with-dots" data-score="76">
+              <div class="snapshot-item metric-with-dots" data-score="0">
                 <strong>Sleep Hours</strong>
                 <div class="metric-topline">
-                  <span id="sleepValue">7.6 hours</span>
-                  <span id="sleepScore" class="metric-score">76 / 100</span>
+                  <span id="sleepValue">0 hours</span>
+                  <span id="sleepScore" class="metric-score">0 / 100</span>
                 </div>
                 <div class="progress-dots" aria-label="Sleep progression"></div>
               </div>
 
-              <div class="snapshot-item metric-with-dots" data-score="61">
+              <div class="snapshot-item metric-with-dots" data-score="0">
                 <strong>HRV</strong>
                 <div class="metric-topline">
-                  <span id="hrvValue">61 ms</span>
-                  <span id="hrvScore">61 / 100</span>
+                  <span id="hrvValue">0 ms</span>
+                  <span id="hrvScore">0 / 100</span>
                 </div>
                 <div class="progress-dots" aria-label="HRV progression"></div>
               </div>
 
               <div class="snapshot-item">
                 <strong>Goal</strong>
-                <span id="goalValue">Improve race-day stamina while maintaining strength output.</span>
+                <span id="goalValue">-</span>
               </div>
 
               <div class="snapshot-item">
                 <strong>Last Strength Recorded</strong>
-                <span id="lastStrengthValue">Back Squat · 225 lb x 3</span>
+                <span id="lastStrengthValue">-</span>
               </div>
 
               <div class="snapshot-item">
                 <strong>Previous Week Class Sessions</strong>
-                <span id="classSessionValue">4 completed sessions</span>
+                <span id="classSessionValue">0 tracked sessions in the current cycle</span>
               </div>
 
               <div class="snapshot-item">
                 <strong>Last 3 Workouts</strong>
                 <ul id="recentWorkoutsList">
-                  <li>Tempo Run · 35 min</li>
-                  <li>Sled Push Intervals · 6 rounds</li>
-                  <li>Upper Body Strength · 45 min</li>
+                  <li>No session history returned by API.</li>
                 </ul>
               </div>
             </div>
@@ -1220,27 +1218,27 @@
             <div class="coach-brief">
               <div class="brief-block">
                 <span class="label">Session Objective</span>
-                <span id="objectiveValue" class="value">Build aerobic power without flattening lower-body output.</span>
+                <span id="objectiveValue" class="value">-</span>
               </div>
 
               <div class="brief-block">
                 <span class="label">Why Today</span>
-                <span id="whyTodayValue" class="value">Readiness is good enough to progress quality work, but recent class density means the session should stay sharp, not bloated.</span>
+                <span id="whyTodayValue" class="value">-</span>
               </div>
 
               <div class="brief-block">
                 <span class="label">Recommended Mode</span>
-                <span id="modeValue" class="value">Hybrid strength + threshold control.</span>
+                <span id="modeValue" class="value">-</span>
               </div>
 
               <div class="brief-block">
                 <span class="label">Primary Constraint</span>
-                <span id="constraintValue" class="value">Watch posterior-chain fatigue and avoid unnecessary volume spikes after the main lift.</span>
+                <span id="constraintValue" class="value">-</span>
               </div>
 
               <div class="brief-block">
                 <span class="label">Coach Note</span>
-                <span id="coachNoteValue" class="value">Push quality, not chaos. If movement speed drops or breathing gets sloppy, trim volume and keep the session honest.</span>
+                <span id="coachNoteValue" class="value">-</span>
               </div>
             </div>
 
@@ -1249,11 +1247,12 @@
 
         <div class="page-links">
           <a href="./index.html">Back to Home</a>
+          <a href="./adaptive-session-live.html">Open Contract Live UI</a>
           <a class="secondary" href="mailto:support@deltazonesystem.com?subject=Refresh%20Athlete%20Data">Refresh Athlete Data</a>
         </div>
       </section>
     </section>
   </main>
-  <script src="./assets/js/ai-agent.js"></script>
+  <script src="./assets/js/ai-agent.js?v=20260421-2"></script>
 </body>
 </html>
