@@ -91,6 +91,8 @@ const TELEMETRY_ALERT_COOLDOWN_MS = 15000;
 
 let latestTelemetryOverrides = {};
 let latestTargetZone = null;
+let latestCoachResult = null;
+let latestCoachWorkflowId = '';
 let telemetryOverlayTimer = null;
 let telemetryPollTimer = null;
 let lastTelemetryAlert = { scenario: '', at: 0 };
@@ -896,6 +898,9 @@ function setWorkflowMeta(value) {
 }
 
 function renderCoachSession(result) {
+  latestCoachResult = result || latestCoachResult;
+  latestCoachWorkflowId = result?.workflow_id || latestCoachWorkflowId;
+
   const sessionOutput = result?.session_output || {};
   const programmingLogic = result?.programming_logic || {};
   const memberContext = result?.member_context || {};
@@ -1009,21 +1014,42 @@ async function fetchJson(url) {
   return json;
 }
 
-async function postJson(url, body) {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
+async function postJson(url, body, options = {}) {
+  const timeoutMs = Number(options.timeoutMs || 30000);
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
 
-  if (!response.ok) {
-    throw new Error(`${url} -> ${response.status}`);
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+
+    if (!response.ok) {
+      throw new Error(`${url} -> ${response.status}`);
+    }
+
+    const raw = await response.text();
+    if (!raw || !raw.trim()) return {};
+
+    try {
+      return JSON.parse(raw);
+    } catch (error) {
+      throw new Error(`Invalid JSON response from ${url}`);
+    }
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      throw new Error(`Request timed out after ${Math.round(timeoutMs / 1000)}s`);
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
   }
-
-  return response.json();
 }
 
 async function loadWhoopRaw() {
@@ -1065,15 +1091,26 @@ async function runCoachAgent() {
     booking: {
       date: bookingDate,
       duration_minutes: durationMinutes
-    }
+    },
+    previous_workflow_id: latestCoachWorkflowId || undefined,
+    last_session_snapshot: latestCoachResult?.session_output || undefined
   };
 
   if (coachAgentBtn) coachAgentBtn.disabled = true;
+  setWorkflowMeta('Workflow ID: submitting coach prompt...');
   setStatus('warn', 'AI Coach running', 'Generating a custom session from coach prompt...');
 
   try {
-    const result = await postJson(url, body);
+    const result = await postJson(url, body, { timeoutMs: 45000 });
+    console.log('[adaptive-session-live] coach request body:', JSON.stringify(body, null, 2));
     console.log('[adaptive-session-live] raw coach response:', JSON.stringify(result, null, 2));
+
+    if (!result || typeof result !== 'object' || !Object.keys(result).length) {
+      setStatus('warn', 'AI Coach returned empty result', 'No content was returned. Try a more specific prompt or regenerate the base session first.');
+      setWorkflowMeta('Workflow ID: not returned (empty response)');
+      return;
+    }
+
     renderCoachSession(result);
   } catch (error) {
     setStatus('bad', 'AI Coach failed', error.message || 'Unable to run coach prompt agent.');
