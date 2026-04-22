@@ -220,6 +220,196 @@
     font-weight: 800;
   }
 
+  .viz-stack {
+    display: grid;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .viz-card {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    background: rgba(255,255,255,.03);
+  }
+
+  .viz-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .viz-title {
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .viz-sub {
+    margin: 0;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .zone-rows {
+    display: grid;
+    gap: 6px;
+  }
+
+  .zone-row {
+    display: grid;
+    grid-template-columns: 36px 1fr 56px;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .zone-label,
+  .zone-value {
+    font-size: 12px;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .zone-value {
+    text-align: right;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .zone-track {
+    height: 8px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.1);
+  }
+
+  .zone-fill {
+    height: 100%;
+    width: var(--pct, 0%);
+    transition: width .38s ease;
+    border-radius: 999px;
+  }
+
+  .zone-z0 { background: linear-gradient(90deg, #6b7280, #9ca3af); }
+  .zone-z1 { background: linear-gradient(90deg, #0ea5a4, #2dd4bf); }
+  .zone-z2 { background: linear-gradient(90deg, #22c55e, #86efac); }
+  .zone-z3 { background: linear-gradient(90deg, #f59e0b, #facc15); }
+  .zone-z4 { background: linear-gradient(90deg, #f97316, #fb7185); }
+  .zone-z5 { background: linear-gradient(90deg, #ef4444, #b91c1c); }
+
+  .delta-score {
+    display: grid;
+    gap: 8px;
+  }
+
+  .delta-score-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .delta-score-value {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .delta-score-meta {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .delta-track {
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.12);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.12);
+  }
+
+  .delta-fill {
+    height: 100%;
+    width: var(--pct, 0%);
+    transition: width .38s ease;
+    background: linear-gradient(90deg, #f59e0b, #f97316, #ef4444);
+    box-shadow: 0 0 12px rgba(249,115,22,.3);
+  }
+
+  .coach-form-card {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    background: rgba(255,255,255,.03);
+    display: grid;
+    gap: 10px;
+  }
+
+  .coach-form-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .coach-form-copy {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  .coach-form-heading {
+    margin: 0;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .coach-form-list {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 6px;
+    color: rgba(255,255,255,.9);
+    font-size: 13px;
+  }
+
+  .coach-zone-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .coach-zone-item {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px;
+    font-size: 12px;
+    color: rgba(255,255,255,.88);
+    line-height: 1.4;
+    background: rgba(255,255,255,.02);
+  }
+
+  .coach-zone-item strong {
+    color: #fff;
+  }
+
+  .coach-zone-stat {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+
   .line {
     color: var(--muted);
     font-size: 14px;
@@ -488,6 +678,7 @@
   @media (max-width: 620px) {
     .metrics { grid-template-columns: 1fr; }
     .detail-grid { grid-template-columns: 1fr; }
+    .coach-zone-grid { grid-template-columns: 1fr; }
     .home-orb {
       top: 74px;
       left: 12px;
@@ -605,6 +796,10 @@
             <strong id="sportNameValue">-</strong>
           </div>
           <div class="detail-item">
+            <small>Heart Rate Zones (min)</small>
+            <strong id="zoneBreakdownValue">Z0 0.0 | Z1 0.0 | Z2 0.0 | Z3 0.0 | Z4 0.0 | Z5 0.0</strong>
+          </div>
+          <div class="detail-item">
             <small>Avg / Max HR</small>
             <strong id="heartRateValue">-</strong>
           </div>
@@ -624,6 +819,85 @@
             <small>Recovery / Sleep / Load</small>
             <strong id="scoringBreakdownValue">0.0 / 0.0 / 0.0</strong>
           </div>
+        </div>
+
+        <div class="viz-stack" aria-label="Heart rate visualizations">
+          <section class="viz-card" aria-label="Zone distribution graph">
+            <div class="viz-head">
+              <p class="viz-title">Graph 1 - Zone Distribution</p>
+              <p id="zoneDistributionTotal" class="viz-sub">Total 0.0 min</p>
+            </div>
+            <div class="zone-rows">
+              <div class="zone-row">
+                <span class="zone-label">Z0</span>
+                <div class="zone-track"><div id="zoneBarZ0" class="zone-fill zone-z0" style="--pct: 0%;"></div></div>
+                <span id="zoneValueZ0" class="zone-value">0.0m</span>
+              </div>
+              <div class="zone-row">
+                <span class="zone-label">Z1</span>
+                <div class="zone-track"><div id="zoneBarZ1" class="zone-fill zone-z1" style="--pct: 0%;"></div></div>
+                <span id="zoneValueZ1" class="zone-value">0.0m</span>
+              </div>
+              <div class="zone-row">
+                <span class="zone-label">Z2</span>
+                <div class="zone-track"><div id="zoneBarZ2" class="zone-fill zone-z2" style="--pct: 0%;"></div></div>
+                <span id="zoneValueZ2" class="zone-value">0.0m</span>
+              </div>
+              <div class="zone-row">
+                <span class="zone-label">Z3</span>
+                <div class="zone-track"><div id="zoneBarZ3" class="zone-fill zone-z3" style="--pct: 0%;"></div></div>
+                <span id="zoneValueZ3" class="zone-value">0.0m</span>
+              </div>
+              <div class="zone-row">
+                <span class="zone-label">Z4</span>
+                <div class="zone-track"><div id="zoneBarZ4" class="zone-fill zone-z4" style="--pct: 0%;"></div></div>
+                <span id="zoneValueZ4" class="zone-value">0.0m</span>
+              </div>
+              <div class="zone-row">
+                <span class="zone-label">Z5</span>
+                <div class="zone-track"><div id="zoneBarZ5" class="zone-fill zone-z5" style="--pct: 0%;"></div></div>
+                <span id="zoneValueZ5" class="zone-value">0.0m</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="viz-card" aria-label="Delta zone score graph">
+            <div class="viz-head">
+              <p class="viz-title">Graph 2 - Delta Zone Score</p>
+              <p class="viz-sub">Proprietary signal: Z3 + Z4</p>
+            </div>
+            <div class="delta-score">
+              <div class="delta-score-top">
+                <span id="deltaScoreValue" class="delta-score-value">0.0m</span>
+                <span id="deltaScoreMeta" class="delta-score-meta">0.0% of time</span>
+              </div>
+              <div class="delta-track"><div id="deltaScoreBar" class="delta-fill" style="--pct: 0%;"></div></div>
+            </div>
+          </section>
+
+          <section class="coach-form-card" aria-label="Zone distribution coaching form">
+            <h3 class="coach-form-title">Zone Distribution (Latest Session)</h3>
+            <p class="coach-form-copy">Time spent in each heart rate zone from the most recent recorded workout.</p>
+
+            <p class="coach-form-heading">Coaching Formula</p>
+            <p id="coachFormulaIntro" class="coach-form-copy">Session quality is determined by where time is spent:</p>
+            <ul id="coachFormulaList" class="coach-form-list">
+              <li>Z1-Z2 -> build capacity, support recovery</li>
+              <li>Z3 -> accumulate controlled fatigue</li>
+              <li>Z4 -> drive performance adaptation</li>
+              <li>Z5 -> high stress, use sparingly</li>
+            </ul>
+            <p id="coachFormulaUse" class="coach-form-copy">Used to assess effort distribution, recovery demand, threshold exposure, and overall training load.</p>
+
+            <p class="coach-form-heading">Zones</p>
+            <div class="coach-zone-grid">
+              <div class="coach-zone-item"><strong>Z1</strong> -> passive recovery / very low effort <span id="coachZoneZ1Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
+              <div class="coach-zone-item"><strong>Z2</strong> -> active recovery / aerobic base <span id="coachZoneZ2Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
+              <div class="coach-zone-item"><strong>Z3</strong> -> sustained effort / threshold work <span id="coachZoneZ3Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
+              <div class="coach-zone-item"><strong>Z4</strong> -> high-intensity effort <span id="coachZoneZ4Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
+              <div class="coach-zone-item"><strong>Z5</strong> -> maximal effort / redline <span id="coachZoneZ5Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
+            </div>
+          </section>
         </div>
 
         <div class="panel-head" style="margin-top:12px;">

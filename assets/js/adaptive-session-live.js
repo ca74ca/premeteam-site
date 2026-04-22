@@ -32,11 +32,36 @@ const readinessScoreValue = document.getElementById('readinessScoreValue');
 const zoneClassifierChip = document.getElementById('zoneClassifierChip');
 const loadTierChip = document.getElementById('loadTierChip');
 const sportNameValue = document.getElementById('sportNameValue');
+const zoneBreakdownValue = document.getElementById('zoneBreakdownValue');
 const heartRateValue = document.getElementById('heartRateValue');
 const deltaZoneMinutesValue = document.getElementById('deltaZoneMinutesValue');
 const deltaZoneRatioValue = document.getElementById('deltaZoneRatioValue');
 const loadPenaltyValue = document.getElementById('loadPenaltyValue');
 const scoringBreakdownValue = document.getElementById('scoringBreakdownValue');
+const zoneDistributionTotal = document.getElementById('zoneDistributionTotal');
+const zoneBarZ0 = document.getElementById('zoneBarZ0');
+const zoneBarZ1 = document.getElementById('zoneBarZ1');
+const zoneBarZ2 = document.getElementById('zoneBarZ2');
+const zoneBarZ3 = document.getElementById('zoneBarZ3');
+const zoneBarZ4 = document.getElementById('zoneBarZ4');
+const zoneBarZ5 = document.getElementById('zoneBarZ5');
+const zoneValueZ0 = document.getElementById('zoneValueZ0');
+const zoneValueZ1 = document.getElementById('zoneValueZ1');
+const zoneValueZ2 = document.getElementById('zoneValueZ2');
+const zoneValueZ3 = document.getElementById('zoneValueZ3');
+const zoneValueZ4 = document.getElementById('zoneValueZ4');
+const zoneValueZ5 = document.getElementById('zoneValueZ5');
+const deltaScoreValue = document.getElementById('deltaScoreValue');
+const deltaScoreMeta = document.getElementById('deltaScoreMeta');
+const deltaScoreBar = document.getElementById('deltaScoreBar');
+const coachFormulaIntro = document.getElementById('coachFormulaIntro');
+const coachFormulaList = document.getElementById('coachFormulaList');
+const coachFormulaUse = document.getElementById('coachFormulaUse');
+const coachZoneZ1Stat = document.getElementById('coachZoneZ1Stat');
+const coachZoneZ2Stat = document.getElementById('coachZoneZ2Stat');
+const coachZoneZ3Stat = document.getElementById('coachZoneZ3Stat');
+const coachZoneZ4Stat = document.getElementById('coachZoneZ4Stat');
+const coachZoneZ5Stat = document.getElementById('coachZoneZ5Stat');
 
 const historyList = document.getElementById('historyList');
 const historyEmpty = document.getElementById('historyEmpty');
@@ -183,6 +208,129 @@ function formatNumberOrZero(value, digits = 1) {
   return Number.isFinite(number) ? number.toFixed(digits) : (0).toFixed(digits);
 }
 
+function toFiniteNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function renderDynamicCoaching(zones, totalMinutes, deltaMinutes, deltaPercent) {
+  const pct = (minutes) => (totalMinutes ? ((minutes / totalMinutes) * 100) : 0);
+  const z12Pct = pct(zones.z1 + zones.z2);
+  const z3Pct = pct(zones.z3);
+  const z4Pct = pct(zones.z4);
+  const z5Pct = pct(zones.z5);
+
+  const exposureBand = deltaPercent >= 45
+    ? 'high threshold exposure'
+    : deltaPercent >= 30
+      ? 'balanced threshold exposure'
+      : 'low threshold exposure';
+  const redlineBand = z5Pct >= 8
+    ? 'redline stress is elevated'
+    : z5Pct >= 3
+      ? 'redline stress is moderate'
+      : 'redline stress is controlled';
+
+  if (coachFormulaIntro) {
+    coachFormulaIntro.textContent = `Session quality is determined by where time is spent. This session shows ${formatNumberOrZero(totalMinutes, 1)} total zone minutes with ${formatNumberOrZero(deltaMinutes, 1)} minutes in Delta (Z3+Z4).`;
+  }
+
+  if (coachFormulaList) {
+    coachFormulaList.innerHTML = [
+      `Z1-Z2 -> build capacity, support recovery (${formatNumberOrZero(z12Pct, 1)}%)`,
+      `Z3 -> accumulate controlled fatigue (${formatNumberOrZero(z3Pct, 1)}%)`,
+      `Z4 -> drive performance adaptation (${formatNumberOrZero(z4Pct, 1)}%)`,
+      `Z5 -> high stress, use sparingly (${formatNumberOrZero(z5Pct, 1)}%)`
+    ].map((line) => `<li>${line}</li>`).join('');
+  }
+
+  if (coachFormulaUse) {
+    coachFormulaUse.textContent = `Used to assess effort distribution, recovery demand, threshold exposure, and overall training load. Current read: ${exposureBand}; ${redlineBand}.`;
+  }
+
+  const setZoneStat = (el, minutes) => {
+    if (!el) return;
+    el.textContent = `${formatNumberOrZero(minutes, 1)}m (${formatNumberOrZero(pct(minutes), 1)}%)`;
+  };
+
+  setZoneStat(coachZoneZ1Stat, zones.z1);
+  setZoneStat(coachZoneZ2Stat, zones.z2);
+  setZoneStat(coachZoneZ3Stat, zones.z3);
+  setZoneStat(coachZoneZ4Stat, zones.z4);
+  setZoneStat(coachZoneZ5Stat, zones.z5);
+}
+
+function renderZoneVisuals(workoutContext, scoring) {
+  const zones = {
+    z0: toFiniteNumber(workoutContext.zone0_minutes ?? workoutContext.zone_zero_minutes),
+    z1: toFiniteNumber(workoutContext.zone1_minutes ?? workoutContext.zone_one_minutes),
+    z2: toFiniteNumber(workoutContext.zone2_minutes ?? workoutContext.zone_two_minutes),
+    z3: toFiniteNumber(workoutContext.zone3_minutes ?? workoutContext.zone_three_minutes),
+    z4: toFiniteNumber(workoutContext.zone4_minutes ?? workoutContext.zone_four_minutes),
+    z5: toFiniteNumber(workoutContext.zone5_minutes ?? workoutContext.zone_five_minutes)
+  };
+
+  const totalMinutes = toFiniteNumber(workoutContext.total_zone_minutes)
+    || (zones.z0 + zones.z1 + zones.z2 + zones.z3 + zones.z4 + zones.z5);
+
+  const pct = (minutes) => {
+    if (!totalMinutes) return 0;
+    return Math.max(0, Math.min((minutes / totalMinutes) * 100, 100));
+  };
+
+  if (zoneDistributionTotal) {
+    zoneDistributionTotal.textContent = `Total ${formatNumberOrZero(totalMinutes, 1)} min`;
+  }
+
+  const barMap = {
+    z0: zoneBarZ0,
+    z1: zoneBarZ1,
+    z2: zoneBarZ2,
+    z3: zoneBarZ3,
+    z4: zoneBarZ4,
+    z5: zoneBarZ5
+  };
+
+  const valueMap = {
+    z0: zoneValueZ0,
+    z1: zoneValueZ1,
+    z2: zoneValueZ2,
+    z3: zoneValueZ3,
+    z4: zoneValueZ4,
+    z5: zoneValueZ5
+  };
+
+  Object.entries(zones).forEach(([key, minutes]) => {
+    const percent = pct(minutes);
+    if (barMap[key]) {
+      barMap[key].style.setProperty('--pct', `${percent.toFixed(1)}%`);
+      barMap[key].title = `${minutes.toFixed(1)} min (${percent.toFixed(1)}%)`;
+    }
+    if (valueMap[key]) {
+      valueMap[key].textContent = `${minutes.toFixed(1)}m`;
+    }
+  });
+
+  const deltaMinutes = toFiniteNumber(workoutContext.delta_zone_minutes ?? scoring.delta_zone_minutes)
+    || (zones.z3 + zones.z4);
+  const deltaRatio = toFiniteNumber(workoutContext.delta_zone_ratio ?? scoring.delta_zone_ratio)
+    || (totalMinutes ? (deltaMinutes / totalMinutes) : 0);
+  const deltaPercent = Math.max(0, Math.min(deltaRatio * 100, 100));
+
+  renderDynamicCoaching(zones, totalMinutes, deltaMinutes, deltaPercent);
+
+  if (deltaScoreValue) {
+    deltaScoreValue.textContent = `${formatNumberOrZero(deltaMinutes, 1)}m`;
+  }
+  if (deltaScoreMeta) {
+    deltaScoreMeta.textContent = `${formatNumberOrZero(deltaPercent, 1)}% of time`;
+  }
+  if (deltaScoreBar) {
+    deltaScoreBar.style.setProperty('--pct', `${deltaPercent.toFixed(1)}%`);
+    deltaScoreBar.title = `${deltaMinutes.toFixed(1)} min (${deltaPercent.toFixed(1)}%)`;
+  }
+}
+
 function extractWhoopSignals(whoopPayload) {
   return {
     recovery: readNumber(whoopPayload, ['recovery', 'recovery_score', 'recovery.score.recovery_score']),
@@ -227,6 +375,16 @@ function renderAdaptiveSession(payload) {
   if (sportNameValue) {
     sportNameValue.textContent = workoutContext.sport_name || '-';
   }
+  if (zoneBreakdownValue) {
+    zoneBreakdownValue.textContent = [
+      `Z0 ${formatNumberOrZero(workoutContext.zone0_minutes ?? workoutContext.zone_zero_minutes, 1)}`,
+      `Z1 ${formatNumberOrZero(workoutContext.zone1_minutes ?? workoutContext.zone_one_minutes, 1)}`,
+      `Z2 ${formatNumberOrZero(workoutContext.zone2_minutes ?? workoutContext.zone_two_minutes, 1)}`,
+      `Z3 ${formatNumberOrZero(workoutContext.zone3_minutes ?? workoutContext.zone_three_minutes, 1)}`,
+      `Z4 ${formatNumberOrZero(workoutContext.zone4_minutes ?? workoutContext.zone_four_minutes, 1)}`,
+      `Z5 ${formatNumberOrZero(workoutContext.zone5_minutes ?? workoutContext.zone_five_minutes, 1)}`
+    ].join(' | ');
+  }
   if (heartRateValue) {
     const avg = formatNumber(workoutContext.average_heart_rate, 0);
     const max = formatNumber(workoutContext.max_heart_rate, 0);
@@ -244,6 +402,7 @@ function renderAdaptiveSession(payload) {
   if (scoringBreakdownValue) {
     scoringBreakdownValue.textContent = `${formatNumberOrZero(scoring.recovery_component, 1)} / ${formatNumberOrZero(scoring.sleep_component, 1)} / ${formatNumberOrZero(scoring.load_component, 1)}`;
   }
+  renderZoneVisuals(workoutContext, scoring);
 
   if (whoop && sourceFromAdaptivePayload(payload) === 'whoop') {
     setStatus('ok', 'Live WHOOP connected', 'Session generated from live physiology signal.');
