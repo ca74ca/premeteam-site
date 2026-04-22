@@ -58,6 +58,9 @@ function resolveApiBase() {
   }
 
   const { protocol, hostname } = window.location;
+  if (hostname.includes('deltazonesystem.com')) {
+    return 'https://www.varacis.com';
+  }
   if (hostname.includes('.app.github.dev')) {
     const backendHost = hostname.replace(/-\d+\.app\.github\.dev$/, '-3000.app.github.dev');
     return `${protocol}//${backendHost}`;
