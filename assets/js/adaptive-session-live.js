@@ -218,14 +218,46 @@ function buildAdaptiveLogicBlocks(session) {
 }
 
 function buildCoachLogicBlocks(result, sessionOutput, mainWorkout) {
+  const normalizeMainWorkoutCandidates = (value) => {
+    if (!value) return [];
+
+    if (Array.isArray(value)) {
+      return value.filter((item) => item && typeof item === 'object');
+    }
+
+    if (typeof value === 'object') {
+      const keyed = Object.entries(value)
+        .filter(([key, item]) => {
+          if (!item || typeof item !== 'object') return false;
+          return /^block[_\s-]/i.test(key) || /^block\s*[a-z0-9]+$/i.test(key);
+        })
+        .map(([, item]) => item);
+
+      if (keyed.length) return keyed;
+
+      if (value.block_a || value.block_b || value.block_c) {
+        return [value.block_a, value.block_b, value.block_c].filter((item) => item && typeof item === 'object');
+      }
+    }
+
+    return [];
+  };
+
   const candidates = [
     result?.logic_blocks,
     result?.programming_logic?.logic_blocks,
-    sessionOutput?.logic_blocks
+    sessionOutput?.logic_blocks,
+    sessionOutput?.main_workout,
+    sessionOutput?.main_workout_blocks,
+    result?.main_workout,
+    result?.main_workout_blocks
   ];
 
-  const explicit = candidates.find((item) => Array.isArray(item) && item.length);
-  if (explicit) {
+  const explicit = candidates
+    .flatMap((item) => normalizeMainWorkoutCandidates(item))
+    .filter(Boolean);
+
+  if (explicit.length) {
     return explicit
       .map((item, index) => {
         try {
@@ -839,7 +871,11 @@ function renderCoachSession(result) {
   const sessionOutput = result?.session_output || {};
   const programmingLogic = result?.programming_logic || {};
   const memberContext = result?.member_context || {};
-  const mainWorkout = Array.isArray(sessionOutput.main_workout) ? sessionOutput.main_workout : [];
+  const mainWorkout = Array.isArray(sessionOutput.main_workout)
+    ? sessionOutput.main_workout
+    : (sessionOutput.main_workout && typeof sessionOutput.main_workout === 'object')
+      ? Object.values(sessionOutput.main_workout).filter((item) => item && typeof item === 'object')
+      : [];
   const logicBlocks = buildCoachLogicBlocks(result, sessionOutput, mainWorkout);
   latestTelemetryOverrides = buildTelemetryOverrideMap(
     sessionOutput?.telemetry_overrides
