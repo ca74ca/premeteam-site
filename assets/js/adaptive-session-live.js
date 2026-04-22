@@ -218,11 +218,23 @@ function buildAdaptiveLogicBlocks(session) {
 }
 
 function buildCoachLogicBlocks(result, sessionOutput, mainWorkout) {
+  // Coerce a block-shaped value into a plain-object array the normalizer can consume.
+  // Handles: array of objects, array of strings, keyed object blocks, string blocks.
+  const coerceStringBlock = (str) => ({
+    title: sanitizeBlockText(str),
+    target_zone: 'Zone Authority',
+    rounds: '',
+    instructions: [sanitizeBlockText(str)]
+  });
+
   const normalizeMainWorkoutCandidates = (value) => {
     if (!value) return [];
 
     if (Array.isArray(value)) {
-      return value.filter((item) => item && typeof item === 'object');
+      return value
+        .filter(Boolean)
+        .map((item) => (typeof item === 'string' ? coerceStringBlock(item) : item))
+        .filter((item) => item && typeof item === 'object');
     }
 
     if (typeof value === 'object') {
@@ -238,6 +250,11 @@ function buildCoachLogicBlocks(result, sessionOutput, mainWorkout) {
       if (value.block_a || value.block_b || value.block_c) {
         return [value.block_a, value.block_b, value.block_c].filter((item) => item && typeof item === 'object');
       }
+
+      // Plain object that itself looks like a single block
+      if (value.instructions || value.exercises || value.target_zone) {
+        return [value];
+      }
     }
 
     return [];
@@ -249,8 +266,13 @@ function buildCoachLogicBlocks(result, sessionOutput, mainWorkout) {
     sessionOutput?.logic_blocks,
     sessionOutput?.main_workout,
     sessionOutput?.main_workout_blocks,
+    sessionOutput?.blocks,
     result?.main_workout,
-    result?.main_workout_blocks
+    result?.main_workout_blocks,
+    result?.blocks,
+    result?.session?.logic_blocks,
+    result?.session?.main_workout,
+    result?.session?.blocks
   ];
 
   const explicit = candidates
@@ -1045,6 +1067,7 @@ async function runCoachAgent() {
 
   try {
     const result = await postJson(url, body);
+    console.log('[adaptive-session-live] raw coach response:', JSON.stringify(result, null, 2));
     renderCoachSession(result);
   } catch (error) {
     setStatus('bad', 'AI Coach failed', error.message || 'Unable to run coach prompt agent.');
