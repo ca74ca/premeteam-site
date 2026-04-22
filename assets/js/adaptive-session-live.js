@@ -356,7 +356,8 @@ function renderHistory(items) {
 async function fetchJson(url) {
   const response = await fetch(url, {
     method: 'GET',
-    headers: { Accept: 'application/json' }
+    headers: { Accept: 'application/json' },
+    cache: 'no-store'
   });
 
   if (!response.ok) {
@@ -538,7 +539,6 @@ function syncWhoopRawVisibility() {
   if (showWhoopRawToggle.checked) {
     loadWhoopRaw();
   }
-  loadLiveData();
 }
 
 function attachButtonGlow() {
