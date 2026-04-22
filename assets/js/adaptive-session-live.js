@@ -205,6 +205,34 @@ function buildWorkoutCopyText() {
   return lines.join('\n');
 }
 
+async function writeTextToClipboard(text) {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch (error) {
+      // Fall through to legacy copy path when async clipboard is unavailable or blocked.
+    }
+  }
+
+  const helper = document.createElement('textarea');
+  helper.value = text;
+  helper.setAttribute('readonly', '');
+  helper.style.position = 'fixed';
+  helper.style.opacity = '0';
+  helper.style.pointerEvents = 'none';
+  document.body.appendChild(helper);
+  helper.focus();
+  helper.select();
+
+  const copied = document.execCommand('copy');
+  document.body.removeChild(helper);
+
+  if (!copied) {
+    throw new Error('Clipboard copy was blocked by the browser.');
+  }
+}
+
 async function copyWorkoutToClipboard() {
   const text = buildWorkoutCopyText();
 
@@ -216,19 +244,7 @@ async function copyWorkoutToClipboard() {
   if (copyWorkoutBtn) copyWorkoutBtn.disabled = true;
 
   try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-    } else {
-      const helper = document.createElement('textarea');
-      helper.value = text;
-      helper.setAttribute('readonly', '');
-      helper.style.position = 'fixed';
-      helper.style.opacity = '0';
-      document.body.appendChild(helper);
-      helper.select();
-      document.execCommand('copy');
-      document.body.removeChild(helper);
-    }
+    await writeTextToClipboard(text);
     setStatus('ok', 'Workout copied', 'Copied the current workout to your clipboard.');
   } catch (error) {
     setStatus('bad', 'Copy failed', error?.message || 'Clipboard copy was blocked by the browser.');
