@@ -1387,7 +1387,10 @@ if (refreshBtn) {
 
 if (reconnectBtn) {
   reconnectBtn.addEventListener('click', () => {
-    window.location.href = WHOOP_AUTH_URL;
+    const whoopUserId = getCurrentWhoopUserId();
+    const authUrl = new URL(WHOOP_AUTH_URL);
+    if (whoopUserId) authUrl.searchParams.set('userId', whoopUserId);
+    window.location.href = authUrl.toString();
   });
 }
 
