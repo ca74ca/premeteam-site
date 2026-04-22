@@ -71,6 +71,48 @@ const whoopRawPre = document.getElementById('whoopRawPre');
 const STORAGE_KEY = 'adaptiveSessionLiveUserId';
 const DEFAULT_WHOOP_USER_ID = String(window.DELTA_WHOOP_USER_ID || '1243444');
 
+// ─── Delta Zone Voice Layer ───────────────────────────────────────────────────
+const BLACKLIST_MAP = [
+  { pattern: /\bcore work\b/gi, replacement: 'Structural Integrity' },
+  { pattern: /\blight\b/gi, replacement: 'Structural Integrity' },
+  { pattern: /\beasy\b/gi, replacement: 'Active Flush' },
+  { pattern: /\brest\b/gi, replacement: 'Active Flush Window' },
+  { pattern: /\brpe\b/gi, replacement: 'Zone Authority' }
+];
+
+function sanitizeBlockText(text) {
+  if (!text) return text;
+  let result = String(text);
+  for (const { pattern, replacement } of BLACKLIST_MAP) {
+    result = result.replace(pattern, replacement);
+  }
+  return result;
+}
+
+function mapIntensityToStatus(intensity) {
+  const raw = String(intensity || '').trim();
+  const num = parseFloat(raw);
+  if (Number.isFinite(num)) {
+    if (num <= 4) return '<span class="status-precision">Precision Recovery</span>';
+    if (num >= 8) return '<span class="status-redline">Redline Authority</span>';
+    return raw;
+  }
+  const lower = raw.toLowerCase();
+  if (lower === 'low' || lower.includes('low')) return '<span class="status-precision">Precision Recovery</span>';
+  if (lower === 'high' || lower.includes('high')) return '<span class="status-redline">Redline Authority</span>';
+  if (lower === '-' || lower === '') return '-';
+  return raw;
+}
+
+function renderBlockItem(text) {
+  const sanitized = sanitizeBlockText(text);
+  const lower = (sanitized || '').toLowerCase();
+  if (lower.includes('active flush')) {
+    return `<li><div class="active-flush-timer">${sanitized}</div></li>`;
+  }
+  return `<li class="block-item">${sanitized}</li>`;
+}
+
 const UI_COPY = {
   outlookLabel: 'TODAYS OUTLOOK',
   biometricsHeading: 'LIVE POHE BIOMETRICS SNAPSHOT'
@@ -164,7 +206,8 @@ function setReadiness(readiness) {
   const value = String(readiness || 'UNKNOWN').toUpperCase();
   const cls = value === 'HIGH' ? 'high' : value === 'MODERATE' ? 'moderate' : value === 'LOW' ? 'low' : 'unknown';
   readinessChip.className = `readiness-chip ${cls}`;
-  readinessChip.textContent = `Readiness ${value}`;
+  const labelMap = { HIGH: 'Calibrated — High Authority', MODERATE: 'Calibrated — Structural Integrity', LOW: 'Precision Recovery Mode', UNKNOWN: 'Readiness Unknown' };
+  readinessChip.textContent = labelMap[value] || `Readiness ${value}`;
 }
 
 function setSource(source) {
@@ -367,15 +410,16 @@ function renderAdaptiveSession(payload) {
   setSource(sourceFromAdaptivePayload(payload));
 
   if (sessionTitle) sessionTitle.textContent = session.session_title || 'Delta Zone session unavailable';
-  if (sessionIntensity) sessionIntensity.textContent = session.intensity || '-';
-  if (sessionFocus) sessionFocus.textContent = session.focus || '-';
-  if (sessionFinisher) sessionFinisher.textContent = session.finisher || '-';
+  if (sessionIntensity) sessionIntensity.innerHTML = mapIntensityToStatus(session.intensity);
+  if (sessionFocus) sessionFocus.textContent = sanitizeBlockText(session.focus) || '-';
+  const finisherRaw = sanitizeBlockText(session.finisher);
+  if (sessionFinisher) sessionFinisher.textContent = finisherRaw ? `The final round is your best round. ${finisherRaw}` : '-';
 
   if (sessionBlocks) {
     const blocks = Array.isArray(session.blocks) ? session.blocks.filter(Boolean) : [];
     sessionBlocks.innerHTML = blocks.length
-      ? blocks.map((block) => `<li class="block-item">${block}</li>`).join('')
-      : '<li class="block-item">No blocks returned by API.</li>';
+      ? blocks.map((block) => renderBlockItem(block)).join('')
+      : '<li class="block-item">Architecture pending — no blocks returned by API.</li>';
   }
 
   if (readinessScoreValue) {
@@ -456,21 +500,22 @@ function renderCoachSession(result) {
     sessionTitle.textContent = sessionOutput.session_focus || programmingLogic.session_objective || sessionOutput.coach_summary || 'AI Coach session generated';
   }
   if (sessionIntensity) {
-    sessionIntensity.textContent = sessionOutput.session_intensity || programmingLogic.intensity || '-';
+    sessionIntensity.innerHTML = mapIntensityToStatus(sessionOutput.session_intensity || programmingLogic.intensity);
   }
   if (sessionFocus) {
-    sessionFocus.textContent = programmingLogic.training_mode || sessionOutput.session_intent || memberContext.primary_goal || '-';
+    sessionFocus.textContent = sanitizeBlockText(programmingLogic.training_mode || sessionOutput.session_intent || memberContext.primary_goal) || '-';
   }
   if (sessionFinisher) {
-    const finisher = Array.isArray(sessionOutput.cooldown) && sessionOutput.cooldown.length
+    const rawFinisher = Array.isArray(sessionOutput.cooldown) && sessionOutput.cooldown.length
       ? sessionOutput.cooldown.flatMap((block) => block?.items || []).join(' | ')
-      : (sessionOutput.coach_summary || '-');
-    sessionFinisher.textContent = finisher || '-';
+      : (sessionOutput.coach_summary || '');
+    const finisherSanitized = sanitizeBlockText(rawFinisher);
+    sessionFinisher.textContent = finisherSanitized ? `The final round is your best round. ${finisherSanitized}` : '-';
   }
   if (sessionBlocks) {
     sessionBlocks.innerHTML = blockItems.length
-      ? blockItems.map((item) => `<li class="block-item">${item}</li>`).join('')
-      : '<li class="block-item">No blocks returned by AI Coach agent.</li>';
+      ? blockItems.map((item) => renderBlockItem(item)).join('')
+      : '<li class="block-item">Architecture pending — no blocks returned by AI Coach agent.</li>';
   }
   setWorkflowMeta(result?.workflow_id ? `Workflow ID: ${result.workflow_id}` : 'Workflow ID: not returned');
   setStatus('ok', 'AI Coach generated', 'Custom session built from coach prompt and member context.');
@@ -519,7 +564,7 @@ function renderHistory(items) {
         <span class="source-chip ${source === 'whoop' ? 'live' : 'fallback'}">${source === 'whoop' ? 'Live WHOOP' : 'Fallback'}</span>
       </div>
       <div class="history-meta">${createdAt}</div>
-      <div class="history-meta">Readiness: ${readiness} | Intensity: ${item?.session?.intensity || '-'}</div>
+      <div class="history-meta">Readiness: ${readiness} | Status: ${mapIntensityToStatus(item?.session?.intensity).replace(/<[^>]+>/g, '')}</div>
       <div class="history-meta">Readiness score: ${readinessScore === '-' ? '0.0' : readinessScore} | ${zoneClassifier} | ${loadTier}</div>
     `;
 

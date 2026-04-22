@@ -428,6 +428,80 @@
 
   .block-item,
   .history-item {
+
+      .zone-authority-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .zone-authority-badge.taught-pace {
+        background: rgba(245,158,11,.18);
+        color: #f59e0b;
+        border: 1px solid rgba(245,158,11,.32);
+      }
+
+      .zone-authority-badge.redline {
+        background: rgba(239,68,68,.18);
+        color: #ef4444;
+        border: 1px solid rgba(239,68,68,.32);
+        animation: redlinePulse 1.8s ease infinite;
+      }
+
+      .zone-authority-badge.precision-recovery {
+        background: rgba(14,165,164,.18);
+        color: #0ea5a4;
+        border: 1px solid rgba(14,165,164,.32);
+      }
+
+      @keyframes redlinePulse {
+        0%, 100% { box-shadow: 0 0 0 rgba(239,68,68,0); }
+        50% { box-shadow: 0 0 10px rgba(239,68,68,.38); }
+      }
+
+      .active-flush-timer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px dashed rgba(14,165,164,.44);
+        border-radius: 10px;
+        padding: 8px 12px;
+        background: rgba(14,165,164,.06);
+        color: #0ea5a4;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin: 2px 0;
+      }
+
+      .active-flush-timer::before {
+        content: "⟳";
+        font-size: 15px;
+      }
+
+      .status-precision { color: #0ea5a4; font-weight: 800; }
+      .status-redline { color: #ef4444; font-weight: 800; letter-spacing: 0.04em; }
+
+      .target-zone-badge {
+        display: inline-block;
+        border-radius: 5px;
+        padding: 1px 6px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        background: rgba(249,115,22,.16);
+        color: #f97316;
+        border: 1px solid rgba(249,115,22,.28);
+        margin-left: 5px;
+      }
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 10px;
@@ -720,7 +794,7 @@
           <span id="sourceChip" class="source-chip fallback">Fallback</span>
         </div>
 
-        <button id="refreshBtn" type="button">Generate Today&apos;s Session</button>
+        <button id="refreshBtn" type="button">Construct Today&apos;s Architecture</button>
 
         <div class="coach-form" aria-label="AI Coach manual trigger">
           <label class="field">
@@ -737,18 +811,18 @@
               <input id="bookingDateInput" type="date" value="2026-04-21" />
             </label>
             <label class="field">
-              <span>Minutes</span>
+              <span>Training Window</span>
               <input id="bookingDurationInput" type="number" min="1" value="45" />
             </label>
           </div>
-          <button id="coachAgentBtn" class="btn-alt" type="button">Generate With AI Coach</button>
+          <button id="coachAgentBtn" class="btn-alt" type="button">Construct Architecture</button>
           <p id="workflowMeta" class="line">Workflow ID: not generated</p>
         </div>
 
         <p id="sessionTitle" class="history-title">No session loaded</p>
-        <p class="line"><strong>Intensity:</strong> <span id="sessionIntensity">-</span></p>
-        <p class="line"><strong>Focus:</strong> <span id="sessionFocus">-</span></p>
-        <p class="line"><strong>Finisher:</strong> <span id="sessionFinisher">-</span></p>
+        <p class="line"><strong>Status:</strong> <span id="sessionIntensity">-</span></p>
+        <p class="line"><strong>Primary Objective:</strong> <span id="sessionFocus">-</span></p>
+        <p class="line"><strong>The Final Statement:</strong> <span id="sessionFinisher">-</span></p>
 
         <h3>Blocks</h3>
         <ul id="sessionBlocks" class="blocks">
@@ -893,9 +967,9 @@
             <div class="coach-zone-grid">
               <div class="coach-zone-item"><strong>Z1</strong> -> passive recovery / very low effort <span id="coachZoneZ1Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
               <div class="coach-zone-item"><strong>Z2</strong> -> active recovery / aerobic base <span id="coachZoneZ2Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
-              <div class="coach-zone-item"><strong>Z3</strong> -> sustained effort / threshold work <span id="coachZoneZ3Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
-              <div class="coach-zone-item"><strong>Z4</strong> -> high-intensity effort <span id="coachZoneZ4Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
-              <div class="coach-zone-item"><strong>Z5</strong> -> maximal effort / redline <span id="coachZoneZ5Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
+              <div class="coach-zone-item"><strong>Z3</strong> <span class="zone-authority-badge taught-pace">Taught Pace</span> — sustained threshold <span id="coachZoneZ3Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
+              <div class="coach-zone-item"><strong>Z4</strong> <span class="zone-authority-badge redline">Redline</span> — high-intensity authority <span id="coachZoneZ4Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
+              <div class="coach-zone-item"><strong>Z5</strong> <span class="zone-authority-badge redline">Redline Authority</span> — maximal output <span id="coachZoneZ5Stat" class="coach-zone-stat">0.0m (0.0%)</span></div>
             </div>
           </section>
         </div>
