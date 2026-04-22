@@ -24,29 +24,49 @@
     }
 
     var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    var slowConn = navigator.connection && (['slow-2g','2g','3g'].indexOf(navigator.connection.effectiveType) !== -1 || navigator.connection.saveData);
 
     // Always show image immediately on mobile — video plays on top when ready
     if(isMobile){ setImageFallback(); }
 
-    if(slowConn){
-      var v = document.getElementById('bgVid');
-      if(v){ v.remove(); }
-    } else {
-      var v2 = document.getElementById('bgVid');
-      if(v2){
-        var src = isMobile ? v2.getAttribute('data-src-mobile') : v2.getAttribute('data-src-desktop');
-        if(src){
-          var sourceEl = document.createElement('source');
-          sourceEl.src = src;
-          sourceEl.type = 'video/mp4';
-          v2.appendChild(sourceEl);
-          v2.autoplay = true;
-          v2.load();
-          v2.play().catch(function(){});
-        }
+    var v2 = document.getElementById('bgVid');
+    if(!v2){ return; }
+
+    var src = isMobile ? v2.getAttribute('data-src-mobile') : v2.getAttribute('data-src-desktop');
+    if(!src){ return; }
+
+    var sourceEl = document.createElement('source');
+    sourceEl.src = src;
+    sourceEl.type = 'video/mp4';
+    v2.appendChild(sourceEl);
+
+    // Some mobile browsers require these to be explicitly set via JS before play().
+    v2.autoplay = true;
+    v2.muted = true;
+    v2.defaultMuted = true;
+    v2.setAttribute('muted', '');
+    v2.setAttribute('playsinline', '');
+    v2.setAttribute('autoplay', '');
+
+    function tryPlay(){
+      var p = v2.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(function(){
+          // Keep fallback background visible if autoplay is blocked.
+          setImageFallback();
+        });
       }
     }
+
+    v2.addEventListener('loadeddata', tryPlay, { once: true });
+    v2.load();
+    tryPlay();
+
+    // Retry when tab becomes active and on first user interaction.
+    document.addEventListener('visibilitychange', function(){
+      if (!document.hidden) { tryPlay(); }
+    });
+    window.addEventListener('pointerdown', tryPlay, { once: true });
+    window.addEventListener('touchstart', tryPlay, { once: true });
   })();
 </script>
 
