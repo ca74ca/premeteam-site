@@ -19,6 +19,7 @@ const sessionIntensity = document.getElementById('sessionIntensity');
 const sessionFocus = document.getElementById('sessionFocus');
 const sessionFinisher = document.getElementById('sessionFinisher');
 const sessionBlocks = document.getElementById('sessionBlocks');
+const copyWorkoutBtn = document.getElementById('copyWorkoutBtn');
 const coachPromptInput = document.getElementById('coachPromptInput');
 const sportInput = document.getElementById('sportInput');
 const bookingDateInput = document.getElementById('bookingDateInput');
@@ -93,6 +94,7 @@ let latestTelemetryOverrides = {};
 let latestTargetZone = null;
 let latestCoachResult = null;
 let latestCoachWorkflowId = '';
+let latestRenderedWorkout = null;
 let telemetryOverlayTimer = null;
 let telemetryPollTimer = null;
 let lastTelemetryAlert = { scenario: '', at: 0 };
@@ -137,6 +139,102 @@ function formatFinalStatement(value) {
   if (!normalizedBase) return '-';
   const hasSuffix = normalizedBase.toLowerCase().includes(FINAL_STATEMENT_SUFFIX.toLowerCase());
   return hasSuffix ? normalizedBase : `${normalizedBase} ${FINAL_STATEMENT_SUFFIX}`;
+}
+
+function createWorkoutSnapshot(source, payload, metadata = {}) {
+  return {
+    source,
+    payload: payload || null,
+    title: metadata.title || 'Workout',
+    intensity: metadata.intensity || '-',
+    focus: metadata.focus || '-',
+    finisher: metadata.finisher || '-',
+    workflow: metadata.workflow || 'Workflow ID: not generated'
+  };
+}
+
+function workoutBlocksFromSnapshot(snapshot) {
+  if (!snapshot?.payload) return [];
+
+  if (snapshot.source === 'coach') {
+    const sessionOutput = snapshot.payload?.session_output || {};
+    const mainWorkout = Array.isArray(sessionOutput.main_workout)
+      ? sessionOutput.main_workout
+      : (sessionOutput.main_workout && typeof sessionOutput.main_workout === 'object')
+        ? Object.values(sessionOutput.main_workout).filter((item) => item && typeof item === 'object')
+        : [];
+    return buildCoachLogicBlocks(snapshot.payload, sessionOutput, mainWorkout);
+  }
+
+  return buildAdaptiveLogicBlocks(snapshot.payload?.session || {});
+}
+
+function blockTextFromLogicBlock(block, index) {
+  const lines = [`Block ${index + 1}: ${block.title || `Block ${index + 1}`}`];
+  if (block.target_zone) lines.push(`Target Zone: ${block.target_zone}`);
+  if (block.rounds) lines.push(`Rounds: ${block.rounds}`);
+  (block.instructions || []).forEach((item) => lines.push(`- ${item}`));
+  if (block.transition) lines.push(`Transition: ${block.transition}`);
+  if (block.active_flush) lines.push(`Active Flush: ${block.active_flush}`);
+  return lines.join('\n');
+}
+
+function buildWorkoutCopyText() {
+  const snapshot = latestRenderedWorkout;
+  if (!snapshot?.payload) return '';
+
+  const logicBlocks = workoutBlocksFromSnapshot(snapshot);
+  const fallbackBlocks = snapshot.source === 'adaptive'
+    ? (Array.isArray(snapshot.payload?.session?.blocks) ? snapshot.payload.session.blocks.filter(Boolean) : [])
+    : [];
+  const blockText = logicBlocks.length
+    ? logicBlocks.map((block, index) => blockTextFromLogicBlock(block, index)).join('\n\n')
+    : fallbackBlocks.map((item, index) => `Block ${index + 1}: ${sanitizeBlockText(item)}`).join('\n');
+
+  const lines = [snapshot.title];
+  lines.push(`Status: ${snapshot.intensity}`);
+  lines.push(`Primary Objective: ${snapshot.focus}`);
+  if (snapshot.finisher && snapshot.finisher !== '-') {
+    lines.push(`Final Statement: ${snapshot.finisher}`);
+  }
+  if (blockText) {
+    lines.push('');
+    lines.push('Blocks');
+    lines.push(blockText);
+  }
+  return lines.join('\n');
+}
+
+async function copyWorkoutToClipboard() {
+  const text = buildWorkoutCopyText();
+
+  if (!text) {
+    setStatus('warn', 'Nothing to copy', 'Generate or load a workout before using Copy Workout.');
+    return;
+  }
+
+  if (copyWorkoutBtn) copyWorkoutBtn.disabled = true;
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const helper = document.createElement('textarea');
+      helper.value = text;
+      helper.setAttribute('readonly', '');
+      helper.style.position = 'fixed';
+      helper.style.opacity = '0';
+      document.body.appendChild(helper);
+      helper.select();
+      document.execCommand('copy');
+      document.body.removeChild(helper);
+    }
+    setStatus('ok', 'Workout copied', 'Copied the current workout to your clipboard.');
+  } catch (error) {
+    setStatus('bad', 'Copy failed', error?.message || 'Clipboard copy was blocked by the browser.');
+  } finally {
+    if (copyWorkoutBtn) copyWorkoutBtn.disabled = false;
+  }
 }
 
 function escapeHtml(value) {
@@ -843,6 +941,14 @@ function renderAdaptiveSession(payload) {
     }
   }
 
+  latestRenderedWorkout = createWorkoutSnapshot('adaptive', payload, {
+    title: session.session_title || 'Delta Zone session unavailable',
+    intensity: String(session.intensity || '').replace(/<[^>]+>/g, '') || '-',
+    focus: sanitizeBlockText(session.focus) || '-',
+    finisher: formatFinalStatement(finalStatement),
+    workflow: workflowMeta?.textContent?.trim() || 'Workflow ID: not generated'
+  });
+
   if (readinessScoreValue) {
     readinessScoreValue.textContent = formatNumberOrZero(scoring.readiness_score, 1);
   }
@@ -940,6 +1046,15 @@ function renderCoachSession(result) {
       ? renderStructuredWorkoutCards(logicBlocks)
       : '<li class="block-item">Architecture pending — no blocks returned by AI Coach agent.</li>';
   }
+  latestRenderedWorkout = createWorkoutSnapshot('coach', result, {
+    title: sessionOutput.session_focus || programmingLogic.session_objective || sessionOutput.coach_summary || 'AI Coach session generated',
+    intensity: String(sessionOutput.session_intensity || programmingLogic.intensity || '').replace(/<[^>]+>/g, '') || '-',
+    focus: sanitizeBlockText(programmingLogic.training_mode || sessionOutput.session_intent || memberContext.primary_goal) || '-',
+    finisher: formatFinalStatement(sessionOutput.final_statement || (Array.isArray(sessionOutput.cooldown) && sessionOutput.cooldown.length
+      ? sessionOutput.cooldown.flatMap((block) => block?.items || []).join(' | ')
+      : (sessionOutput.coach_summary || ''))),
+    workflow: result?.workflow_id ? `Workflow ID: ${result.workflow_id}` : 'Workflow ID: not returned'
+  });
   setWorkflowMeta(result?.workflow_id ? `Workflow ID: ${result.workflow_id}` : 'Workflow ID: not returned');
   setStatus('ok', 'AI Coach generated', 'Custom session built from coach prompt and member context.');
 }
@@ -1272,4 +1387,8 @@ scheduleTelemetryPolling();
 
 if (coachAgentBtn) {
   coachAgentBtn.addEventListener('click', runCoachAgent);
+}
+
+if (copyWorkoutBtn) {
+  copyWorkoutBtn.addEventListener('click', copyWorkoutToClipboard);
 }

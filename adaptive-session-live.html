@@ -585,6 +585,13 @@
     gap: 8px;
   }
 
+  .session-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin: 12px 0 0;
+  }
+
   textarea,
   input[type="date"],
   input[type="number"] {
@@ -596,6 +603,18 @@
     color: var(--ink);
     background: rgba(0,0,0,.28);
     font-family: inherit;
+  }
+
+  input[type="date"] {
+    color-scheme: dark;
+    background: rgba(15,23,42,.88);
+    color: rgba(255,255,255,.96);
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(1) brightness(1.25);
+    opacity: 0.92;
   }
 
   textarea {
@@ -887,6 +906,7 @@
     .actions { grid-template-columns: 1fr; }
     .metrics { grid-template-columns: 1fr 1fr; }
     .coach-grid { grid-template-columns: 1fr; }
+    .session-actions { grid-template-columns: 1fr; }
   }
 
   @media (max-width: 620px) {
@@ -966,6 +986,10 @@
           <p class="signature-label">THE FINAL STATEMENT</p>
           <p id="sessionFinisher" class="signature-text">-</p>
         </section>
+
+        <div class="session-actions" aria-label="Workout copy actions">
+          <button id="copyWorkoutBtn" class="btn-alt" type="button">Copy Workout</button>
+        </div>
 
         <h3>Blocks</h3>
         <ul id="sessionBlocks" class="blocks">
@@ -1129,21 +1153,7 @@
     <section class="actions" aria-label="Page actions">
       <input id="whoopUserIdInput" class="hidden-input" type="text" value="" autocomplete="off" aria-hidden="true" tabindex="-1" />
       <button id="reconnectBtn" class="btn-alt" type="button">Reconnect WHOOP</button>
-      <label class="toggle" for="showWhoopRawToggle">
-        <input id="showWhoopRawToggle" type="checkbox" />
-        Show raw WHOOP payload
-      </label>
-
-      <details id="whoopRawPanel" class="raw-panel" hidden>
-        <summary>WHOOP raw payload</summary>
-        <pre id="whoopRawPre">Not loaded.</pre>
-      </details>
     </section>
-
-    <nav class="links">
-      <a href="./index.html">Back to Home</a>
-      <a href="./ai-agent.html">AI Agent Dashboard</a>
-    </nav>
   </main>
 
   <aside id="telemetryOverlay" class="telemetry-overlay" aria-live="assertive" aria-atomic="true" role="status">
