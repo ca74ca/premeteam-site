@@ -538,6 +538,17 @@ function syncWhoopRawVisibility() {
   loadLiveData();
 }
 
+function attachButtonGlow() {
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach((button) => {
+    button.addEventListener('click', () => {
+      button.classList.remove('ui-click-glow');
+      void button.offsetWidth;
+      button.classList.add('ui-click-glow');
+    });
+  });
+}
+
 if (refreshBtn) {
   refreshBtn.addEventListener('click', () => loadLiveData({ forceFresh: true }));
 }
@@ -553,6 +564,7 @@ if (showWhoopRawToggle) {
 initUserId();
 setWorkflowMeta('Workflow ID: not generated');
 applyUiCopy();
+attachButtonGlow();
 syncWhoopRawVisibility();
 loadLiveData();
 
