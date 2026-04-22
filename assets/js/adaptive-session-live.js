@@ -147,6 +147,9 @@ function escapeHtml(value) {
 }
 
 function normalizeInstructions(block) {
+  if (typeof block?.instructions === 'string' && block.instructions.trim()) {
+    return [sanitizeBlockText(block.instructions.trim())];
+  }
   if (Array.isArray(block?.instructions)) {
     return block.instructions.filter(Boolean).map((item) => sanitizeBlockText(item));
   }
@@ -178,8 +181,8 @@ function validateLogicBlock(block) {
 function normalizeLogicBlock(rawBlock, fallbackTitle = 'Block') {
   const block = {
     title: sanitizeBlockText(rawBlock?.title || rawBlock?.block || fallbackTitle),
-    target_zone: sanitizeBlockText(rawBlock?.target_zone || rawBlock?.targetZone || rawBlock?.zone || ''),
-    rounds: sanitizeBlockText(rawBlock?.rounds || rawBlock?.sets || ''),
+    target_zone: sanitizeBlockText(rawBlock?.target_zone || rawBlock?.targetZone || rawBlock?.zone || 'Zone Authority'),
+    rounds: sanitizeBlockText(rawBlock?.rounds || rawBlock?.sets || rawBlock?.duration || 'As prescribed'),
     instructions: normalizeInstructions(rawBlock),
     transition: sanitizeBlockText(rawBlock?.transition || ''),
     active_flush: sanitizeBlockText(rawBlock?.active_flush || rawBlock?.activeFlush || '')
@@ -223,7 +226,7 @@ function buildCoachLogicBlocks(result, sessionOutput, mainWorkout) {
   const coerceStringBlock = (str) => ({
     title: sanitizeBlockText(str),
     target_zone: 'Zone Authority',
-    rounds: '',
+    rounds: 'As prescribed',
     instructions: [sanitizeBlockText(str)]
   });
 
@@ -267,12 +270,15 @@ function buildCoachLogicBlocks(result, sessionOutput, mainWorkout) {
     sessionOutput?.main_workout,
     sessionOutput?.main_workout_blocks,
     sessionOutput?.blocks,
+    sessionOutput?.coach_prompt_agent?.workout_adjustments,
     result?.main_workout,
     result?.main_workout_blocks,
     result?.blocks,
+    result?.coach_prompt_agent?.workout_adjustments,
     result?.session?.logic_blocks,
     result?.session?.main_workout,
-    result?.session?.blocks
+    result?.session?.blocks,
+    result?.session?.coach_prompt_agent?.workout_adjustments
   ];
 
   const explicit = candidates
