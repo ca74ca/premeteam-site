@@ -354,17 +354,22 @@ function renderHistory(items) {
 }
 
 async function fetchJson(url) {
+  console.log('📡 fetch:', url);
   const response = await fetch(url, {
     method: 'GET',
     headers: { Accept: 'application/json' },
     cache: 'no-store'
   });
 
+  console.log(`📡 response: ${url} -> ${response.status}`);
+  
   if (!response.ok) {
     throw new Error(`${url} -> ${response.status}`);
   }
 
-  return response.json();
+  const json = await response.json();
+  console.log(`📡 json received from ${url}:`, json);
+  return json;
 }
 
 async function postJson(url, body) {
@@ -458,6 +463,7 @@ async function loadLiveData(options = {}) {
     includeFallback: includeFallback ? 'true' : undefined
   });
 
+  console.log('🔄 loadLiveData:', { adaptiveUrl, whoopUrl, historyUrl });
   refreshBtn.disabled = true;
   if (reconnectBtn) reconnectBtn.disabled = true;
   setStatus('warn', forceFresh ? 'Generating new session' : 'Syncing', forceFresh ? 'Requesting a fresh WHOOP pull and new session insert...' : 'Loading adaptive session, WHOOP snapshot, and history...');
@@ -469,11 +475,14 @@ async function loadLiveData(options = {}) {
       fetchJson(historyUrl)
     ]);
 
+    console.log('📦 API Results:', { adaptiveResult, whoopResult, historyResult });
+
     if (adaptiveResult.status !== 'fulfilled') {
       throw adaptiveResult.reason;
     }
 
     const adaptiveSession = adaptiveResult.value;
+    console.log('✅ Adaptive session payload:', adaptiveSession);
     renderAdaptiveSession(adaptiveSession);
 
     const whoopPayload = whoopResult.status === 'fulfilled' ? whoopResult.value : null;
@@ -508,6 +517,7 @@ async function loadLiveData(options = {}) {
       setStatus(source === 'whoop' ? 'ok' : 'warn', source === 'whoop' ? 'Live WHOOP connected' : 'Fallback session', `Main card source: ${sourceText}. History rows: ${historyCount}${includeFallback ? ' (debug fallback rows enabled)' : ''}.`);
     }
   } catch (error) {
+    console.error('❌ loadLiveData error:', error);
     setStatus('bad', 'Sync failed', error.message || 'Unable to load adaptive APIs.');
     setAthleteName(`Athlete ${whoopUserId}`);
     renderAdaptiveSession({
