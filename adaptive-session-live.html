@@ -1,82 +1,165 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Adaptive Session Live | Delta Zone Systems</title>
-<link rel="stylesheet" href="./styles.css" />
-<style>
-  :root {
-    --bg: #05060a;
-    --ink: rgba(255,255,255,.92);
-    --muted: rgba(255,255,255,.68);
-    --panel: rgba(8,10,18,.58);
-    --line: rgba(255,255,255,.16);
-    --ok: #0f8f68;
-    --warn: #bf6d0a;
-    --bad: #c53030;
-    --chip: rgba(255,255,255,.08);
-    --shadow: 0 22px 54px rgba(0, 0, 0, .45);
-  }
-
-  * { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    min-height: 100vh;
-    color: var(--ink);
-    background: var(--bg);
-    font-family: "Plus Jakarta Sans", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
-  }
-
-  .wrap {
-    width: min(1220px, calc(100% - 32px));
-    margin: 22px auto 36px;
-    display: grid;
-    gap: 14px;
-  }
-
-  .hero {
-    background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02)), var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 22px;
-    padding: 18px;
-    box-shadow: var(--shadow);
-    display: grid;
-    gap: 10px;
-  }
-
-  .hero-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .eyebrow {
-    margin: 0;
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .title {
-    margin: 0;
-    font-size: clamp(24px, 2.8vw, 34px);
-    letter-spacing: -0.02em;
-  }
-
-  .hero-sub {
-    margin: 0;
-    color: var(--muted);
-    font-size: 14px;
-  }
 
   .hero-badges {
     display: flex;
     gap: 8px;
+
+  .zone-authority-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .zone-authority-badge.taught-pace {
+    background: rgba(245,158,11,.18);
+    color: #f59e0b;
+    border: 1px solid rgba(245,158,11,.32);
+  }
+
+  .zone-authority-badge.redline {
+    background: rgba(239,68,68,.18);
+    color: #ef4444;
+    border: 1px solid rgba(239,68,68,.32);
+    animation: redlinePulse 1.8s ease infinite;
+  }
+
+  .zone-authority-badge.precision-recovery {
+    background: rgba(14,165,164,.18);
+    color: #0ea5a4;
+    border: 1px solid rgba(14,165,164,.32);
+  }
+
+  @keyframes redlinePulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(239,68,68,0); }
+    50% { box-shadow: 0 0 10px rgba(239,68,68,.38); }
+  }
+
+  .active-flush-timer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px dashed rgba(14,165,164,.44);
+    border-radius: 10px;
+    padding: 8px 12px;
+    background: rgba(14,165,164,.06);
+    color: #0ea5a4;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 2px 0;
+  }
+
+  .active-flush-timer::before {
+    content: "\27f3";
+    font-size: 15px;
+  }
+
+  .status-precision { color: #0ea5a4; font-weight: 800; }
+  .status-redline { color: #ef4444; font-weight: 800; letter-spacing: 0.04em; }
+
+  .target-zone-badge {
+    display: inline-block;
+    border-radius: 5px;
+    padding: 1px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: rgba(249,115,22,.16);
+    color: #f97316;
+    border: 1px solid rgba(249,115,22,.28);
+    margin-left: 5px;
+  }
+
+  .workout-card {
+    display: grid;
+    gap: 10px;
+    border: 1px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.03);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .workout-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .workout-card-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .instruction-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid rgba(249,115,22,.34);
+    background: rgba(249,115,22,.16);
+    color: #fb923c;
+  }
+
+  .workout-card-rounds {
+    margin: 0;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+  }
+
+  .workout-card-list {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 6px;
+  }
+
+  .workout-card-list li {
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .command-box {
+    border: 1px solid rgba(14,165,164,.5);
+    border-radius: 10px;
+    background: rgba(14,165,164,.08);
+    padding: 10px;
+    display: grid;
+    gap: 7px;
+  }
+
+  .command-box-item {
+    margin: 0;
+    font-size: 12px;
+    color: #5eead4;
+    line-height: 1.4;
+  }
+
+  .command-box-item strong {
+    color: #99f6e4;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 11px;
+  }
     flex-wrap: wrap;
   }
 
@@ -159,10 +242,32 @@
     background: rgba(255,255,255,.10);
   }
 
-  .readiness-chip.high { color: #047857; background: #d1fae5; }
-  .readiness-chip.moderate { color: #b45309; background: #fef3c7; }
-  .readiness-chip.low { color: #b91c1c; background: #fee2e2; }
-  .readiness-chip.unknown { color: #334155; background: #e2e8f0; }
+  .readiness-chip.high {
+    color: #ef4444;
+    background: rgba(239,68,68,.14);
+    border-color: rgba(239,68,68,.38);
+  }
+  .readiness-chip.moderate {
+    color: #0ea5a4;
+    background: rgba(14,165,164,.12);
+    border-color: rgba(14,165,164,.36);
+  }
+  .readiness-chip.low {
+    color: #f59e0b;
+    background: rgba(245,158,11,.12);
+    border-color: rgba(245,158,11,.32);
+  }
+  .readiness-chip.unknown { color: #64748b; background: rgba(100,116,139,.12); border-color: rgba(100,116,139,.28); }
+
+  .readiness-recovery {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: rgba(255,255,255,.58);
+    margin-left: 6px;
+    padding-left: 6px;
+    border-left: 1px solid rgba(255,255,255,.22);
+  }
 
   .source-chip.live { color: #065f46; background: #d1fae5; }
   .source-chip.fallback { color: #92400e; background: #fef3c7; }
@@ -415,6 +520,32 @@
     font-size: 14px;
     line-height: 1.45;
     margin: 8px 0 0;
+  }
+
+  .signature-panel {
+    margin-top: 10px;
+    border: 1px solid rgba(249,115,22,.4);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(249,115,22,.12), rgba(249,115,22,.04));
+    padding: 12px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .signature-label {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #fdba74;
+  }
+
+  .signature-text {
+    margin: 0;
+    color: rgba(255,255,255,.95);
+    font-size: 14px;
+    line-height: 1.45;
   }
 
   .blocks,
@@ -736,6 +867,84 @@
     box-shadow: 0 22px 52px rgba(0,0,0,.52), 0 0 20px rgba(0,190,255,.22), 0 0 20px rgba(255,0,220,.18);
   }
 
+  .telemetry-overlay {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 1400;
+    width: min(420px, calc(100vw - 28px));
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.28);
+    background: linear-gradient(180deg, rgba(7,11,20,.94), rgba(7,11,20,.86));
+    box-shadow: 0 20px 48px rgba(0,0,0,.48);
+    padding: 12px;
+    display: grid;
+    gap: 8px;
+    transform: translateY(16px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s ease, transform .22s ease;
+  }
+
+  .telemetry-overlay.show {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .telemetry-overlay.under {
+    border-color: rgba(245,158,11,.56);
+    box-shadow: 0 20px 48px rgba(0,0,0,.48), 0 0 18px rgba(245,158,11,.28);
+  }
+
+  .telemetry-overlay.over {
+    border-color: rgba(239,68,68,.64);
+    box-shadow: 0 20px 48px rgba(0,0,0,.48), 0 0 20px rgba(239,68,68,.34);
+  }
+
+  .telemetry-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .telemetry-title {
+    margin: 0;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: rgba(255,255,255,.92);
+  }
+
+  .telemetry-close {
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.08);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 8px;
+    line-height: 1;
+    box-shadow: none;
+  }
+
+  .telemetry-message {
+    margin: 0;
+    color: rgba(255,255,255,.96);
+    font-size: 13px;
+    line-height: 1.42;
+  }
+
+  .telemetry-meta {
+    margin: 0;
+    font-size: 11px;
+    color: rgba(255,255,255,.72);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
   @keyframes clickGlow {
     0% { box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 0 0 rgba(0,190,255,0), 0 0 0 rgba(255,0,220,0); }
     40% { box-shadow: 0 18px 36px rgba(0,0,0,.48), 0 0 18px rgba(0,190,255,.34), 0 0 20px rgba(255,0,220,.28); }
@@ -780,7 +989,7 @@
           <p class="hero-sub">Daily adaptive session built from live readiness and training history.</p>
         </div>
         <div class="hero-badges">
-          <span id="readinessChip" class="readiness-chip unknown">Readiness Unknown</span>
+          <span id="readinessChip" class="readiness-chip unknown">Readiness Unknown<span id="readinessRecovery" class="readiness-recovery" hidden></span></span>
           <span id="liveWhoopPill" class="pill warn"><span class="dot"></span><span id="liveWhoopLabel">Live WHOOP checking...</span></span>
         </div>
       </div>
@@ -822,7 +1031,10 @@
         <p id="sessionTitle" class="history-title">No session loaded</p>
         <p class="line"><strong>Status:</strong> <span id="sessionIntensity">-</span></p>
         <p class="line"><strong>Primary Objective:</strong> <span id="sessionFocus">-</span></p>
-        <p class="line"><strong>The Final Statement:</strong> <span id="sessionFinisher">-</span></p>
+        <section class="signature-panel" aria-label="Final statement signature panel">
+          <p class="signature-label">THE FINAL STATEMENT</p>
+          <p id="sessionFinisher" class="signature-text">-</p>
+        </section>
 
         <h3>Blocks</h3>
         <ul id="sessionBlocks" class="blocks">
@@ -1003,6 +1215,15 @@
     </nav>
   </main>
 
-  <script src="./assets/js/adaptive-session-live.js?v=20260422-1"></script>
+  <aside id="telemetryOverlay" class="telemetry-overlay" aria-live="assertive" aria-atomic="true" role="status">
+    <div class="telemetry-title-row">
+      <p id="telemetryOverlayTitle" class="telemetry-title">Telemetry command</p>
+      <button id="telemetryOverlayClose" class="telemetry-close" type="button" aria-label="Dismiss telemetry command">Dismiss</button>
+    </div>
+    <p id="telemetryOverlayMessage" class="telemetry-message">Awaiting live telemetry.</p>
+    <p id="telemetryOverlayMeta" class="telemetry-meta">Current zone -- | Target zone --</p>
+  </aside>
+
+  <script src="./assets/js/adaptive-session-live.js?v=20260422-2"></script>
 </body>
 </html>

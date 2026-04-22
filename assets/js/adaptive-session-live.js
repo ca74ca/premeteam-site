@@ -67,6 +67,11 @@ const historyList = document.getElementById('historyList');
 const historyEmpty = document.getElementById('historyEmpty');
 const whoopRawPanel = document.getElementById('whoopRawPanel');
 const whoopRawPre = document.getElementById('whoopRawPre');
+const telemetryOverlay = document.getElementById('telemetryOverlay');
+const telemetryOverlayTitle = document.getElementById('telemetryOverlayTitle');
+const telemetryOverlayMessage = document.getElementById('telemetryOverlayMessage');
+const telemetryOverlayMeta = document.getElementById('telemetryOverlayMeta');
+const telemetryOverlayClose = document.getElementById('telemetryOverlayClose');
 
 const STORAGE_KEY = 'adaptiveSessionLiveUserId';
 const DEFAULT_WHOOP_USER_ID = String(window.DELTA_WHOOP_USER_ID || '1243444');
@@ -79,6 +84,15 @@ const BLACKLIST_MAP = [
   { pattern: /\brest\b/gi, replacement: 'Active Flush Window' },
   { pattern: /\brpe\b/gi, replacement: 'Zone Authority' }
 ];
+const FINAL_STATEMENT_SUFFIX = 'The final round is your best round.';
+const TELEMETRY_POLL_MS = 12000;
+const TELEMETRY_ALERT_COOLDOWN_MS = 15000;
+
+let latestTelemetryOverrides = {};
+let latestTargetZone = null;
+let telemetryOverlayTimer = null;
+let telemetryPollTimer = null;
+let lastTelemetryAlert = { scenario: '', at: 0 };
 
 function sanitizeBlockText(text) {
   if (!text) return text;
@@ -111,6 +125,317 @@ function renderBlockItem(text) {
     return `<li><div class="active-flush-timer">${sanitized}</div></li>`;
   }
   return `<li class="block-item">${sanitized}</li>`;
+}
+
+function formatFinalStatement(value) {
+  const base = sanitizeBlockText(value || '');
+  if (!base) return '-';
+  const normalizedBase = base.trim();
+  if (!normalizedBase) return '-';
+  const hasSuffix = normalizedBase.toLowerCase().includes(FINAL_STATEMENT_SUFFIX.toLowerCase());
+  return hasSuffix ? normalizedBase : `${normalizedBase} ${FINAL_STATEMENT_SUFFIX}`;
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function normalizeInstructions(block) {
+  if (Array.isArray(block?.instructions)) {
+    return block.instructions.filter(Boolean).map((item) => sanitizeBlockText(item));
+  }
+  if (Array.isArray(block?.exercises)) {
+    return block.exercises.map((exercise) => {
+      const sets = exercise?.sets || exercise?.rounds || '';
+      const reps = exercise?.reps || exercise?.duration || '';
+      const effort = exercise?.effort || '';
+      const parts = [exercise?.name || 'Exercise'];
+      if (sets) parts.push(String(sets));
+      if (reps) parts.push(String(reps));
+      if (effort) parts.push(String(effort));
+      return sanitizeBlockText(parts.join(' · '));
+    });
+  }
+  return [];
+}
+
+function validateLogicBlock(block) {
+  const missing = [];
+  if (!block.target_zone) missing.push('target_zone');
+  if (!block.rounds) missing.push('rounds');
+  if (!block.instructions?.length) missing.push('instructions');
+  if (missing.length) {
+    throw new Error(`Block validation failed: missing ${missing.join(', ')}`);
+  }
+}
+
+function normalizeLogicBlock(rawBlock, fallbackTitle = 'Block') {
+  const block = {
+    title: sanitizeBlockText(rawBlock?.title || rawBlock?.block || fallbackTitle),
+    target_zone: sanitizeBlockText(rawBlock?.target_zone || rawBlock?.targetZone || rawBlock?.zone || ''),
+    rounds: sanitizeBlockText(rawBlock?.rounds || rawBlock?.sets || ''),
+    instructions: normalizeInstructions(rawBlock),
+    transition: sanitizeBlockText(rawBlock?.transition || ''),
+    active_flush: sanitizeBlockText(rawBlock?.active_flush || rawBlock?.activeFlush || '')
+  };
+  validateLogicBlock(block);
+  return block;
+}
+
+function buildAdaptiveLogicBlocks(session) {
+  if (Array.isArray(session?.logic_blocks)) {
+    return session.logic_blocks
+      .map((item, index) => {
+        try {
+          return normalizeLogicBlock(item, `Block ${index + 1}`);
+        } catch (error) {
+          console.error(error.message, item);
+          return null;
+        }
+      })
+      .filter(Boolean);
+  }
+
+  const keyedBlocks = Object.entries(session || {})
+    .filter(([key, value]) => key.startsWith('block_') && value && typeof value === 'object')
+    .map(([, value], index) => {
+      try {
+        return normalizeLogicBlock(value, `Block ${index + 1}`);
+      } catch (error) {
+        console.error(error.message, value);
+        return null;
+      }
+    })
+    .filter(Boolean);
+
+  return keyedBlocks;
+}
+
+function buildCoachLogicBlocks(result, sessionOutput, mainWorkout) {
+  const candidates = [
+    result?.logic_blocks,
+    result?.programming_logic?.logic_blocks,
+    sessionOutput?.logic_blocks
+  ];
+
+  const explicit = candidates.find((item) => Array.isArray(item) && item.length);
+  if (explicit) {
+    return explicit
+      .map((item, index) => {
+        try {
+          return normalizeLogicBlock(item, `Block ${index + 1}`);
+        } catch (error) {
+          console.error(error.message, item);
+          return null;
+        }
+      })
+      .filter(Boolean);
+  }
+
+  return mainWorkout
+    .map((item, index) => {
+      try {
+        return normalizeLogicBlock(item, item?.block || `Block ${index + 1}`);
+      } catch (error) {
+        console.error(error.message, item);
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
+
+function renderStructuredWorkoutCards(blocks) {
+  return blocks.map((block) => {
+    const title = escapeHtml(block.title || 'Block');
+    const targetZone = escapeHtml(block.target_zone || 'Zone Authority');
+    const rounds = escapeHtml(block.rounds || '');
+    const instructions = block.instructions
+      .map((item) => `<li>${escapeHtml(item)}</li>`)
+      .join('');
+
+    const commandRows = [
+      block.transition ? `<p class="command-box-item"><strong>Transition</strong> ${escapeHtml(block.transition)}</p>` : '',
+      block.active_flush ? `<p class="command-box-item"><strong>Active Flush</strong> ${escapeHtml(block.active_flush)}</p>` : ''
+    ].filter(Boolean).join('');
+
+    return `
+      <li class="workout-card">
+        <div class="workout-card-head">
+          <p class="workout-card-title">${title}</p>
+          <span class="instruction-badge">${targetZone}</span>
+        </div>
+        <p class="workout-card-rounds">${rounds}</p>
+        <ul class="workout-card-list">${instructions}</ul>
+        ${commandRows ? `<div class="command-box">${commandRows}</div>` : ''}
+      </li>
+    `;
+  }).join('');
+}
+
+function parseZoneNumber(value) {
+  if (value === undefined || value === null) return null;
+  const match = String(value).match(/(?:zone\s*)?(\d)/i);
+  if (!match) return null;
+  const zone = Number(match[1]);
+  return Number.isFinite(zone) ? zone : null;
+}
+
+function pickFirstZone(source, paths) {
+  for (const path of paths) {
+    const value = getNumberAtPath(source, path);
+    const zone = parseZoneNumber(value);
+    if (zone !== null) return zone;
+  }
+  return null;
+}
+
+function extractCurrentZone(whoopPayload, adaptivePayload) {
+  const zoneFromWhoop = pickFirstZone(whoopPayload || {}, [
+    'current_zone',
+    'live.current_zone',
+    'telemetry.current_zone',
+    'workout.current_zone',
+    'workout.score.current_zone',
+    'workout.live.current_zone'
+  ]);
+  if (zoneFromWhoop !== null) return zoneFromWhoop;
+
+  return pickFirstZone(adaptivePayload || {}, [
+    'workout_context.current_zone',
+    'session.current_zone',
+    'telemetry.current_zone'
+  ]);
+}
+
+function extractTargetZoneFromSession(session) {
+  const direct = parseZoneNumber(session?.target_zone || session?.current_target_zone || session?.zone_target);
+  if (direct !== null) return direct;
+
+  const logicBlocks = buildAdaptiveLogicBlocks(session || {});
+  if (logicBlocks.length) {
+    const fromBlock = parseZoneNumber(logicBlocks[0]?.target_zone);
+    if (fromBlock !== null) return fromBlock;
+  }
+
+  const candidates = [session?.block_a, session?.block_b, session?.block_c];
+  for (const candidate of candidates) {
+    const zone = parseZoneNumber(candidate?.target_zone);
+    if (zone !== null) return zone;
+  }
+
+  return null;
+}
+
+function buildTelemetryOverrideMap(overrides) {
+  const map = {};
+  const rows = Array.isArray(overrides) ? overrides : [];
+  rows.forEach((entry) => {
+    const scenario = String(entry?.scenario || '').toUpperCase();
+    if (!scenario) return;
+    map[scenario] = {
+      command: sanitizeBlockText(entry?.command || ''),
+      trigger: sanitizeBlockText(entry?.trigger || '')
+    };
+  });
+  return map;
+}
+
+function inferTargetFromTrigger(triggerText) {
+  return parseZoneNumber(triggerText || '');
+}
+
+function showTelemetryOverlay(scenario, commandText, currentZone, targetZone) {
+  if (!telemetryOverlay) return;
+
+  const toneClass = scenario === 'UNDER_PERFORMING' ? 'under' : 'over';
+  telemetryOverlay.classList.remove('under', 'over');
+  telemetryOverlay.classList.add(toneClass, 'show');
+
+  if (telemetryOverlayTitle) {
+    telemetryOverlayTitle.textContent = scenario === 'UNDER_PERFORMING'
+      ? 'UNDER PERFORMING COMMAND'
+      : 'OVER PERFORMING COMMAND';
+  }
+  if (telemetryOverlayMessage) {
+    telemetryOverlayMessage.textContent = commandText || 'Command unavailable for this telemetry event.';
+  }
+  if (telemetryOverlayMeta) {
+    telemetryOverlayMeta.textContent = `Current zone Z${currentZone ?? '-'} | Target zone Z${targetZone ?? '-'}`;
+  }
+
+  if (telemetryOverlayTimer) {
+    window.clearTimeout(telemetryOverlayTimer);
+  }
+  telemetryOverlayTimer = window.setTimeout(() => {
+    telemetryOverlay?.classList.remove('show');
+  }, 7200);
+}
+
+function evaluateTelemetryOverrides(adaptivePayload, whoopPayload) {
+  const currentZone = extractCurrentZone(whoopPayload, adaptivePayload);
+  if (currentZone === null) return;
+
+  const session = adaptivePayload?.session || {};
+  const fallbackTarget = extractTargetZoneFromSession(session);
+  const underTarget = inferTargetFromTrigger(latestTelemetryOverrides.UNDER_PERFORMING?.trigger);
+  const overTarget = inferTargetFromTrigger(latestTelemetryOverrides.OVER_PERFORMING?.trigger);
+  const targetZone = latestTargetZone || underTarget || overTarget || fallbackTarget;
+  if (targetZone === null) return;
+
+  let scenario = '';
+  if (currentZone < targetZone) {
+    scenario = 'UNDER_PERFORMING';
+  } else if (currentZone > targetZone) {
+    scenario = 'OVER_PERFORMING';
+  }
+  if (!scenario) return;
+
+  const now = Date.now();
+  if (lastTelemetryAlert.scenario === scenario && (now - lastTelemetryAlert.at) < TELEMETRY_ALERT_COOLDOWN_MS) {
+    return;
+  }
+
+  const fallbackMessage = scenario === 'UNDER_PERFORMING'
+    ? `Status check: telemetry is below target. Move to Zone ${targetZone} now.`
+    : `Telemetry is above target too early. Calibrate back to Zone ${targetZone}.`;
+  const command = latestTelemetryOverrides[scenario]?.command || fallbackMessage;
+  showTelemetryOverlay(scenario, command, currentZone, targetZone);
+
+  lastTelemetryAlert = { scenario, at: now };
+}
+
+function scheduleTelemetryPolling() {
+  if (telemetryPollTimer) {
+    window.clearInterval(telemetryPollTimer);
+  }
+
+  telemetryPollTimer = window.setInterval(async () => {
+    const whoopUserId = getCurrentWhoopUserId();
+    const adaptiveUrl = makeUrl('/api/get-adaptive-session', { whoopUserId });
+    const whoopUrl = makeUrl('/api/whoop-data', { whoopUserId });
+
+    try {
+      const [adaptiveResult, whoopResult] = await Promise.allSettled([
+        fetchJson(adaptiveUrl),
+        fetchJson(whoopUrl)
+      ]);
+      if (adaptiveResult.status !== 'fulfilled') return;
+
+      const adaptivePayload = adaptiveResult.value;
+      const whoopPayload = whoopResult.status === 'fulfilled' ? whoopResult.value : null;
+
+      latestTelemetryOverrides = buildTelemetryOverrideMap(adaptivePayload?.session?.telemetry_overrides || []);
+      latestTargetZone = extractTargetZoneFromSession(adaptivePayload?.session || {});
+      evaluateTelemetryOverrides(adaptivePayload, whoopPayload);
+    } catch (error) {
+      console.warn('telemetry polling failed', error);
+    }
+  }, TELEMETRY_POLL_MS);
 }
 
 const UI_COPY = {
@@ -201,13 +526,38 @@ function resolveAthleteName(whoopPayload, adaptivePayload, historyPayload, whoop
   return `Athlete ${whoopUserId}`;
 }
 
-function setReadiness(readiness) {
+function setReadiness(readiness, recoveryPct) {
   if (!readinessChip) return;
   const value = String(readiness || 'UNKNOWN').toUpperCase();
   const cls = value === 'HIGH' ? 'high' : value === 'MODERATE' ? 'moderate' : value === 'LOW' ? 'low' : 'unknown';
   readinessChip.className = `readiness-chip ${cls}`;
-  const labelMap = { HIGH: 'Calibrated — High Authority', MODERATE: 'Calibrated — Structural Integrity', LOW: 'Precision Recovery Mode', UNKNOWN: 'Readiness Unknown' };
-  readinessChip.textContent = labelMap[value] || `Readiness ${value}`;
+  const labelMap = {
+    HIGH: 'STATUS: REDLINE AUTHORITY',
+    MODERATE: 'STATUS: PRECISION CALIBRATION',
+    LOW: 'STATUS: PRECISION CALIBRATION',
+    UNKNOWN: 'STATUS: AWAITING SIGNAL'
+  };
+  const label = labelMap[value] || `STATUS: ${value}`;
+
+  const recoveryEl = document.getElementById('readinessRecovery');
+  if (recoveryEl) {
+    const pct = Number.isFinite(Number(recoveryPct)) ? Math.round(Number(recoveryPct)) : null;
+    if (pct !== null) {
+      recoveryEl.textContent = `RECOVERY ${pct}%`;
+      recoveryEl.hidden = false;
+    } else {
+      recoveryEl.hidden = true;
+    }
+  }
+
+  // Set label text without disturbing the recovery child element
+  const firstTextNode = Array.from(readinessChip.childNodes)
+    .find((n) => n.nodeType === Node.TEXT_NODE);
+  if (firstTextNode) {
+    firstTextNode.textContent = label;
+  } else {
+    readinessChip.prepend(document.createTextNode(label));
+  }
 }
 
 function setSource(source) {
@@ -406,20 +756,28 @@ function renderAdaptiveSession(payload) {
   const scoring = payload?.scoring || {};
   const session = payload?.session || {};
 
-  setReadiness(readiness);
+  latestTelemetryOverrides = buildTelemetryOverrideMap(session?.telemetry_overrides || []);
+  latestTargetZone = extractTargetZoneFromSession(session);
+
+  setReadiness(readiness, payload?.whoop?.recovery);
   setSource(sourceFromAdaptivePayload(payload));
 
   if (sessionTitle) sessionTitle.textContent = session.session_title || 'Delta Zone session unavailable';
   if (sessionIntensity) sessionIntensity.innerHTML = mapIntensityToStatus(session.intensity);
   if (sessionFocus) sessionFocus.textContent = sanitizeBlockText(session.focus) || '-';
-  const finisherRaw = sanitizeBlockText(session.finisher);
-  if (sessionFinisher) sessionFinisher.textContent = finisherRaw ? `The final round is your best round. ${finisherRaw}` : '-';
+  const finalStatement = session.final_statement || session.finisher;
+  if (sessionFinisher) sessionFinisher.textContent = formatFinalStatement(finalStatement);
 
   if (sessionBlocks) {
+    const logicBlocks = buildAdaptiveLogicBlocks(session);
     const blocks = Array.isArray(session.blocks) ? session.blocks.filter(Boolean) : [];
-    sessionBlocks.innerHTML = blocks.length
-      ? blocks.map((block) => renderBlockItem(block)).join('')
-      : '<li class="block-item">Architecture pending — no blocks returned by API.</li>';
+    if (logicBlocks.length) {
+      sessionBlocks.innerHTML = renderStructuredWorkoutCards(logicBlocks);
+    } else {
+      sessionBlocks.innerHTML = blocks.length
+        ? blocks.map((block) => renderBlockItem(block)).join('')
+        : '<li class="block-item">Architecture pending — no blocks returned by API.</li>';
+    }
   }
 
   if (readinessScoreValue) {
@@ -462,6 +820,7 @@ function renderAdaptiveSession(payload) {
     scoringBreakdownValue.textContent = `${formatNumberOrZero(scoring.recovery_component, 1)} / ${formatNumberOrZero(scoring.sleep_component, 1)} / ${formatNumberOrZero(scoring.load_component, 1)}`;
   }
   renderZoneVisuals(workoutContext, scoring);
+  evaluateTelemetryOverrides(payload, whoop);
 
   if (whoop && sourceFromAdaptivePayload(payload) === 'whoop') {
     setStatus('ok', 'Live WHOOP connected', 'Session generated from live physiology signal.');
@@ -480,21 +839,16 @@ function renderCoachSession(result) {
   const programmingLogic = result?.programming_logic || {};
   const memberContext = result?.member_context || {};
   const mainWorkout = Array.isArray(sessionOutput.main_workout) ? sessionOutput.main_workout : [];
-  const blockItems = mainWorkout.flatMap((block) => {
-    const blockLabel = block?.block || 'Block';
-    const exercises = Array.isArray(block?.exercises) ? block.exercises : [];
-    if (!exercises.length) {
-      return [blockLabel];
-    }
-    return exercises.map((exercise) => {
-      const sets = exercise?.sets || exercise?.rounds || '';
-      const reps = exercise?.reps || exercise?.duration || '';
-      const effort = exercise?.effort || '';
-      return `${blockLabel}: ${exercise?.name || 'Exercise'}${sets ? ` · ${sets}` : ''}${reps ? ` · ${reps}` : ''}${effort ? ` · ${effort}` : ''}`;
-    });
-  });
+  const logicBlocks = buildCoachLogicBlocks(result, sessionOutput, mainWorkout);
+  latestTelemetryOverrides = buildTelemetryOverrideMap(
+    sessionOutput?.telemetry_overrides
+      || programmingLogic?.telemetry_overrides
+      || result?.telemetry_overrides
+      || []
+  );
+  latestTargetZone = parseZoneNumber(logicBlocks[0]?.target_zone) || latestTargetZone;
 
-  setReadiness(memberContext?.readiness_score ? 'MODERATE' : 'UNKNOWN');
+  setReadiness(memberContext?.readiness_score ? 'MODERATE' : 'UNKNOWN', memberContext?.recovery ?? memberContext?.whoop_recovery);
   setSource('coach');
   if (sessionTitle) {
     sessionTitle.textContent = sessionOutput.session_focus || programmingLogic.session_objective || sessionOutput.coach_summary || 'AI Coach session generated';
@@ -506,15 +860,14 @@ function renderCoachSession(result) {
     sessionFocus.textContent = sanitizeBlockText(programmingLogic.training_mode || sessionOutput.session_intent || memberContext.primary_goal) || '-';
   }
   if (sessionFinisher) {
-    const rawFinisher = Array.isArray(sessionOutput.cooldown) && sessionOutput.cooldown.length
+    const rawFinisher = sessionOutput.final_statement || (Array.isArray(sessionOutput.cooldown) && sessionOutput.cooldown.length
       ? sessionOutput.cooldown.flatMap((block) => block?.items || []).join(' | ')
-      : (sessionOutput.coach_summary || '');
-    const finisherSanitized = sanitizeBlockText(rawFinisher);
-    sessionFinisher.textContent = finisherSanitized ? `The final round is your best round. ${finisherSanitized}` : '-';
+      : (sessionOutput.coach_summary || ''));
+    sessionFinisher.textContent = formatFinalStatement(rawFinisher);
   }
   if (sessionBlocks) {
-    sessionBlocks.innerHTML = blockItems.length
-      ? blockItems.map((item) => renderBlockItem(item)).join('')
+    sessionBlocks.innerHTML = logicBlocks.length
+      ? renderStructuredWorkoutCards(logicBlocks)
       : '<li class="block-item">Architecture pending — no blocks returned by AI Coach agent.</li>';
   }
   setWorkflowMeta(result?.workflow_id ? `Workflow ID: ${result.workflow_id}` : 'Workflow ID: not returned');
@@ -715,6 +1068,8 @@ async function loadLiveData(options = {}) {
       renderWhoopSnapshot(null);
     }
 
+    evaluateTelemetryOverrides(adaptiveSession, whoopPayload);
+
     if (historyResult.status === 'fulfilled') {
       renderHistory(historyResult.value);
     } else {
@@ -796,12 +1151,19 @@ if (showWhoopRawToggle) {
   showWhoopRawToggle.addEventListener('change', syncWhoopRawVisibility);
 }
 
+if (telemetryOverlayClose) {
+  telemetryOverlayClose.addEventListener('click', () => {
+    telemetryOverlay?.classList.remove('show');
+  });
+}
+
 initUserId();
 setWorkflowMeta('Workflow ID: not generated');
 applyUiCopy();
 attachButtonGlow();
 syncWhoopRawVisibility();
 loadLiveData();
+scheduleTelemetryPolling();
 
 if (coachAgentBtn) {
   coachAgentBtn.addEventListener('click', runCoachAgent);
