@@ -219,11 +219,14 @@ async function writeTextToClipboard(text) {
   helper.value = text;
   helper.setAttribute('readonly', '');
   helper.style.position = 'fixed';
+  helper.style.left = '-9999px';
+  helper.style.top = '0';
   helper.style.opacity = '0';
   helper.style.pointerEvents = 'none';
   document.body.appendChild(helper);
   helper.focus();
   helper.select();
+  helper.setSelectionRange(0, helper.value.length);
 
   const copied = document.execCommand('copy');
   document.body.removeChild(helper);
@@ -247,7 +250,12 @@ async function copyWorkoutToClipboard() {
     await writeTextToClipboard(text);
     setStatus('ok', 'Workout copied', 'Copied the current workout to your clipboard.');
   } catch (error) {
-    setStatus('bad', 'Copy failed', error?.message || 'Clipboard copy was blocked by the browser.');
+    const manualCopy = window.prompt('Clipboard was blocked. Copy the workout below:', text);
+    if (manualCopy !== null) {
+      setStatus('warn', 'Manual copy opened', 'Browser blocked automatic copy, so the workout text was opened for manual copy.');
+    } else {
+      setStatus('bad', 'Copy failed', error?.message || 'Clipboard copy was blocked by the browser.');
+    }
   } finally {
     if (copyWorkoutBtn) copyWorkoutBtn.disabled = false;
   }
