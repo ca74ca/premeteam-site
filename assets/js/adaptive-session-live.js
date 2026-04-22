@@ -3,6 +3,7 @@ const showWhoopRawToggle = document.getElementById('showWhoopRawToggle');
 const refreshBtn = document.getElementById('refreshBtn');
 const reconnectBtn = document.getElementById('reconnectBtn');
 const coachAgentBtn = document.getElementById('coachAgentBtn');
+const WHOOP_AUTH_URL = 'https://www.varacis.com/api/whoop-auth';
 
 const statusText = document.getElementById('statusText');
 const liveWhoopPill = document.getElementById('liveWhoopPill');
@@ -1144,7 +1145,9 @@ if (refreshBtn) {
 }
 
 if (reconnectBtn) {
-  reconnectBtn.addEventListener('click', () => loadLiveData());
+  reconnectBtn.addEventListener('click', () => {
+    window.location.href = WHOOP_AUTH_URL;
+  });
 }
 
 if (showWhoopRawToggle) {

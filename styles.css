@@ -179,6 +179,36 @@ body{
     0 0 26px rgba(255,0,220,.12);
 }
 
+.whoopConnectCard.connected{
+  border-color:rgba(74,222,128,.72);
+  background:linear-gradient(180deg, rgba(74,222,128,.24), rgba(34,197,94,.10));
+  box-shadow:
+    0 20px 48px rgba(0,0,0,.45),
+    0 0 18px rgba(74,222,128,.58),
+    0 0 34px rgba(34,197,94,.42);
+  animation:whoopConnectedPulse 1.7s ease-in-out infinite;
+}
+
+.whoopConnectCard.connected .cardLabel,
+.whoopConnectCard.connected .cardValue{
+  color:rgba(220,252,231,.98);
+}
+
+@keyframes whoopConnectedPulse{
+  0%, 100%{
+    box-shadow:
+      0 20px 48px rgba(0,0,0,.45),
+      0 0 16px rgba(74,222,128,.48),
+      0 0 28px rgba(34,197,94,.34);
+  }
+  50%{
+    box-shadow:
+      0 24px 52px rgba(0,0,0,.52),
+      0 0 24px rgba(74,222,128,.70),
+      0 0 44px rgba(34,197,94,.52);
+  }
+}
+
 .socialRow .glassCard:nth-child(1){ animation-delay:.08s; }
 .socialRow .glassCard:nth-child(2){ animation-delay:.16s; }
 .socialRow .glassCard:nth-child(3){ animation-delay:.24s; }
