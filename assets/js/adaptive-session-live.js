@@ -180,9 +180,24 @@ function setSource(source) {
 }
 
 function sourceFromAdaptivePayload(payload) {
+  const title = String(payload?.session?.session_title || '').toLowerCase();
+  if (title.includes('fallback')) return 'fallback';
+
   const readiness = String(payload?.readiness || 'UNKNOWN').toUpperCase();
-  if (payload?.whoop && readiness !== 'UNKNOWN') return 'whoop';
+  const whoop = payload?.whoop || {};
+  const hasWhoopSignal = Number(whoop.recovery) > 0 || Number(whoop.sleep) > 0 || Number(whoop.strain) > 0;
+  if (hasWhoopSignal && readiness !== 'UNKNOWN') return 'whoop';
   return 'fallback';
+}
+
+function getWhoopAuthError(whoopPayload) {
+  const statusCandidates = [
+    whoopPayload?.recovery?.status,
+    whoopPayload?.sleep?.status,
+    whoopPayload?.workout?.status
+  ];
+  const status = statusCandidates.find((value) => Number(value) === 401);
+  return Number(status) === 401 ? 'WHOOP auth expired (401)' : '';
 }
 
 function getNumberAtPath(source, path) {
@@ -646,6 +661,7 @@ async function loadLiveData(options = {}) {
 
     const whoopPayload = whoopResult.status === 'fulfilled' ? whoopResult.value : null;
     const historyPayload = historyResult.status === 'fulfilled' ? historyResult.value : null;
+    const whoopAuthError = whoopPayload ? getWhoopAuthError(whoopPayload) : '';
     setAthleteName(resolveAthleteName(whoopPayload, adaptiveSession, historyPayload, whoopUserId));
 
     if (whoopResult.status === 'fulfilled') {
@@ -672,6 +688,8 @@ async function loadLiveData(options = {}) {
         historyResult.status === 'rejected' ? 'session-history' : null
       ].filter(Boolean).join(', ');
       setStatus('warn', source === 'whoop' ? 'Partial live sync' : 'Fallback session', `Main card source: ${sourceText}. Partial data: ${degraded}. History rows: ${historyCount}${includeFallback ? ' (debug fallback rows enabled)' : ''}.`);
+    } else if (whoopAuthError) {
+      setStatus('warn', 'WHOOP auth required', `${whoopAuthError}. Reconnect WHOOP to restore live physiology sync.`);
     } else {
       setStatus(source === 'whoop' ? 'ok' : 'warn', source === 'whoop' ? 'Live WHOOP connected' : 'Fallback session', `Main card source: ${sourceText}. History rows: ${historyCount}${includeFallback ? ' (debug fallback rows enabled)' : ''}.`);
     }
