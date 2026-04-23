@@ -76,6 +76,7 @@ const telemetryOverlayMeta = document.getElementById('telemetryOverlayMeta');
 const telemetryOverlayClose = document.getElementById('telemetryOverlayClose');
 
 const STORAGE_KEY = 'adaptiveSessionLiveUserId';
+const APP_USER_STORAGE_KEY = 'adaptiveSessionLiveAppUserId';
 const DEFAULT_WHOOP_USER_ID = String(window.DELTA_WHOOP_USER_ID || '1243444');
 
 // ─── Delta Zone Voice Layer ───────────────────────────────────────────────────
@@ -685,6 +686,28 @@ function applyUiCopy() {
 function getCurrentWhoopUserId() {
   const typedValue = whoopUserIdInput?.value?.trim();
   return typedValue || DEFAULT_WHOOP_USER_ID;
+}
+
+function getQueryParam(keys = []) {
+  const params = new URLSearchParams(window.location.search || '');
+  for (const key of keys) {
+    const value = params.get(key);
+    if (value && value.trim()) return value.trim();
+  }
+  return '';
+}
+
+function getCurrentAppUserId() {
+  const explicit = String(window.DELTA_APP_USER_ID || '').trim();
+  if (explicit) return explicit;
+
+  const fromQuery = getQueryParam(['appUserId', 'applicationUserId', 'accountUserId', 'uid']);
+  if (fromQuery) return fromQuery;
+
+  const cached = String(window.localStorage.getItem(APP_USER_STORAGE_KEY) || '').trim();
+  if (cached) return cached;
+
+  return '';
 }
 
 function resolveAthleteName(whoopPayload, adaptivePayload, historyPayload, whoopUserId) {
@@ -1352,6 +1375,11 @@ async function loadLiveData(options = {}) {
 }
 
 function initUserId() {
+  const appUserId = getCurrentAppUserId();
+  if (appUserId) {
+    window.localStorage.setItem(APP_USER_STORAGE_KEY, appUserId);
+  }
+
   const cachedUserId = window.localStorage.getItem(STORAGE_KEY);
   if (cachedUserId && whoopUserIdInput) {
     whoopUserIdInput.value = cachedUserId;
@@ -1388,8 +1416,29 @@ if (refreshBtn) {
 if (reconnectBtn) {
   reconnectBtn.addEventListener('click', () => {
     const whoopUserId = getCurrentWhoopUserId();
+    const appUserId = getCurrentAppUserId();
+    const memberId = getQueryParam(['memberId', 'member_id']) || whoopUserId;
     const authUrl = new URL(WHOOP_AUTH_URL);
-    if (whoopUserId) authUrl.searchParams.set('userId', whoopUserId);
+
+    if (appUserId) {
+      authUrl.searchParams.set('userId', appUserId);
+      authUrl.searchParams.set('appUserId', appUserId);
+    } else if (whoopUserId) {
+      authUrl.searchParams.set('userId', whoopUserId);
+    }
+
+    if (memberId) authUrl.searchParams.set('memberId', memberId);
+    if (whoopUserId) authUrl.searchParams.set('whoopUserId', whoopUserId);
+
+    if (appUserId || memberId || whoopUserId) {
+      const state = {
+        appUserId: appUserId || undefined,
+        memberId: memberId || undefined,
+        whoopUserId: whoopUserId || undefined
+      };
+      authUrl.searchParams.set('state', JSON.stringify(state));
+    }
+
     window.location.href = authUrl.toString();
   });
 }
