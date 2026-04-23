@@ -80,10 +80,13 @@ const telemetryOverlayTitle = document.getElementById('telemetryOverlayTitle');
 const telemetryOverlayMessage = document.getElementById('telemetryOverlayMessage');
 const telemetryOverlayMeta = document.getElementById('telemetryOverlayMeta');
 const telemetryOverlayClose = document.getElementById('telemetryOverlayClose');
+const fallbackGuideOrb = document.getElementById('fallbackGuideOrb');
+const fallbackGuidePanel = document.getElementById('fallbackGuidePanel');
 
 const STORAGE_KEY = 'adaptiveSessionLiveUserId';
 const APP_USER_STORAGE_KEY = 'adaptiveSessionLiveAppUserId';
 const DEFAULT_WHOOP_USER_ID = String(window.DELTA_WHOOP_USER_ID || '1243444');
+const WHOOP_LINK_GUIDANCE = 'Please link wearable for Delta zone performace POHE verification.';
 
 // ─── Delta Zone Voice Layer ───────────────────────────────────────────────────
 const BLACKLIST_MAP = [
@@ -105,6 +108,7 @@ let latestRenderedWorkout = null;
 let telemetryOverlayTimer = null;
 let telemetryPollTimer = null;
 let lastTelemetryAlert = { scenario: '', at: 0 };
+let fallbackGuidePanelShown = false;
 
 function sanitizeBlockText(text) {
   if (!text) return text;
@@ -737,7 +741,7 @@ function resolveAthleteName(whoopPayload, adaptivePayload, historyPayload, whoop
   ].map((value) => String(value || '').trim()).filter(Boolean);
 
   if (candidates[0]) return candidates[0];
-  return `Athlete ${whoopUserId}`;
+  return 'User Unknown';
 }
 
 function setReadiness(readiness, recoveryPct) {
@@ -805,6 +809,39 @@ function getWhoopAuthError(whoopPayload) {
   ];
   const status = statusCandidates.find((value) => Number(value) === 401);
   return Number(status) === 401 ? 'WHOOP auth expired (401)' : '';
+}
+
+function hasWhoopDataPresent(whoopPayload) {
+  if (!whoopPayload || typeof whoopPayload !== 'object') return false;
+  if (getWhoopAuthError(whoopPayload)) return false;
+
+  const signals = extractWhoopSignals(whoopPayload);
+  return [signals.recovery, signals.sleep, signals.strain, signals.restingHr, signals.hrv]
+    .some((value) => Number.isFinite(Number(value)) && Number(value) > 0);
+}
+
+function withWhoopLinkGuidance(message) {
+  const base = String(message || '').trim();
+  if (!base) return WHOOP_LINK_GUIDANCE;
+  if (base.toLowerCase().includes(WHOOP_LINK_GUIDANCE.toLowerCase())) return base;
+  return `${base} ${WHOOP_LINK_GUIDANCE}`;
+}
+
+function setFallbackGuideVisibility(visible) {
+  if (!fallbackGuideOrb || !fallbackGuidePanel) return;
+
+  fallbackGuideOrb.hidden = !visible;
+  if (!visible) {
+    fallbackGuidePanel.hidden = true;
+    fallbackGuideOrb.setAttribute('aria-expanded', 'false');
+    return;
+  }
+
+  if (!fallbackGuidePanelShown) {
+    fallbackGuidePanel.hidden = false;
+    fallbackGuideOrb.setAttribute('aria-expanded', 'true');
+    fallbackGuidePanelShown = true;
+  }
 }
 
 function getValueAtPath(source, path) {
@@ -1142,7 +1179,7 @@ function renderAdaptiveSession(payload) {
   if (whoop && sourceFromAdaptivePayload(payload) === 'whoop') {
     setStatus('ok', 'Live WHOOP connected', 'Session generated from live physiology signal.');
   } else {
-    setStatus('warn', 'WHOOP unavailable', 'Fallback session active. Reconnect WHOOP and regenerate.');
+    setStatus('warn', 'WHOOP unavailable', withWhoopLinkGuidance('Fallback session active. Reconnect WHOOP and regenerate.'));
   }
 }
 
@@ -1390,7 +1427,8 @@ async function loadLiveData(options = {}) {
   const includeFallback = Boolean(showWhoopRawToggle?.checked);
 
   window.localStorage.setItem(STORAGE_KEY, whoopUserId);
-  setAthleteName(`Athlete ${whoopUserId}`);
+  setAthleteName('User Unknown');
+  setFallbackGuideVisibility(true);
 
   const adaptiveUrl = makeUrl('/api/get-adaptive-session', {
     whoopUserId,
@@ -1425,9 +1463,13 @@ async function loadLiveData(options = {}) {
     renderAdaptiveSession(adaptiveSession);
 
     const whoopPayload = whoopResult.status === 'fulfilled' ? whoopResult.value : null;
+    const hasWhoopData = hasWhoopDataPresent(whoopPayload);
     const historyPayload = historyResult.status === 'fulfilled' ? historyResult.value : null;
     const whoopAuthError = whoopPayload ? getWhoopAuthError(whoopPayload) : '';
-    setAthleteName(resolveAthleteName(whoopPayload, adaptiveSession, historyPayload, whoopUserId));
+    setAthleteName(hasWhoopData
+      ? resolveAthleteName(whoopPayload, adaptiveSession, historyPayload, whoopUserId)
+      : 'User Unknown');
+    setFallbackGuideVisibility(!hasWhoopData);
 
     if (whoopResult.status === 'fulfilled') {
       renderWhoopSnapshot(whoopPayload);
@@ -1454,16 +1496,23 @@ async function loadLiveData(options = {}) {
         whoopResult.status === 'rejected' ? 'whoop-data' : null,
         historyResult.status === 'rejected' ? 'session-history' : null
       ].filter(Boolean).join(', ');
-      setStatus('warn', source === 'whoop' ? 'Partial live sync' : 'Fallback session', `Main card source: ${sourceText}. Partial data: ${degraded}. History rows: ${historyCount}${includeFallback ? ' (debug fallback rows enabled)' : ''}.`);
+      const partialMessage = `Main card source: ${sourceText}. Partial data: ${degraded}. History rows: ${historyCount}${includeFallback ? ' (debug fallback rows enabled)' : ''}.`;
+      setStatus('warn', source === 'whoop' ? 'Partial live sync' : 'Fallback session', hasWhoopData ? partialMessage : withWhoopLinkGuidance(partialMessage));
     } else if (whoopAuthError) {
-      setStatus('warn', 'WHOOP auth required', `${whoopAuthError}. Reconnect WHOOP to restore live physiology sync.`);
+      setStatus('warn', 'WHOOP auth required', withWhoopLinkGuidance(`${whoopAuthError}. Reconnect WHOOP to restore live physiology sync.`));
     } else {
-      setStatus(source === 'whoop' ? 'ok' : 'warn', source === 'whoop' ? 'Live WHOOP connected' : 'Fallback session', `Main card source: ${sourceText}. History rows: ${historyCount}${includeFallback ? ' (debug fallback rows enabled)' : ''}.`);
+      const defaultMessage = `Main card source: ${sourceText}. History rows: ${historyCount}${includeFallback ? ' (debug fallback rows enabled)' : ''}.`;
+      setStatus(
+        source === 'whoop' ? 'ok' : 'warn',
+        source === 'whoop' ? 'Live WHOOP connected' : 'Fallback session',
+        hasWhoopData ? defaultMessage : withWhoopLinkGuidance(defaultMessage)
+      );
     }
   } catch (error) {
     console.error('❌ loadLiveData error:', error);
-    setStatus('bad', 'Sync failed', error.message || 'Unable to load adaptive APIs.');
-    setAthleteName(`Athlete ${whoopUserId}`);
+    setStatus('bad', 'Sync failed', withWhoopLinkGuidance(error.message || 'Unable to load adaptive APIs.'));
+    setAthleteName('User Unknown');
+    setFallbackGuideVisibility(true);
     renderAdaptiveSession({
       readiness: 'UNKNOWN',
       session: { session_title: 'Delta Zone - Session unavailable', intensity: '-', focus: '-', blocks: [], finisher: '-' }
@@ -1564,6 +1613,16 @@ if (showWhoopRawToggle) {
 if (telemetryOverlayClose) {
   telemetryOverlayClose.addEventListener('click', () => {
     telemetryOverlay?.classList.remove('show');
+  });
+}
+
+if (fallbackGuideOrb) {
+  fallbackGuideOrb.addEventListener('click', () => {
+    if (!fallbackGuidePanel) return;
+    const isHidden = fallbackGuidePanel.hidden;
+    fallbackGuidePanel.hidden = !isHidden;
+    fallbackGuideOrb.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+    if (isHidden) fallbackGuidePanelShown = true;
   });
 }
 
