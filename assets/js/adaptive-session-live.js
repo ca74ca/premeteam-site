@@ -701,7 +701,7 @@ function getCurrentAppUserId() {
   const explicit = String(window.DELTA_APP_USER_ID || '').trim();
   if (explicit) return explicit;
 
-  const fromQuery = getQueryParam(['appUserId', 'applicationUserId', 'accountUserId', 'uid']);
+  const fromQuery = getQueryParam(['appUserId', 'applicationUserId', 'accountUserId', 'uid', 'userId', 'user_id']);
   if (fromQuery) return fromQuery;
 
   const cached = String(window.localStorage.getItem(APP_USER_STORAGE_KEY) || '').trim();
@@ -1423,17 +1423,29 @@ if (reconnectBtn) {
     if (appUserId) {
       authUrl.searchParams.set('userId', appUserId);
       authUrl.searchParams.set('appUserId', appUserId);
+      authUrl.searchParams.set('applicationUserId', appUserId);
+      authUrl.searchParams.set('accountUserId', appUserId);
+      authUrl.searchParams.set('uid', appUserId);
+      authUrl.searchParams.set('user_id', appUserId);
     } else if (whoopUserId) {
       authUrl.searchParams.set('userId', whoopUserId);
     }
 
-    if (memberId) authUrl.searchParams.set('memberId', memberId);
+    if (memberId) {
+      authUrl.searchParams.set('memberId', memberId);
+      authUrl.searchParams.set('member_id', memberId);
+    }
     if (whoopUserId) authUrl.searchParams.set('whoopUserId', whoopUserId);
 
     if (appUserId || memberId || whoopUserId) {
       const state = {
         appUserId: appUserId || undefined,
+        applicationUserId: appUserId || undefined,
+        accountUserId: appUserId || undefined,
+        uid: appUserId || undefined,
+        userId: appUserId || whoopUserId || undefined,
         memberId: memberId || undefined,
+        member_id: memberId || undefined,
         whoopUserId: whoopUserId || undefined
       };
       authUrl.searchParams.set('state', JSON.stringify(state));
