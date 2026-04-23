@@ -30,6 +30,12 @@ const whoopSleep = document.getElementById('whoopSleep');
 const whoopStrain = document.getElementById('whoopStrain');
 const whoopRhr = document.getElementById('whoopRhr');
 const whoopHrv = document.getElementById('whoopHrv');
+const profileNameValue = document.getElementById('profileNameValue');
+const profileEmailValue = document.getElementById('profileEmailValue');
+const profileUserIdValue = document.getElementById('profileUserIdValue');
+const profileHeightValue = document.getElementById('profileHeightValue');
+const profileWeightValue = document.getElementById('profileWeightValue');
+const profileMaxHrValue = document.getElementById('profileMaxHrValue');
 const readinessScoreValue = document.getElementById('readinessScoreValue');
 const zoneClassifierChip = document.getElementById('zoneClassifierChip');
 const loadTierChip = document.getElementById('loadTierChip');
@@ -957,6 +963,57 @@ function extractWhoopSignals(whoopPayload) {
   };
 }
 
+function firstNonEmptyValue(values = []) {
+  for (const value of values) {
+    const text = String(value || '').trim();
+    if (text) return text;
+  }
+  return '';
+}
+
+function formatHeightMeters(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) return '-';
+  return `${parsed.toFixed(3)} m`;
+}
+
+function formatWeightKg(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) return '-';
+  return `${parsed.toFixed(2)} kg`;
+}
+
+function renderWhoopProfileSpots(payload) {
+  const profile = payload?.profile && typeof payload.profile === 'object' ? payload.profile : {};
+
+  const fullName = firstNonEmptyValue([
+    profile.fullName,
+    [profile.firstName, profile.lastName].filter(Boolean).join(' '),
+    payload?.athlete_name,
+    payload?.member_name,
+    payload?.name
+  ]);
+  const email = firstNonEmptyValue([profile.email, payload?.email]);
+  const userId = firstNonEmptyValue([
+    profile.userId,
+    profile.user_id,
+    payload?.userId,
+    payload?.user_id,
+    payload?.member_id
+  ]);
+
+  const heightMeters = readNumber(payload || {}, ['profile.heightMeter', 'profile.height_meter', 'heightMeter', 'height_meter']);
+  const weightKg = readNumber(payload || {}, ['profile.weightKg', 'profile.weight_kg', 'weightKg', 'weight_kg']);
+  const maxHeartRate = readNumber(payload || {}, ['profile.maxHeartRate', 'profile.max_heart_rate', 'maxHeartRate', 'max_heart_rate']);
+
+  if (profileNameValue) profileNameValue.textContent = fullName || '-';
+  if (profileEmailValue) profileEmailValue.textContent = email || '-';
+  if (profileUserIdValue) profileUserIdValue.textContent = userId || '-';
+  if (profileHeightValue) profileHeightValue.textContent = formatHeightMeters(heightMeters);
+  if (profileWeightValue) profileWeightValue.textContent = formatWeightKg(weightKg);
+  if (profileMaxHrValue) profileMaxHrValue.textContent = formatNumber(maxHeartRate, 0);
+}
+
 function renderAdaptiveSession(payload) {
   const readiness = String(payload?.readiness || 'UNKNOWN').toUpperCase();
   const whoop = payload?.whoop || null;
@@ -1107,6 +1164,7 @@ function renderCoachSession(result) {
 }
 
 function renderWhoopSnapshot(payload) {
+  renderWhoopProfileSpots(payload || {});
   const signals = extractWhoopSignals(payload || {});
   if (whoopRecovery) whoopRecovery.textContent = formatNumber(signals.recovery, 0);
   if (whoopSleep) whoopSleep.textContent = formatNumber(signals.sleep, 0);

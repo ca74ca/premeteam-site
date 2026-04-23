@@ -635,6 +635,49 @@
     margin-top: 8px;
   }
 
+  .profile-glass-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .profile-glass-spot {
+    border-radius: 12px;
+    padding: 9px 10px;
+    display: grid;
+    gap: 4px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: linear-gradient(150deg, var(--glassA), var(--glassB));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.26), 0 8px 24px rgba(0,0,0,.18);
+    backdrop-filter: blur(8px) saturate(130%);
+    -webkit-backdrop-filter: blur(8px) saturate(130%);
+    min-height: 64px;
+  }
+
+  .profile-glass-spot small {
+    color: rgba(255,255,255,.66);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .profile-glass-spot strong {
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    color: rgba(255,255,255,.95);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .profile-glass-cyan { --glassA: rgba(6,182,212,.28); --glassB: rgba(14,116,144,.16); }
+  .profile-glass-emerald { --glassA: rgba(16,185,129,.26); --glassB: rgba(6,95,70,.16); }
+  .profile-glass-amber { --glassA: rgba(245,158,11,.28); --glassB: rgba(146,64,14,.16); }
+  .profile-glass-rose { --glassA: rgba(244,63,94,.28); --glassB: rgba(159,18,57,.15); }
+  .profile-glass-violet { --glassA: rgba(139,92,246,.25); --glassB: rgba(91,33,182,.15); }
+  .profile-glass-slate { --glassA: rgba(148,163,184,.24); --glassB: rgba(71,85,105,.16); }
+
   .metric {
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -911,12 +954,14 @@
     .layout { grid-template-columns: 1fr; }
     .actions { grid-template-columns: 1fr; }
     .metrics { grid-template-columns: 1fr 1fr; }
+    .profile-glass-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .coach-grid { grid-template-columns: 1fr; }
     .session-actions { grid-template-columns: 1fr; }
   }
 
   @media (max-width: 620px) {
     .metrics { grid-template-columns: 1fr; }
+    .profile-glass-grid { grid-template-columns: 1fr; }
     .detail-grid { grid-template-columns: 1fr; }
     .coach-zone-grid { grid-template-columns: 1fr; }
     .home-orb {
@@ -1005,6 +1050,32 @@
 
       <article class="card" aria-label="Physiology and history panel">
         <h2 id="biometricsHeading">LIVE POHE BIOMETRICS SNAPSHOT</h2>
+        <div class="profile-glass-grid" aria-label="WHOOP profile highlights">
+          <div class="profile-glass-spot profile-glass-cyan">
+            <small>Name</small>
+            <strong id="profileNameValue">-</strong>
+          </div>
+          <div class="profile-glass-spot profile-glass-emerald">
+            <small>Email</small>
+            <strong id="profileEmailValue">-</strong>
+          </div>
+          <div class="profile-glass-spot profile-glass-amber">
+            <small>User ID</small>
+            <strong id="profileUserIdValue">-</strong>
+          </div>
+          <div class="profile-glass-spot profile-glass-rose">
+            <small>Height</small>
+            <strong id="profileHeightValue">-</strong>
+          </div>
+          <div class="profile-glass-spot profile-glass-violet">
+            <small>Weight</small>
+            <strong id="profileWeightValue">-</strong>
+          </div>
+          <div class="profile-glass-spot profile-glass-slate">
+            <small>Max HR</small>
+            <strong id="profileMaxHrValue">-</strong>
+          </div>
+        </div>
         <div class="metrics">
           <div class="metric">
             <small>Readiness Score</small>
@@ -1171,6 +1242,6 @@
     <p id="telemetryOverlayMeta" class="telemetry-meta">Current zone -- | Target zone --</p>
   </aside>
 
-  <script src="./assets/js/adaptive-session-live.js?v=20260423-1"></script>
+  <script src="./assets/js/adaptive-session-live.js?v=20260423-2"></script>
 </body>
 </html>
