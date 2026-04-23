@@ -807,8 +807,12 @@ function getWhoopAuthError(whoopPayload) {
   return Number(status) === 401 ? 'WHOOP auth expired (401)' : '';
 }
 
+function getValueAtPath(source, path) {
+  return path.split('.').reduce((value, key) => (value === undefined || value === null ? undefined : value[key]), source);
+}
+
 function getNumberAtPath(source, path) {
-  return path.split('.').reduce((value, key) => (value ? value[key] : undefined), source);
+  return getValueAtPath(source, path);
 }
 
 function readNumber(source, candidates) {
@@ -818,6 +822,15 @@ function readNumber(source, candidates) {
     if (Number.isFinite(num)) return num;
   }
   return null;
+}
+
+function readText(source, candidates) {
+  for (const path of candidates) {
+    const value = getValueAtPath(source, path);
+    if (typeof value === 'string' && value.trim()) return value.trim();
+    if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+  }
+  return '';
 }
 
 function formatNumber(value, digits = 0) {
@@ -984,7 +997,13 @@ function formatWeightKg(value) {
 }
 
 function renderWhoopProfileSpots(payload) {
-  const profile = payload?.profile && typeof payload.profile === 'object' ? payload.profile : {};
+  const profile = payload?.profile && typeof payload.profile === 'object'
+    ? payload.profile
+    : (payload?.data?.profile && typeof payload.data.profile === 'object'
+      ? payload.data.profile
+      : (payload?.whoop_data?.profile && typeof payload.whoop_data.profile === 'object'
+        ? payload.whoop_data.profile
+        : {}));
 
   const fullName = firstNonEmptyValue([
     profile.fullName,
@@ -1002,13 +1021,38 @@ function renderWhoopProfileSpots(payload) {
     payload?.member_id
   ]);
 
-  const heightMeters = readNumber(payload || {}, ['profile.heightMeter', 'profile.height_meter', 'heightMeter', 'height_meter']);
-  const weightKg = readNumber(payload || {}, ['profile.weightKg', 'profile.weight_kg', 'weightKg', 'weight_kg']);
-  const maxHeartRate = readNumber(payload || {}, ['profile.maxHeartRate', 'profile.max_heart_rate', 'maxHeartRate', 'max_heart_rate']);
+  const resolvedEmail = email || readText(payload || {}, [
+    'profile.email',
+    'data.profile.email',
+    'whoop_data.profile.email',
+    'whoop.profile.email',
+    'user.email',
+    'member.email',
+    'email'
+  ]);
+  const resolvedUserId = userId || readText(payload || {}, [
+    'profile.userId',
+    'profile.user_id',
+    'data.profile.userId',
+    'data.profile.user_id',
+    'whoop_data.profile.userId',
+    'whoop_data.profile.user_id',
+    'whoop.profile.userId',
+    'whoop.profile.user_id',
+    'userId',
+    'user_id',
+    'memberId',
+    'member_id',
+    'id'
+  ]);
+
+  const heightMeters = readNumber(payload || {}, ['profile.heightMeter', 'profile.height_meter', 'data.profile.heightMeter', 'data.profile.height_meter', 'whoop_data.profile.heightMeter', 'whoop_data.profile.height_meter', 'heightMeter', 'height_meter']);
+  const weightKg = readNumber(payload || {}, ['profile.weightKg', 'profile.weight_kg', 'data.profile.weightKg', 'data.profile.weight_kg', 'whoop_data.profile.weightKg', 'whoop_data.profile.weight_kg', 'weightKg', 'weight_kg']);
+  const maxHeartRate = readNumber(payload || {}, ['profile.maxHeartRate', 'profile.max_heart_rate', 'data.profile.maxHeartRate', 'data.profile.max_heart_rate', 'whoop_data.profile.maxHeartRate', 'whoop_data.profile.max_heart_rate', 'maxHeartRate', 'max_heart_rate']);
 
   if (profileNameValue) profileNameValue.textContent = fullName || '-';
-  if (profileEmailValue) profileEmailValue.textContent = email || '-';
-  if (profileUserIdValue) profileUserIdValue.textContent = userId || '-';
+  if (profileEmailValue) profileEmailValue.textContent = resolvedEmail || '-';
+  if (profileUserIdValue) profileUserIdValue.textContent = resolvedUserId || '-';
   if (profileHeightValue) profileHeightValue.textContent = formatHeightMeters(heightMeters);
   if (profileWeightValue) profileWeightValue.textContent = formatWeightKg(weightKg);
   if (profileMaxHrValue) profileMaxHrValue.textContent = formatNumber(maxHeartRate, 0);
