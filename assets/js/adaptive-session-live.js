@@ -694,8 +694,25 @@ function applyUiCopy() {
 }
 
 function getCurrentWhoopUserId() {
+  const fromQuery = getQueryParam(['whoopUserId']);
+  if (fromQuery) return fromQuery;
+
   const typedValue = whoopUserIdInput?.value?.trim();
   return typedValue || DEFAULT_WHOOP_USER_ID;
+}
+
+function getAuthStateParam() {
+  const params = new URLSearchParams(window.location.search || '');
+  const rawState = params.get('state');
+  if (!rawState) return null;
+
+  try {
+    const parsed = JSON.parse(rawState);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch (error) {
+    console.warn('[adaptive-session-live] Failed to parse OAuth state param.', error);
+    return null;
+  }
 }
 
 function getQueryParam(keys = []) {
@@ -704,7 +721,33 @@ function getQueryParam(keys = []) {
     const value = params.get(key);
     if (value && value.trim()) return value.trim();
   }
+
+  const state = getAuthStateParam();
+  if (state) {
+    for (const key of keys) {
+      const value = state[key];
+      if (typeof value === 'string' && value.trim()) return value.trim();
+      if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+    }
+  }
+
   return '';
+}
+
+function isOauthReturn() {
+  const params = new URLSearchParams(window.location.search || '');
+  return ['code', 'state', 'error', 'whoopUserId'].some((key) => params.has(key));
+}
+
+function cleanupOauthParamsFromUrl() {
+  if (!window.history?.replaceState) return;
+
+  const url = new URL(window.location.href);
+  ['code', 'state', 'error', 'error_description', 'whoopUserId', 'appUserId', 'applicationUserId', 'accountUserId', 'uid', 'userId', 'user_id', 'memberId', 'member_id'].forEach((key) => {
+    url.searchParams.delete(key);
+  });
+
+  window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
 }
 
 function getCurrentAppUserId() {
@@ -1425,6 +1468,7 @@ async function loadLiveData(options = {}) {
   const { forceFresh = false } = options;
   const whoopUserId = getCurrentWhoopUserId();
   const includeFallback = Boolean(showWhoopRawToggle?.checked);
+  const cacheBust = forceFresh ? Date.now() : undefined;
 
   window.localStorage.setItem(STORAGE_KEY, whoopUserId);
   setAthleteName('User Unknown');
@@ -1432,12 +1476,16 @@ async function loadLiveData(options = {}) {
 
   const adaptiveUrl = makeUrl('/api/get-adaptive-session', {
     whoopUserId,
-    bust: forceFresh ? Date.now() : undefined
+    bust: cacheBust
   });
-  const whoopUrl = makeUrl('/api/whoop-data', { whoopUserId });
+  const whoopUrl = makeUrl('/api/whoop-data', {
+    whoopUserId,
+    bust: cacheBust
+  });
   const historyUrl = makeUrl('/api/session-history', {
     whoopUserId,
-    includeFallback: includeFallback ? 'true' : undefined
+    includeFallback: includeFallback ? 'true' : undefined,
+    bust: cacheBust
   });
 
   console.log('🔄 loadLiveData:', { adaptiveUrl, whoopUrl, historyUrl });
@@ -1529,6 +1577,13 @@ function initUserId() {
   const appUserId = getCurrentAppUserId();
   if (appUserId) {
     window.localStorage.setItem(APP_USER_STORAGE_KEY, appUserId);
+  }
+
+  const queryWhoopUserId = getQueryParam(['whoopUserId']);
+  if (queryWhoopUserId && whoopUserIdInput) {
+    whoopUserIdInput.value = queryWhoopUserId;
+    window.localStorage.setItem(STORAGE_KEY, queryWhoopUserId);
+    return;
   }
 
   const cachedUserId = window.localStorage.getItem(STORAGE_KEY);
@@ -1631,7 +1686,10 @@ setWorkflowMeta('Workflow ID: not generated');
 applyUiCopy();
 attachButtonGlow();
 syncWhoopRawVisibility();
-loadLiveData();
+loadLiveData({ forceFresh: isOauthReturn() });
+if (isOauthReturn()) {
+  cleanupOauthParamsFromUrl();
+}
 scheduleTelemetryPolling();
 
 if (coachAgentBtn) {
