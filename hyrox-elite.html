@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HYROX Elite | Delta Zone Systems</title>
+<link rel="stylesheet" href="./styles.css" />
+<style>
+  .stage { justify-content: flex-start; padding-top: 80px; gap: 18px; }
+  .backLink { position: fixed; top: 22px; left: 22px; z-index: 1300; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 10px 6px; min-height: 44px; display: inline-flex; align-items: center; }
+  .backLink:hover { color: var(--text); }
+  .programShell { width: min(920px, 100%); padding: 0 20px 40px; display: grid; gap: 18px; }
+  .programHero,.programCard,.programCta { border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)), radial-gradient(420px 140px at 18% 18%, rgba(0,190,255,.12), transparent 55%), radial-gradient(420px 140px at 82% 78%, rgba(255,0,220,.10), transparent 55%), var(--glass2); border: 1px solid rgba(255,255,255,.16); box-shadow: 0 18px 44px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.10); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); opacity: 0; animation: fadeUp 900ms ease forwards; }
+  .programHero { padding: 30px 28px; animation-delay: .12s; }
+  .programHero h1 { margin: 0 0 10px; font-size: clamp(26px, 4vw, 52px); line-height: 1.05; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.86); }
+  .programHero p { margin: 0; max-width: 700px; color: rgba(255,255,255,.78); line-height: 1.7; font-size: 15px; }
+  .programGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  .programCard { padding: 24px 22px; }
+  .programEyebrow { margin: 0 0 10px; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); }
+  .programList { margin: 0; padding-left: 18px; display: grid; gap: 10px; color: rgba(255,255,255,.84); line-height: 1.55; }
+  .programMeta { margin: 0; color: rgba(255,255,255,.84); line-height: 1.7; font-size: 15px; }
+  .programCta { padding: 28px; text-align: center; animation-delay: .72s; }
+  .programCta h2 { margin: 0 0 8px; font-size: 26px; color: rgba(255,255,255,.94); }
+  .programCtaBtn { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 14px 28px; border-radius: 999px; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: rgba(255,255,255,.96); background: linear-gradient(135deg, rgba(0,190,255,.28), rgba(255,0,220,.22)); border: 1px solid rgba(255,255,255,.34); }
+  @media (max-width: 768px) { .programShell { padding: 0 16px 36px; } .programGrid { grid-template-columns: 1fr; } .programHero,.programCard,.programCta { padding: 22px 18px; } .programCtaBtn { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="bg" id="bgWrap"><video id="bgVid" class="bgVideo" muted loop playsinline preload="none" data-src-desktop="./assets/delta_homepage_3.mp4" data-src-mobile="./assets/mobile_video_1.mp4"></video><div class="bgOverlay"></div><div class="bgGlow"></div></div>
+<a class="backLink" href="./index.html">&larr; Back</a>
+<main class="stage">
+  <section class="programShell" aria-label="HYROX Elite details">
+    <section class="programHero">
+      <p class="programEyebrow">Delta Zone Systems</p>
+      <h1>HYROX Elite</h1>
+      <p>Built for elite and highly competitive athletes seeking maximum performance.</p>
+    </section>
+    <section class="programGrid">
+      <article class="programCard"><p class="programEyebrow">Build The Performance</p><ul class="programList"><li>Race simulations</li><li>Threshold development</li><li>Density under fatigue</li><li>Adaptive programming</li><li>Recovery management</li><li>Performance analytics</li></ul></article>
+      <article class="programCard"><p class="programEyebrow">Built For</p><ul class="programList"><li>Elite and highly competitive athletes</li><li>Athletes seeking maximum performance</li></ul></article>
+      <article class="programCard"><p class="programEyebrow">Delta Zone Mentality</p><p class="programMeta">Performance under fatigue is trained.</p></article>
+      <article class="programCard"><p class="programEyebrow">Training Details</p><p class="programMeta"><strong>Training Frequency</strong><br />5-6 sessions per week</p></article>
+    </section>
+    <section class="programCta"><p class="programEyebrow">Ready to begin your assessment?</p><h2>Begin Your Assessment</h2><a class="programCtaBtn" href="https://tally.so/r/q4PNJ5?division=elite&workflow_id=hyrox-open&workflow=hyrox-open">Begin Your Assessment</a></section>
+  </section>
+</main>
+</body>
+</html>
