@@ -87,6 +87,23 @@ const STORAGE_KEY = 'adaptiveSessionLiveUserId';
 const APP_USER_STORAGE_KEY = 'adaptiveSessionLiveAppUserId';
 const DEFAULT_WHOOP_USER_ID = String(window.DELTA_WHOOP_USER_ID || '1243444');
 const WHOOP_LINK_GUIDANCE = 'Please link wearable for Delta zone performace POHE verification.';
+const DIVISION_WORKFLOW_MAP = {
+  beginner: 'hyrox-beginner',
+  'hyrox-beginner': 'hyrox-beginner',
+  open: 'hyrox-open',
+  elite: 'hyrox-open',
+  'hyrox-open': 'hyrox-open',
+  pro: 'hyrox-pro',
+  'hyrox-pro': 'hyrox-pro',
+  doubles: 'hyrox-doubles',
+  'hyrox-doubles': 'hyrox-doubles',
+  'race-prep': 'race-prep',
+  raceprep: 'race-prep',
+  race: 'race-prep',
+  'strength-prep': 'strength-prep',
+  strengthprep: 'strength-prep',
+  strength: 'strength-prep'
+};
 
 // ─── Delta Zone Voice Layer ───────────────────────────────────────────────────
 const BLACKLIST_MAP = [
@@ -105,6 +122,7 @@ let latestTargetZone = null;
 let latestCoachResult = null;
 let latestCoachWorkflowId = '';
 let latestRenderedWorkout = null;
+let selectedDivisionWorkflowId = '';
 let telemetryOverlayTimer = null;
 let telemetryPollTimer = null;
 let lastTelemetryAlert = { scenario: '', at: 0 };
@@ -761,6 +779,32 @@ function getCurrentAppUserId() {
   if (cached) return cached;
 
   return '';
+}
+
+function normalizeWorkflowKey(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, '-');
+}
+
+function resolveDivisionWorkflowFromQuery() {
+  const raw = getQueryParam(['division', 'category', 'workflow', 'workflowId', 'workflow_id']);
+  if (!raw) return '';
+
+  const normalized = normalizeWorkflowKey(raw);
+  return DIVISION_WORKFLOW_MAP[normalized] || '';
+}
+
+function applyDivisionWorkflowPreset() {
+  selectedDivisionWorkflowId = resolveDivisionWorkflowFromQuery();
+  if (!selectedDivisionWorkflowId) return;
+
+  if (sportInput && String(sportInput.value || '').trim().toLowerCase() === 'functional-fitness') {
+    sportInput.value = 'hyrox';
+  }
+
+  setWorkflowMeta(`Workflow preset: ${selectedDivisionWorkflowId}`);
 }
 
 function resolveAthleteName(whoopPayload, adaptivePayload, historyPayload, whoopUserId) {
@@ -1432,6 +1476,9 @@ async function runCoachAgent() {
     member_id: memberId,
     coach_prompt: coachPrompt,
     sport,
+    workflow_id: selectedDivisionWorkflowId || undefined,
+    workflow: selectedDivisionWorkflowId || undefined,
+    workflow_template: selectedDivisionWorkflowId || undefined,
     booking: {
       date: bookingDate,
       duration_minutes: durationMinutes
@@ -1682,7 +1729,10 @@ if (fallbackGuideOrb) {
 }
 
 initUserId();
-setWorkflowMeta('Workflow ID: not generated');
+applyDivisionWorkflowPreset();
+if (!selectedDivisionWorkflowId) {
+  setWorkflowMeta('Workflow ID: not generated');
+}
 applyUiCopy();
 attachButtonGlow();
 syncWhoopRawVisibility();
