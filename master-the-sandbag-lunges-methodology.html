@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Learn Individual Modules | Delta Zone Systems</title>
+<title>Master The Sandbag Lunges | Delta Zone Methodology</title>
 <link rel="stylesheet" href="./styles.css" />
 <style>
   .stage {
@@ -32,15 +32,16 @@
     color: var(--text);
   }
 
-  .modulesShell {
+  .methodShell {
     width: min(940px, 100%);
     padding: 0 20px 40px;
     display: grid;
     gap: 18px;
   }
 
-  .modulesHero,
-  .modulesPanel {
+  .methodHero,
+  .methodBody,
+  .methodCta {
     border-radius: 18px;
     background:
       linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)),
@@ -55,12 +56,23 @@
     animation: fadeUp 900ms ease forwards;
   }
 
-  .modulesHero {
+  .methodHero {
     padding: 30px 28px;
     animation-delay: .12s;
   }
 
-  .modulesEyebrow {
+  .methodBody {
+    padding: 24px 22px;
+    animation-delay: .20s;
+  }
+
+  .methodCta {
+    padding: 24px 22px;
+    text-align: center;
+    animation-delay: .30s;
+  }
+
+  .methodEyebrow {
     margin: 0 0 10px;
     font-size: 12px;
     letter-spacing: .24em;
@@ -68,8 +80,8 @@
     color: var(--muted);
   }
 
-  .modulesHero h1 {
-    margin: 0 0 10px;
+  .methodHero h1 {
+    margin: 0;
     font-size: clamp(26px, 4vw, 52px);
     line-height: 1.05;
     letter-spacing: .08em;
@@ -77,51 +89,73 @@
     color: rgba(255,255,255,.88);
   }
 
-  .modulesHero p {
+  .methodBody h2 {
+    margin: 0 0 12px;
+    font-size: clamp(20px, 2.8vw, 30px);
+    line-height: 1.2;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.92);
+  }
+
+  .methodCopy {
     margin: 0;
-    max-width: 720px;
-    color: rgba(255,255,255,.78);
-    line-height: 1.7;
+    color: rgba(255,255,255,.84);
+    line-height: 1.72;
     font-size: 15px;
+    white-space: pre-line;
   }
 
-  .modulesPanel {
-    padding: 24px 22px;
-    animation-delay: .22s;
+  .methodCta h3 {
+    margin: 0 0 10px;
+    font-size: clamp(18px, 2.4vw, 24px);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.92);
   }
 
-  .moduleList {
-    margin: 0;
-    padding-left: 20px;
-    display: grid;
-    gap: 10px;
-    color: rgba(255,255,255,.88);
-    line-height: 1.55;
-    font-size: 15px;
+  .methodCta p {
+    margin: 0 0 16px;
+    color: rgba(255,255,255,.76);
+    line-height: 1.6;
   }
 
-  .moduleLink {
-    color: rgba(236,247,255,.94);
+  .downloadBtn {
     text-decoration: none;
-    border-bottom: 1px solid rgba(255,255,255,.22);
-    transition: color .18s ease, border-color .18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-size: 13px;
+    letter-spacing: .20em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.96);
+    background: linear-gradient(135deg, rgba(0,190,255,.28), rgba(255,0,220,.22));
+    border: 1px solid rgba(255,255,255,.34);
   }
 
-  .moduleLink:hover,
-  .moduleLink:focus-visible {
-    color: rgba(180,255,220,.95);
-    border-color: rgba(140,255,210,.65);
+  .downloadBtn:hover,
+  .downloadBtn:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(140,255,210,.62);
     outline: none;
   }
 
   @media (max-width: 768px) {
-    .modulesShell {
+    .methodShell {
       padding: 0 16px 36px;
     }
 
-    .modulesHero,
-    .modulesPanel {
+    .methodHero,
+    .methodBody,
+    .methodCta {
       padding: 22px 18px;
+    }
+
+    .downloadBtn {
+      width: 100%;
     }
   }
 </style>
@@ -174,29 +208,27 @@
 })();
 </script>
 
-<a class="backLink" href="./index.html">&larr; Back</a>
+<a class="backLink" href="./individual-modules.html">&larr; Back</a>
 
 <main class="stage">
-  <section class="modulesShell" aria-label="Individual modules learning page">
-    <section class="modulesHero">
-      <p class="modulesEyebrow">Learn</p>
-      <h1>Individual Modules</h1>
-      <p>Master each station one by one with focused module training.</p>
+  <section class="methodShell" aria-label="Delta Zone module methodology">
+    <section class="methodHero">
+      <p class="methodEyebrow">Delta Zone Methodology</p>
+      <h1>Master The Sandbag Lunges™</h1>
     </section>
 
-    <section class="modulesPanel">
-      <p class="modulesEyebrow">Master The Station™</p>
-      <ol class="moduleList">
-        <li><a class="moduleLink" href="./master-the-skierg-methodology.html" aria-label="Open Master The SkiErg methodology page">Master The SkiErg</a></li>
-        <li><a class="moduleLink" href="./master-the-sled-push-methodology.html" aria-label="Open Master The Sled Push methodology page">Master The Sled Push</a></li>
-        <li><a class="moduleLink" href="./master-the-sled-pull-methodology.html" aria-label="Open Master The Sled Pull methodology page">Master The Sled Pull</a></li>
-        <li><a class="moduleLink" href="./master-the-burpee-broad-jump-methodology.html" aria-label="Open Master The Burpee Broad Jump methodology page">Master The Burpee Broad Jump</a></li>
-        <li><a class="moduleLink" href="./master-the-row-methodology.html" aria-label="Open Master The Row methodology page">Master The Row</a></li>
-        <li><a class="moduleLink" href="./master-the-farmers-carry-methodology.html" aria-label="Open Master The Farmers Carry methodology page">Master The Farmers Carry</a></li>
-        <li><a class="moduleLink" href="./master-the-sandbag-lunges-methodology.html" aria-label="Open Master The Sandbag Lunges methodology page">Master The Sandbag Lunges</a></li>
-        <li><a class="moduleLink" href="./master-the-wall-balls-methodology.html" aria-label="Open Master The Wall Balls methodology page">Master The Wall Balls</a></li>
-        <li><a class="moduleLink" href="./master-the-run-methodology.html" aria-label="Open Master The Run methodology page">Master The Run</a></li>
-      </ol>
+    <section class="methodBody">
+      <h2>Build The Durability</h2>
+      <p class="methodCopy">Delta Zone methodology brief coming next.
+This page is ready for your final station copy.
+Add your training intent, common errors, and what this module solves.
+Keep the message concise, tactical, and race-relevant.</p>
+    </section>
+
+    <section class="methodCta">
+      <h3>Download The Module PDF</h3>
+      <p>Review the methodology first, then apply it during your station-specific session.</p>
+      <a class="downloadBtn" href="./pdfs/delta_zone_hyrox_free_pdf_expanded.pdf" target="_blank" rel="noopener" download>Download PDF</a>
     </section>
   </section>
 </main>
