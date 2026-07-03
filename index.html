@@ -114,9 +114,9 @@
       <div class="cardValue">Get the 411</div>
     </a>
 
-    <a id="connectDataBtn" class="glassCard whoopConnectCard" href="https://www.varacis.com/api/whoop-auth" aria-label="Connect WHOOP data">
-      <div id="connectDataLabel" class="cardLabel">Connect Data</div>
-      <div id="connectDataValue" class="cardValue">Connect WHOOP</div>
+    <a id="connectDataBtn" class="glassCard whoopConnectCard" href="#" aria-label="Connect wearable data">
+      <div id="connectDataLabel" class="cardLabel">CONNECT DATA /</div>
+      <div id="connectDataValue" class="cardValue">Connect Your Wearable</div>
     </a>
 
     <a class="glassCard" href="./adaptive-session-live.html" aria-label="Open athlete adaptive programming powered by POHE verified biometric data">
@@ -135,75 +135,35 @@
 
 <script>
   (function () {
-    var WHOOP_AUTH_URL = 'https://www.varacis.com/api/whoop-auth';
-    var WHOOP_API_BASE = 'https://www.varacis.com/api';
-    var ADAPTIVE_PAGE_URL = './adaptive-session-live.html';
-    var DEFAULT_WHOOP_USER_ID = '1243444';
     var USER_ID_STORAGE_KEY = 'adaptiveSessionLiveUserId';
-    var CONNECT_PENDING_KEY = 'whoopConnectPendingRedirect';
+    var CONNECT_REDIRECT_BASE = 'https://www.varacis.com/api/wearables/connect-redirect';
+    var PARTNER = 'premeteam';
 
     var connectDataBtn = document.getElementById('connectDataBtn');
-    var connectDataLabel = document.getElementById('connectDataLabel');
-    var connectDataValue = document.getElementById('connectDataValue');
 
     if (!connectDataBtn) return;
 
-    function resolveWhoopUserId() {
+    function resolveAthleteId() {
       var fromQuery = new URLSearchParams(window.location.search).get('whoopUserId');
       if (fromQuery) return fromQuery;
       var stored = window.localStorage.getItem(USER_ID_STORAGE_KEY);
-      return stored || DEFAULT_WHOOP_USER_ID;
-    }
-
-    function setConnectionUi(connected) {
-      if (connected) {
-        connectDataBtn.classList.add('connected');
-        if (connectDataLabel) connectDataLabel.textContent = 'WHOOP Connected';
-        if (connectDataValue) connectDataValue.textContent = 'Open Adaptive Session';
-      } else {
-        connectDataBtn.classList.remove('connected');
-        if (connectDataLabel) connectDataLabel.textContent = 'Connect Data';
-        if (connectDataValue) connectDataValue.textContent = 'Connect WHOOP';
-      }
-    }
-
-    async function hasWhoopConnection() {
-      var whoopUserId = encodeURIComponent(resolveWhoopUserId());
-      var url = WHOOP_API_BASE + '/whoop-data?whoopUserId=' + whoopUserId;
-      var response = await fetch(url, {
-        method: 'GET',
-        headers: { Accept: 'application/json' },
-        cache: 'no-store'
-      });
-      if (!response.ok) return false;
-      var payload = await response.json();
-      var recovery = payload && payload.recovery && payload.recovery.score && payload.recovery.score.recovery_score;
-      var sleep = payload && payload.sleep && payload.sleep.score && payload.sleep.score.sleep_performance_percentage;
-      return recovery != null && sleep != null;
+      if (stored) return stored;
+      return window.prompt('Enter your athlete ID:') || '';
     }
 
     connectDataBtn.addEventListener('click', function (event) {
-      if (connectDataBtn.classList.contains('connected')) {
-        event.preventDefault();
-        window.location.href = ADAPTIVE_PAGE_URL;
-        return;
-      }
       event.preventDefault();
-      window.localStorage.setItem(CONNECT_PENDING_KEY, '1');
-      window.location.href = WHOOP_AUTH_URL;
+      var athleteId = resolveAthleteId();
+      if (!athleteId) return;
+      athleteId = athleteId.trim();
+      if (!athleteId) return;
+      window.localStorage.setItem(USER_ID_STORAGE_KEY, athleteId);
+      var redirectUrl =
+        CONNECT_REDIRECT_BASE +
+        '?athleteId=' + encodeURIComponent(athleteId) +
+        '&partner=' + encodeURIComponent(PARTNER);
+      window.location.href = redirectUrl;
     });
-
-    hasWhoopConnection()
-      .then(function (connected) {
-        setConnectionUi(connected);
-        if (connected && window.localStorage.getItem(CONNECT_PENDING_KEY) === '1') {
-          window.localStorage.removeItem(CONNECT_PENDING_KEY);
-          window.location.href = ADAPTIVE_PAGE_URL;
-        }
-      })
-      .catch(function () {
-        setConnectionUi(false);
-      });
   })();
 </script>
 </body>
