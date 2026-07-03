@@ -719,6 +719,17 @@ function getCurrentWhoopUserId() {
   return typedValue || DEFAULT_WHOOP_USER_ID;
 }
 
+function getUnknownAthleteLabel() {
+  const typedValue = String(whoopUserIdInput?.value || '').trim();
+  const storedValue = String(window.localStorage.getItem(STORAGE_KEY) || '').trim();
+  const athleteId = typedValue || storedValue;
+
+  if (!athleteId || athleteId === DEFAULT_WHOOP_USER_ID) {
+    return 'User Unknown';
+  }
+  return `Athlete ${athleteId}`;
+}
+
 function getAuthStateParam() {
   const params = new URLSearchParams(window.location.search || '');
   const rawState = params.get('state');
@@ -1563,7 +1574,7 @@ async function loadLiveData(options = {}) {
     const whoopAuthError = whoopPayload ? getWhoopAuthError(whoopPayload) : '';
     setAthleteName(hasWhoopData
       ? resolveAthleteName(whoopPayload, adaptiveSession, historyPayload, whoopUserId)
-      : 'User Unknown');
+      : getUnknownAthleteLabel());
     setFallbackGuideVisibility(!hasWhoopData);
 
     if (whoopResult.status === 'fulfilled') {
@@ -1606,7 +1617,7 @@ async function loadLiveData(options = {}) {
   } catch (error) {
     console.error('❌ loadLiveData error:', error);
     setStatus('bad', 'Sync failed', withWhoopLinkGuidance(error.message || 'Unable to load adaptive APIs.'));
-    setAthleteName('User Unknown');
+    setAthleteName(getUnknownAthleteLabel());
     setFallbackGuideVisibility(true);
     renderAdaptiveSession({
       readiness: 'UNKNOWN',
