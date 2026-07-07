@@ -119,6 +119,11 @@
       <div id="connectDataValue" class="cardValue">Connect Your Wearable</div>
     </a>
 
+    <a id="connectWhoopBtn" class="glassCard whoopConnectCard" href="#" aria-label="Connect WHOOP to Varacis">
+      <div class="cardLabel">CONNECT WHOOP /</div>
+      <div class="cardValue">Link WHOOP to Varacis</div>
+    </a>
+
     <a class="glassCard" href="./adaptive-session-live.html" aria-label="Open athlete adaptive programming powered by POHE verified biometric data">
       <div class="cardLabel">connect data here for VERIFIED</div>
       <div class="cardValue">Athlete Adaptive Programming powered by Delta zone system POHE</div>
@@ -137,11 +142,13 @@
   (function () {
     var USER_ID_STORAGE_KEY = 'adaptiveSessionLiveUserId';
     var CONNECT_REDIRECT_BASE = 'https://www.varacis.com/api/wearables/connect-redirect';
+    var WHOOP_AUTH_URL = 'https://www.varacis.com/api/whoop-auth';
     var PARTNER = 'premeteam';
 
     var connectDataBtn = document.getElementById('connectDataBtn');
+    var connectWhoopBtn = document.getElementById('connectWhoopBtn');
 
-    if (!connectDataBtn) return;
+    if (!connectDataBtn && !connectWhoopBtn) return;
 
     function resolveAthleteId() {
       var fromQuery = new URLSearchParams(window.location.search).get('whoopUserId');
@@ -151,19 +158,51 @@
       return window.prompt('Enter your athlete ID:') || '';
     }
 
-    connectDataBtn.addEventListener('click', function (event) {
-      event.preventDefault();
+    function normalizeAthleteId() {
       var athleteId = resolveAthleteId();
-      if (!athleteId) return;
+      if (!athleteId) return '';
       athleteId = athleteId.trim();
-      if (!athleteId) return;
+      if (!athleteId) return '';
       window.localStorage.setItem(USER_ID_STORAGE_KEY, athleteId);
-      var redirectUrl =
-        CONNECT_REDIRECT_BASE +
-        '?athleteId=' + encodeURIComponent(athleteId) +
-        '&partner=' + encodeURIComponent(PARTNER);
-      window.location.href = redirectUrl;
-    });
+      return athleteId;
+    }
+
+    function buildWhoopAuthUrl(athleteId) {
+      var authUrl = new URL(WHOOP_AUTH_URL);
+      authUrl.searchParams.set('userId', athleteId);
+      authUrl.searchParams.set('memberId', athleteId);
+      authUrl.searchParams.set('member_id', athleteId);
+      authUrl.searchParams.set('whoopUserId', athleteId);
+      authUrl.searchParams.set('state', JSON.stringify({
+        userId: athleteId,
+        memberId: athleteId,
+        member_id: athleteId,
+        whoopUserId: athleteId
+      }));
+      return authUrl.toString();
+    }
+
+    if (connectDataBtn) {
+      connectDataBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+        var athleteId = normalizeAthleteId();
+        if (!athleteId) return;
+        var redirectUrl =
+          CONNECT_REDIRECT_BASE +
+          '?athleteId=' + encodeURIComponent(athleteId) +
+          '&partner=' + encodeURIComponent(PARTNER);
+        window.location.href = redirectUrl;
+      });
+    }
+
+    if (connectWhoopBtn) {
+      connectWhoopBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+        var athleteId = normalizeAthleteId();
+        if (!athleteId) return;
+        window.location.href = buildWhoopAuthUrl(athleteId);
+      });
+    }
   })();
 </script>
 </body>
