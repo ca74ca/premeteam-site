@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quick Workout | Delta Zone Systems</title>
+<link rel="stylesheet" href="./styles.css" />
+<style>
+  :root {
+    --panel: rgba(8, 12, 22, 0.66);
+    --line: rgba(255, 255, 255, 0.18);
+    --ink: rgba(255, 255, 255, 0.95);
+    --muted: rgba(255, 255, 255, 0.66);
+    --ok: #22c55e;
+    --warn: #f59e0b;
+    --bad: #ef4444;
+  }
+
+  * { box-sizing: border-box; }
+
+  body.quick-workout-page {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+      radial-gradient(960px 520px at 15% 10%, rgba(0, 190, 255, 0.16), transparent 60%),
+      radial-gradient(820px 420px at 88% 8%, rgba(255, 0, 220, 0.14), transparent 60%),
+      linear-gradient(180deg, #04060c 0%, #060a14 54%, #080c1a 100%);
+  }
+
+  .quick-wrap {
+    width: min(920px, 100%);
+    margin: 0 auto;
+    padding: 28px 18px 48px;
+    display: grid;
+    gap: 16px;
+  }
+
+  .quick-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .quick-home-link {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.06);
+    transition: transform 0.18s ease, border-color 0.18s ease;
+  }
+
+  .quick-home-link:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .quick-card {
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+      var(--panel);
+    box-shadow: 0 20px 56px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(14px) saturate(145%);
+    -webkit-backdrop-filter: blur(14px) saturate(145%);
+    padding: 18px;
+  }
+
+  .quick-title {
+    margin: 0;
+    font-size: clamp(24px, 3.2vw, 34px);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+  }
+
+  .quick-sub {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .quick-form {
+    margin-top: 14px;
+    display: grid;
+    gap: 12px;
+  }
+
+  .field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .field-label {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .text-input {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 11px;
+    font-size: 14px;
+    color: var(--ink);
+    background: rgba(0, 0, 0, 0.24);
+    font-family: inherit;
+  }
+
+  .upload-zone {
+    border: 1px dashed rgba(255, 255, 255, 0.35);
+    border-radius: 14px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    display: grid;
+    gap: 12px;
+    justify-items: center;
+    text-align: center;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    cursor: pointer;
+  }
+
+  .upload-zone.drag-over {
+    border-color: rgba(94, 234, 212, 0.9);
+    background: rgba(20, 184, 166, 0.12);
+  }
+
+  .upload-copy {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .upload-hint {
+    margin: 0;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .preview-wrap {
+    width: min(100%, 320px);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(0, 0, 0, 0.32);
+    display: none;
+  }
+
+  .preview-wrap.visible {
+    display: block;
+  }
+
+  .preview-wrap img {
+    width: 100%;
+    display: block;
+    height: auto;
+  }
+
+  .button-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .quick-btn {
+    border: 0;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+  }
+
+  .quick-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .quick-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .quick-btn.primary {
+    background: linear-gradient(135deg, rgba(0, 190, 255, 0.72), rgba(255, 0, 220, 0.48));
+  }
+
+  .quick-btn.secondary {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+  }
+
+  .status-line {
+    margin: 0;
+    min-height: 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .status-line.ok { color: var(--ok); }
+  .status-line.warn { color: var(--warn); }
+  .status-line.bad { color: var(--bad); }
+
+  .workout-card {
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    display: grid;
+    gap: 10px;
+  }
+
+  .workout-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .workout-head h2 {
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .workout-output {
+    margin: 0;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.92);
+    min-height: 80px;
+  }
+
+  @media (max-width: 640px) {
+    .quick-wrap {
+      padding: 18px 12px 28px;
+    }
+
+    .quick-card {
+      border-radius: 16px;
+      padding: 14px;
+    }
+  }
+</style>
+</head>
+<body class="quick-workout-page">
+  <div class="powerByStamp" aria-label="powered by VARACIS POHE INTELLIGENCE tm">
+    <span class="powerByText">powered by VARACIS POHE INTELLIGENCE tm</span>
+    <span class="powerByOrb" aria-hidden="true"></span>
+  </div>
+
+  <main class="quick-wrap">
+    <div class="quick-topbar">
+      <a class="quick-home-link" href="./index.html" aria-label="Back to home">Back to Home</a>
+    </div>
+
+    <section class="quick-card" aria-labelledby="quickWorkoutHeading">
+      <h1 id="quickWorkoutHeading" class="quick-title">Quick Workout Generator</h1>
+      <p class="quick-sub">Drop a wearable screenshot, enter your email, and generate a plain-text adaptive workout from the Varacis endpoint.</p>
+
+      <form id="quickWorkoutForm" class="quick-form" novalidate>
+        <div class="field">
+          <label class="field-label" for="emailInput">Email</label>
+          <input id="emailInput" class="text-input" type="email" autocomplete="email" placeholder="you@example.com" required />
+        </div>
+
+        <div class="field">
+          <span class="field-label">Wearable Screenshot</span>
+          <div id="uploadZone" class="upload-zone" role="button" tabindex="0" aria-label="Upload workout image">
+            <p class="upload-copy">Drag and drop an image here, or click to choose a file.</p>
+            <p class="upload-hint">PNG, JPG, WEBP. Max 10MB.</p>
+            <div id="previewWrap" class="preview-wrap" aria-live="polite">
+              <img id="previewImage" alt="Uploaded screenshot preview" />
+            </div>
+          </div>
+          <input id="imageInput" type="file" accept="image/*" hidden />
+        </div>
+
+        <div class="button-row">
+          <button id="submitBtn" class="quick-btn primary" type="submit">Generate Workout</button>
+        </div>
+
+        <p id="statusLine" class="status-line" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="quick-card" aria-labelledby="workoutOutputHeading">
+      <div class="workout-card">
+        <div class="workout-head">
+          <h2 id="workoutOutputHeading">Generated Workout</h2>
+          <button id="copyBtn" class="quick-btn secondary" type="button" disabled>Copy to Clipboard</button>
+        </div>
+        <pre id="workoutOutput" class="workout-output">Your generated workout will appear here.</pre>
+      </div>
+    </section>
+  </main>
+
+  <script src="./assets/js/quick-workout.js" defer></script>
+</body>
+</html>
