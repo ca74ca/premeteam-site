@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Add Client | Delta Zone Systems</title>
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  :root {
+    --panel: rgba(8, 12, 22, 0.66);
+    --line: rgba(255, 255, 255, 0.18);
+    --ink: rgba(255, 255, 255, 0.95);
+    --muted: rgba(255, 255, 255, 0.66);
+    --ok: #22c55e;
+    --warn: #f59e0b;
+    --bad: #ef4444;
+  }
+
+  * { box-sizing: border-box; }
+
+  body.client-intake-page {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+      radial-gradient(960px 520px at 15% 10%, rgba(0, 190, 255, 0.16), transparent 60%),
+      radial-gradient(820px 420px at 88% 8%, rgba(255, 0, 220, 0.14), transparent 60%),
+      linear-gradient(180deg, #04060c 0%, #060a14 54%, #080c1a 100%);
+  }
+
+  .intake-wrap {
+    width: min(880px, 100%);
+    margin: 0 auto;
+    padding: 28px 18px 48px;
+    display: grid;
+    gap: 16px;
+  }
+
+  .intake-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .intake-home-link {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.06);
+    transition: transform 0.18s ease, border-color 0.18s ease;
+  }
+
+  .intake-home-link:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .intake-card {
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+      var(--panel);
+    box-shadow: 0 20px 56px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(14px) saturate(145%);
+    -webkit-backdrop-filter: blur(14px) saturate(145%);
+    padding: 18px;
+  }
+
+  .intake-title {
+    margin: 0;
+    font-size: clamp(24px, 3.2vw, 34px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .intake-sub {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .intake-form {
+    margin-top: 14px;
+    display: grid;
+    gap: 12px;
+  }
+
+  .field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .field-label {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .text-input,
+  .select-input {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 11px;
+    font-size: 14px;
+    color: var(--ink);
+    background: rgba(0, 0, 0, 0.24);
+    font-family: inherit;
+  }
+
+  .select-input option {
+    background: #0d1220;
+    color: #fff;
+  }
+
+  .button-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .intake-btn {
+    border: 0;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+    background: linear-gradient(135deg, rgba(0, 190, 255, 0.72), rgba(255, 0, 220, 0.48));
+  }
+
+  .intake-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .intake-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .status-line {
+    margin: 0;
+    min-height: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .status-line.ok { color: var(--ok); }
+  .status-line.warn { color: var(--warn); }
+  .status-line.bad { color: var(--bad); }
+
+  @media (max-width: 640px) {
+    .intake-wrap {
+      padding: 18px 12px 28px;
+    }
+
+    .intake-card {
+      border-radius: 16px;
+      padding: 14px;
+    }
+  }
+</style>
+</head>
+<body class="client-intake-page">
+  <div class="powerByStamp" aria-label="powered by VARACIS POHE INTELLIGENCE tm">
+    <span class="powerByText">powered by VARACIS POHE INTELLIGENCE tm</span>
+    <span class="powerByOrb" aria-hidden="true"></span>
+  </div>
+
+  <main class="intake-wrap">
+    <div class="intake-topbar">
+      <a class="intake-home-link" href="../index.html" aria-label="Back to home">Back to Home</a>
+    </div>
+
+    <section class="intake-card" aria-labelledby="intakeHeading">
+      <h1 id="intakeHeading" class="intake-title">Client Intake</h1>
+      <p class="intake-sub">Capture athlete basics and send them directly to CoachRx intake on Varacis.</p>
+
+      <form id="clientIntakeForm" class="intake-form" novalidate>
+        <div class="field">
+          <label class="field-label" for="nameInput">Name</label>
+          <input id="nameInput" class="text-input" type="text" autocomplete="name" placeholder="Client full name" required />
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="emailInput">Email</label>
+          <input id="emailInput" class="text-input" type="email" autocomplete="email" placeholder="client@example.com" required />
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="wearableInput">Wearable</label>
+          <select id="wearableInput" class="select-input" required>
+            <option value="">Select wearable</option>
+            <option value="WHOOP">WHOOP</option>
+            <option value="Garmin">Garmin</option>
+            <option value="Oura">Oura</option>
+            <option value="Apple Health">Apple Health</option>
+          </select>
+        </div>
+
+        <div class="button-row">
+          <button id="submitBtn" class="intake-btn" type="submit">Send to CoachRx</button>
+        </div>
+
+        <p id="statusLine" class="status-line" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <script src="../assets/js/add-client.js" defer></script>
+</body>
+</html>
