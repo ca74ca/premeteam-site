@@ -201,6 +201,23 @@ body{
   gap:14px;
   align-items:flex-start;
   z-index:1200;
+  max-height:calc(100vh - 112px);
+  overflow-y:auto;
+  padding-right:6px;
+  scrollbar-width:thin;
+}
+
+.socialRow::-webkit-scrollbar{
+  width:8px;
+}
+
+.socialRow::-webkit-scrollbar-thumb{
+  border-radius:999px;
+  background:rgba(255,255,255,.24);
+}
+
+.socialRow::-webkit-scrollbar-track{
+  background:transparent;
 }
 
 /* Glass cards */

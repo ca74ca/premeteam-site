@@ -114,19 +114,9 @@
       <div class="cardValue">Get the 411</div>
     </a>
 
-    <a class="glassCard" href="./quick-workout.html" aria-label="Open quick workout generator using screenshot upload and email">
-      <div class="cardLabel">quick workout</div>
-      <div class="cardValue">Upload Screenshot + Get Workout</div>
-    </a>
-
     <a class="glassCard" href="./pages/add-client.html" aria-label="Open client intake and send data to CoachRx">
       <div class="cardLabel">client intake</div>
       <div class="cardValue">Add Client + Send to CoachRx</div>
-    </a>
-
-    <a id="connectDataBtn" class="glassCard whoopConnectCard" href="#" aria-label="Connect wearable data">
-      <div id="connectDataLabel" class="cardLabel">CONNECT DATA /</div>
-      <div id="connectDataValue" class="cardValue">Connect Your Wearable</div>
     </a>
 
     <a id="connectWhoopBtn" class="glassCard whoopConnectCard" href="#" aria-label="Connect WHOOP to Varacis">
@@ -151,14 +141,11 @@
 <script>
   (function () {
     var USER_ID_STORAGE_KEY = 'adaptiveSessionLiveUserId';
-    var CONNECT_REDIRECT_BASE = 'https://www.varacis.com/api/wearables/connect-redirect';
     var WHOOP_AUTH_URL = 'https://www.varacis.com/api/whoop-auth';
-    var PARTNER = 'premeteam';
 
-    var connectDataBtn = document.getElementById('connectDataBtn');
     var connectWhoopBtn = document.getElementById('connectWhoopBtn');
 
-    if (!connectDataBtn && !connectWhoopBtn) return;
+    if (!connectWhoopBtn) return;
 
     function resolveAthleteId() {
       var fromQuery = new URLSearchParams(window.location.search).get('whoopUserId');
@@ -190,19 +177,6 @@
         whoopUserId: athleteId
       }));
       return authUrl.toString();
-    }
-
-    if (connectDataBtn) {
-      connectDataBtn.addEventListener('click', function (event) {
-        event.preventDefault();
-        var athleteId = normalizeAthleteId();
-        if (!athleteId) return;
-        var redirectUrl =
-          CONNECT_REDIRECT_BASE +
-          '?athleteId=' + encodeURIComponent(athleteId) +
-          '&partner=' + encodeURIComponent(PARTNER);
-        window.location.href = redirectUrl;
-      });
     }
 
     if (connectWhoopBtn) {
