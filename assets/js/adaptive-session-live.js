@@ -82,6 +82,15 @@ const telemetryOverlayMeta = document.getElementById('telemetryOverlayMeta');
 const telemetryOverlayClose = document.getElementById('telemetryOverlayClose');
 const fallbackGuideOrb = document.getElementById('fallbackGuideOrb');
 const fallbackGuidePanel = document.getElementById('fallbackGuidePanel');
+const oauthTransitionOverlay = document.getElementById('oauthTransitionOverlay');
+const oauthTransitionStep1 = document.getElementById('oauthTransitionStep1');
+const oauthTransitionStep2 = document.getElementById('oauthTransitionStep2');
+const oauthTransitionStep3 = document.getElementById('oauthTransitionStep3');
+const oauthTransitionStep4 = document.getElementById('oauthTransitionStep4');
+const oauthTransitionStep1Text = document.getElementById('oauthTransitionStep1Text');
+const oauthTransitionStep2Text = document.getElementById('oauthTransitionStep2Text');
+const oauthTransitionStep3Text = document.getElementById('oauthTransitionStep3Text');
+const oauthTransitionStep4Text = document.getElementById('oauthTransitionStep4Text');
 
 const STORAGE_KEY = 'adaptiveSessionLiveUserId';
 const APP_USER_STORAGE_KEY = 'adaptiveSessionLiveAppUserId';
@@ -116,6 +125,8 @@ const BLACKLIST_MAP = [
 const FINAL_STATEMENT_SUFFIX = 'The final round is your best round.';
 const TELEMETRY_POLL_MS = 12000;
 const TELEMETRY_ALERT_COOLDOWN_MS = 15000;
+const OAUTH_TRANSITION_TYPE_MS = 34;
+const OAUTH_TRANSITION_SETTLE_MS = 520;
 
 let latestTelemetryOverrides = {};
 let latestTargetZone = null;
@@ -168,6 +179,136 @@ function formatFinalStatement(value) {
   if (!normalizedBase) return '-';
   const hasSuffix = normalizedBase.toLowerCase().includes(FINAL_STATEMENT_SUFFIX.toLowerCase());
   return hasSuffix ? normalizedBase : `${normalizedBase} ${FINAL_STATEMENT_SUFFIX}`;
+}
+
+function waitMs(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+function createOauthTransitionController(enabled) {
+  const stepRefs = {
+    1: { line: oauthTransitionStep1, text: oauthTransitionStep1Text },
+    2: { line: oauthTransitionStep2, text: oauthTransitionStep2Text },
+    3: { line: oauthTransitionStep3, text: oauthTransitionStep3Text },
+    4: { line: oauthTransitionStep4, text: oauthTransitionStep4Text }
+  };
+
+  const hasUi = oauthTransitionOverlay
+    && Object.values(stepRefs).every((ref) => ref.line && ref.text);
+
+  if (!enabled || !hasUi) {
+    return {
+      start() {},
+      markStepComplete() {},
+      finish: async () => {}
+    };
+  }
+
+  const scripts = {
+    1: 'Syncing wearable metrics...',
+    2: 'Calculating Delta Zone...',
+    3: 'Building adaptive session...',
+    4: 'Generating today\'s coaching recommendations...'
+  };
+
+  const settledCopy = {
+    1: '✓ Recovery analyzed',
+    2: '✓ Complete',
+    3: '✓ Complete'
+  };
+
+  const state = {
+    done: false,
+    step: {
+      1: { typed: false, pendingComplete: false },
+      2: { typed: false, pendingComplete: false },
+      3: { typed: false, pendingComplete: false },
+      4: { typed: false, pendingComplete: false }
+    }
+  };
+
+  let sequencePromise = Promise.resolve();
+
+  const resetLine = (step) => {
+    const ref = stepRefs[step];
+    ref.text.textContent = '';
+    ref.line.classList.remove('is-active', 'is-complete', 'is-settled');
+  };
+
+  const typeLine = async (step, text) => {
+    const ref = stepRefs[step];
+    ref.line.classList.add('is-active');
+    ref.text.textContent = '';
+
+    for (let i = 0; i < text.length; i += 1) {
+      if (state.done) return;
+      ref.text.textContent += text[i];
+      await waitMs(OAUTH_TRANSITION_TYPE_MS);
+    }
+
+    state.step[step].typed = true;
+  };
+
+  const settleStep = (step) => {
+    const ref = stepRefs[step];
+    ref.line.classList.remove('is-active', 'is-settled');
+    ref.line.classList.add('is-complete');
+
+    window.setTimeout(() => {
+      if (!state.done) {
+        ref.line.classList.remove('is-complete');
+        ref.line.classList.add('is-settled');
+      }
+    }, OAUTH_TRANSITION_SETTLE_MS);
+  };
+
+  const applyCompletion = (step) => {
+    if (step === 4) return;
+    const ref = stepRefs[step];
+    ref.text.textContent = settledCopy[step];
+    settleStep(step);
+  };
+
+  return {
+    start() {
+      Object.keys(stepRefs).forEach((key) => resetLine(Number(key)));
+      oauthTransitionOverlay.hidden = false;
+      oauthTransitionOverlay.classList.add('show');
+
+      sequencePromise = (async () => {
+        for (const step of [1, 2, 3, 4]) {
+          await typeLine(step, scripts[step]);
+          if (state.step[step].pendingComplete && step !== 4) {
+            applyCompletion(step);
+          }
+          if (state.done) return;
+        }
+      })();
+    },
+
+    markStepComplete(step) {
+      if (state.done || step === 4) return;
+      const stepState = state.step[step];
+      if (!stepState) return;
+
+      if (stepState.typed) {
+        applyCompletion(step);
+      } else {
+        stepState.pendingComplete = true;
+      }
+    },
+
+    async finish() {
+      state.done = true;
+      await sequencePromise.catch(() => {});
+      oauthTransitionOverlay.classList.remove('show');
+      window.setTimeout(() => {
+        oauthTransitionOverlay.hidden = true;
+      }, 220);
+    }
+  };
 }
 
 function createWorkoutSnapshot(source, payload, metadata = {}) {
@@ -1523,10 +1664,12 @@ async function runCoachAgent() {
 }
 
 async function loadLiveData(options = {}) {
-  const { forceFresh = false } = options;
+  const { forceFresh = false, showOauthTransition = false } = options;
   const whoopUserId = getCurrentWhoopUserId();
   const includeFallback = Boolean(showWhoopRawToggle?.checked);
   const cacheBust = forceFresh ? Date.now() : undefined;
+  const oauthTransition = createOauthTransitionController(showOauthTransition);
+  oauthTransition.start();
 
   window.localStorage.setItem(STORAGE_KEY, whoopUserId);
   setAthleteName('User Unknown');
@@ -1552,10 +1695,17 @@ async function loadLiveData(options = {}) {
   setStatus('warn', forceFresh ? 'Generating new session' : 'Syncing', forceFresh ? 'Requesting a fresh WHOOP pull and new session insert...' : 'Loading adaptive session, WHOOP snapshot, and history...');
 
   try {
+    const adaptiveRequest = fetchJson(adaptiveUrl)
+      .finally(() => oauthTransition.markStepComplete(2));
+    const whoopRequest = fetchJson(whoopUrl)
+      .finally(() => oauthTransition.markStepComplete(1));
+    const historyRequest = fetchJson(historyUrl)
+      .finally(() => oauthTransition.markStepComplete(3));
+
     const [adaptiveResult, whoopResult, historyResult] = await Promise.allSettled([
-      fetchJson(adaptiveUrl),
-      fetchJson(whoopUrl),
-      fetchJson(historyUrl)
+      adaptiveRequest,
+      whoopRequest,
+      historyRequest
     ]);
 
     console.log('📦 API Results:', { adaptiveResult, whoopResult, historyResult });
@@ -1628,6 +1778,7 @@ async function loadLiveData(options = {}) {
   } finally {
     refreshBtn.disabled = false;
     if (reconnectBtn) reconnectBtn.disabled = false;
+    await oauthTransition.finish();
   }
 }
 
@@ -1747,7 +1898,7 @@ if (!selectedDivisionWorkflowId) {
 applyUiCopy();
 attachButtonGlow();
 syncWhoopRawVisibility();
-loadLiveData({ forceFresh: isOauthReturn() });
+loadLiveData({ forceFresh: isOauthReturn(), showOauthTransition: isOauthReturn() });
 if (isOauthReturn()) {
   cleanupOauthParamsFromUrl();
 }
