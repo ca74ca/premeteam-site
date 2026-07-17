@@ -231,6 +231,7 @@ function createOauthTransitionController(enabled) {
     }
   };
 
+  const pendingCompletionPromises = new Set();
   let sequencePromise = Promise.resolve();
 
   const resetLine = (step) => {
@@ -264,11 +265,18 @@ function createOauthTransitionController(enabled) {
       elapsedMs: elapsed
     });
     const remaining = Math.max(0, OAUTH_TRANSITION_MIN_STEP_MS - elapsed);
+    let resolveCompletion;
+    const completionPromise = new Promise((resolve) => {
+      resolveCompletion = resolve;
+    });
+    pendingCompletionPromises.add(completionPromise);
     stepState.completionTimer = window.setTimeout(() => {
       stepState.completionTimer = null;
+      pendingCompletionPromises.delete(completionPromise);
       if (!state.done) {
         applyCompletion(step);
       }
+      resolveCompletion();
     }, remaining);
   };
 
@@ -326,12 +334,13 @@ function createOauthTransitionController(enabled) {
     },
 
     async finish() {
+      await sequencePromise.catch(() => {});
+      await Promise.allSettled(Array.from(pendingCompletionPromises));
       const totalElapsedMs = transitionStartedAt ? Date.now() - transitionStartedAt : 0;
       state.done = true;
       console.log('OAuth transition finished:', {
         totalElapsedMs
       });
-      await sequencePromise.catch(() => {});
       oauthTransitionOverlay.classList.remove('show');
       window.setTimeout(() => {
         oauthTransitionOverlay.hidden = true;
