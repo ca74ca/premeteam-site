@@ -127,6 +127,7 @@ const TELEMETRY_POLL_MS = 12000;
 const TELEMETRY_ALERT_COOLDOWN_MS = 15000;
 const OAUTH_TRANSITION_TYPE_MS = 34;
 const OAUTH_TRANSITION_SETTLE_MS = 520;
+const OAUTH_TRANSITION_MIN_STEP_MS = 800;
 
 let latestTelemetryOverrides = {};
 let latestTargetZone = null;
@@ -222,10 +223,10 @@ function createOauthTransitionController(enabled) {
   const state = {
     done: false,
     step: {
-      1: { typed: false, pendingComplete: false },
-      2: { typed: false, pendingComplete: false },
-      3: { typed: false, pendingComplete: false },
-      4: { typed: false, pendingComplete: false }
+      1: { typed: false, pendingComplete: false, startedAt: 0, completionTimer: null },
+      2: { typed: false, pendingComplete: false, startedAt: 0, completionTimer: null },
+      3: { typed: false, pendingComplete: false, startedAt: 0, completionTimer: null },
+      4: { typed: false, pendingComplete: false, startedAt: 0, completionTimer: null }
     }
   };
 
@@ -239,6 +240,7 @@ function createOauthTransitionController(enabled) {
 
   const typeLine = async (step, text) => {
     const ref = stepRefs[step];
+    state.step[step].startedAt = Date.now();
     ref.line.classList.add('is-active');
     ref.text.textContent = '';
 
@@ -249,6 +251,20 @@ function createOauthTransitionController(enabled) {
     }
 
     state.step[step].typed = true;
+  };
+
+  const scheduleCompletion = (step) => {
+    const stepState = state.step[step];
+    if (!stepState || state.done || stepState.completionTimer) return;
+
+    const elapsed = Date.now() - stepState.startedAt;
+    const remaining = Math.max(0, OAUTH_TRANSITION_MIN_STEP_MS - elapsed);
+    stepState.completionTimer = window.setTimeout(() => {
+      stepState.completionTimer = null;
+      if (!state.done) {
+        applyCompletion(step);
+      }
+    }, remaining);
   };
 
   const settleStep = (step) => {
@@ -281,7 +297,7 @@ function createOauthTransitionController(enabled) {
         for (const step of [1, 2, 3, 4]) {
           await typeLine(step, scripts[step]);
           if (state.step[step].pendingComplete && step !== 4) {
-            applyCompletion(step);
+            scheduleCompletion(step);
           }
           if (state.done) return;
         }
@@ -294,7 +310,7 @@ function createOauthTransitionController(enabled) {
       if (!stepState) return;
 
       if (stepState.typed) {
-        applyCompletion(step);
+        scheduleCompletion(step);
       } else {
         stepState.pendingComplete = true;
       }
