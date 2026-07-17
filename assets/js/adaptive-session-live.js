@@ -127,7 +127,8 @@ const TELEMETRY_POLL_MS = 12000;
 const TELEMETRY_ALERT_COOLDOWN_MS = 15000;
 const OAUTH_TRANSITION_TYPE_MS = 34;
 const OAUTH_TRANSITION_SETTLE_MS = 520;
-const OAUTH_TRANSITION_MIN_STEP_MS = 800;
+const OAUTH_TRANSITION_MIN_STEP_MS = 1200;
+const OAUTH_TRANSITION_MIN_TOTAL_MS = 4000;
 
 let latestTelemetryOverrides = {};
 let latestTargetZone = null;
@@ -260,10 +261,6 @@ function createOauthTransitionController(enabled) {
     if (!stepState || state.done || stepState.completionTimer) return;
 
     const elapsed = Date.now() - stepState.startedAt;
-    console.log('OAuth transition step completion fired:', {
-      step,
-      elapsedMs: elapsed
-    });
     const remaining = Math.max(0, OAUTH_TRANSITION_MIN_STEP_MS - elapsed);
     let resolveCompletion;
     const completionPromise = new Promise((resolve) => {
@@ -306,9 +303,6 @@ function createOauthTransitionController(enabled) {
       oauthTransitionOverlay.hidden = false;
       oauthTransitionOverlay.classList.add('show');
       transitionStartedAt = Date.now();
-      console.log('OAuth transition started:', {
-        startedAt: transitionStartedAt
-      });
 
       sequencePromise = (async () => {
         for (const step of [1, 2, 3, 4]) {
@@ -337,10 +331,11 @@ function createOauthTransitionController(enabled) {
       await sequencePromise.catch(() => {});
       await Promise.allSettled(Array.from(pendingCompletionPromises));
       const totalElapsedMs = transitionStartedAt ? Date.now() - transitionStartedAt : 0;
+      const totalRemaining = Math.max(0, OAUTH_TRANSITION_MIN_TOTAL_MS - totalElapsedMs);
+      if (totalRemaining > 0) {
+        await waitMs(totalRemaining);
+      }
       state.done = true;
-      console.log('OAuth transition finished:', {
-        totalElapsedMs
-      });
       oauthTransitionOverlay.classList.remove('show');
       window.setTimeout(() => {
         oauthTransitionOverlay.hidden = true;
