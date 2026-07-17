@@ -189,6 +189,7 @@ function waitMs(ms) {
 }
 
 function createOauthTransitionController(enabled) {
+  let transitionStartedAt = 0;
   const stepRefs = {
     1: { line: oauthTransitionStep1, text: oauthTransitionStep1Text },
     2: { line: oauthTransitionStep2, text: oauthTransitionStep2Text },
@@ -258,6 +259,10 @@ function createOauthTransitionController(enabled) {
     if (!stepState || state.done || stepState.completionTimer) return;
 
     const elapsed = Date.now() - stepState.startedAt;
+    console.log('OAuth transition step completion fired:', {
+      step,
+      elapsedMs: elapsed
+    });
     const remaining = Math.max(0, OAUTH_TRANSITION_MIN_STEP_MS - elapsed);
     stepState.completionTimer = window.setTimeout(() => {
       stepState.completionTimer = null;
@@ -292,6 +297,10 @@ function createOauthTransitionController(enabled) {
       Object.keys(stepRefs).forEach((key) => resetLine(Number(key)));
       oauthTransitionOverlay.hidden = false;
       oauthTransitionOverlay.classList.add('show');
+      transitionStartedAt = Date.now();
+      console.log('OAuth transition started:', {
+        startedAt: transitionStartedAt
+      });
 
       sequencePromise = (async () => {
         for (const step of [1, 2, 3, 4]) {
@@ -317,7 +326,11 @@ function createOauthTransitionController(enabled) {
     },
 
     async finish() {
+      const totalElapsedMs = transitionStartedAt ? Date.now() - transitionStartedAt : 0;
       state.done = true;
+      console.log('OAuth transition finished:', {
+        totalElapsedMs
+      });
       await sequencePromise.catch(() => {});
       oauthTransitionOverlay.classList.remove('show');
       window.setTimeout(() => {
