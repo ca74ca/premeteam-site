@@ -91,6 +91,9 @@ const oauthTransitionStep1Text = document.getElementById('oauthTransitionStep1Te
 const oauthTransitionStep2Text = document.getElementById('oauthTransitionStep2Text');
 const oauthTransitionStep3Text = document.getElementById('oauthTransitionStep3Text');
 const oauthTransitionStep4Text = document.getElementById('oauthTransitionStep4Text');
+const oauthTransitionSuccess = document.querySelector('.oauth-transition-success');
+const oauthTransitionBrand = document.querySelector('.oauth-transition-brand');
+const oauthTransitionCompiling = document.querySelector('.oauth-transition-compiling');
 
 const STORAGE_KEY = 'adaptiveSessionLiveUserId';
 const APP_USER_STORAGE_KEY = 'adaptiveSessionLiveAppUserId';
@@ -128,7 +131,9 @@ const TELEMETRY_ALERT_COOLDOWN_MS = 15000;
 const OAUTH_TRANSITION_TYPE_MS = 34;
 const OAUTH_TRANSITION_SETTLE_MS = 520;
 const OAUTH_TRANSITION_MIN_STEP_MS = 1200;
-const OAUTH_TRANSITION_MIN_TOTAL_MS = 4000;
+const OAUTH_TRANSITION_MIN_TOTAL_MS = 7400;
+const OAUTH_TRANSITION_SUCCESS_STAGGER_MS = 500;
+const OAUTH_TRANSITION_SUCCESS_HOLD_MS = 1800;
 
 let latestTelemetryOverrides = {};
 let latestTargetZone = null;
@@ -241,6 +246,12 @@ function createOauthTransitionController(enabled) {
     ref.line.classList.remove('is-active', 'is-complete', 'is-settled');
   };
 
+  const resetSuccessBeat = () => {
+    if (oauthTransitionSuccess) oauthTransitionSuccess.classList.remove('show');
+    if (oauthTransitionBrand) oauthTransitionBrand.classList.remove('show');
+    if (oauthTransitionCompiling) oauthTransitionCompiling.classList.remove('show');
+  };
+
   const typeLine = async (step, text) => {
     const ref = stepRefs[step];
     state.step[step].startedAt = Date.now();
@@ -297,9 +308,33 @@ function createOauthTransitionController(enabled) {
     settleStep(step);
   };
 
+  const settleStepFour = async () => {
+    const stepState = state.step[4];
+    if (!stepState?.typed) return;
+    const elapsed = Date.now() - stepState.startedAt;
+    const remaining = Math.max(0, OAUTH_TRANSITION_MIN_STEP_MS - elapsed);
+    if (remaining > 0) {
+      await waitMs(remaining);
+    }
+    if (state.done) return;
+    settleStep(4);
+    await waitMs(OAUTH_TRANSITION_SETTLE_MS);
+  };
+
+  const runSuccessBeat = async () => {
+    if (!oauthTransitionSuccess && !oauthTransitionBrand && !oauthTransitionCompiling) return;
+    if (oauthTransitionSuccess) oauthTransitionSuccess.classList.add('show');
+    await waitMs(OAUTH_TRANSITION_SUCCESS_STAGGER_MS);
+    if (oauthTransitionBrand) oauthTransitionBrand.classList.add('show');
+    await waitMs(OAUTH_TRANSITION_SUCCESS_STAGGER_MS);
+    if (oauthTransitionCompiling) oauthTransitionCompiling.classList.add('show');
+    await waitMs(OAUTH_TRANSITION_SUCCESS_HOLD_MS);
+  };
+
   return {
     start() {
       Object.keys(stepRefs).forEach((key) => resetLine(Number(key)));
+      resetSuccessBeat();
       oauthTransitionOverlay.hidden = false;
       oauthTransitionOverlay.classList.add('show');
       transitionStartedAt = Date.now();
@@ -330,6 +365,8 @@ function createOauthTransitionController(enabled) {
     async finish() {
       await sequencePromise.catch(() => {});
       await Promise.allSettled(Array.from(pendingCompletionPromises));
+      await settleStepFour();
+      await runSuccessBeat();
       const totalElapsedMs = transitionStartedAt ? Date.now() - transitionStartedAt : 0;
       const totalRemaining = Math.max(0, OAUTH_TRANSITION_MIN_TOTAL_MS - totalElapsedMs);
       if (totalRemaining > 0) {

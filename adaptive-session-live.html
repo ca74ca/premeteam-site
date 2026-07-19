@@ -1127,6 +1127,39 @@
     animation: oauthCursorBlink 1.05s steps(1, end) infinite;
   }
 
+  .oauth-transition-success {
+    margin: 14px 0 2px;
+    font-size: 13px;
+    letter-spacing: .08em;
+    color: #bbf7d0;
+    opacity: 0;
+    transition: opacity .4s ease;
+  }
+
+  .oauth-transition-brand {
+    margin: 4px 0;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #67e8f9;
+    opacity: 0;
+    transition: opacity .4s ease .3s;
+  }
+
+  .oauth-transition-compiling {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: rgba(125, 211, 252, .74);
+    opacity: 0;
+    transition: opacity .4s ease .6s;
+  }
+
+  .oauth-transition-success.show,
+  .oauth-transition-brand.show,
+  .oauth-transition-compiling.show {
+    opacity: 1;
+  }
+
   .oauth-transition-footer {
     margin: 0;
     font-size: 11px;
@@ -1460,6 +1493,9 @@
         <p id="oauthTransitionStep3" class="oauth-transition-line"><span id="oauthTransitionStep3Text"></span><span class="oauth-transition-cursor" aria-hidden="true"></span></p>
         <p id="oauthTransitionStep4" class="oauth-transition-line"><span id="oauthTransitionStep4Text"></span><span class="oauth-transition-cursor" aria-hidden="true"></span></p>
       </div>
+      <p class="oauth-transition-success">[ COMPLETE ]</p>
+      <p class="oauth-transition-brand">VARACIS POHE INTELLIGENCE™ — DECISION ENGINE ONLINE</p>
+      <p class="oauth-transition-compiling">&gt;&gt; compiling adaptive session...</p>
       <p class="oauth-transition-footer">Powered by VARACIS POHE Intelligence™</p>
     </div>
   </section>
