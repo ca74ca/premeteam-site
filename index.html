@@ -5,6 +5,109 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Delta Zone Systems</title>
 <link rel="stylesheet" href="./styles.css" />
+<style>
+  .oauth-transition-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: grid;
+    place-items: center;
+    padding: 22px;
+    background: radial-gradient(circle at 16% 20%, rgba(14, 165, 233, .16), transparent 45%),
+      radial-gradient(circle at 80% 76%, rgba(56, 189, 248, .14), transparent 50%),
+      rgba(3, 10, 20, .66);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .22s ease, visibility .22s ease;
+  }
+
+  .oauth-transition-overlay.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .oauth-transition-card {
+    width: min(680px, 94vw);
+    border-radius: 20px;
+    padding: 24px 22px;
+    border: 1px solid rgba(56, 189, 248, .48);
+    background: linear-gradient(160deg, rgba(9, 20, 34, .74), rgba(5, 14, 26, .62));
+    box-shadow: 0 0 0 1px rgba(125, 211, 252, .18) inset,
+      0 28px 68px rgba(2, 8, 18, .7),
+      0 0 26px rgba(34, 211, 238, .34),
+      0 0 56px rgba(14, 165, 233, .2);
+    backdrop-filter: blur(18px) saturate(130%);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+    font-family: 'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', 'Cascadia Mono', monospace;
+    color: #7dd3fc;
+  }
+
+  .oauth-transition-title {
+    margin: 0 0 14px;
+    font-size: 13px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: #bae6fd;
+    opacity: .95;
+  }
+
+  .oauth-transition-steps {
+    display: grid;
+    gap: 9px;
+    margin-bottom: 18px;
+  }
+
+  .oauth-transition-line {
+    margin: 0;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    letter-spacing: .06em;
+    color: rgba(125, 211, 252, .74);
+    text-shadow: 0 0 10px rgba(56, 189, 248, .16);
+    transition: color .22s ease, opacity .22s ease;
+  }
+
+  .oauth-transition-line.is-active {
+    color: #67e8f9;
+    opacity: 1;
+    text-shadow: 0 0 14px rgba(34, 211, 238, .34);
+  }
+
+  .oauth-transition-line.is-complete {
+    color: #bbf7d0;
+  }
+
+  .oauth-transition-success {
+    margin: 0;
+    min-height: 24px;
+    font-size: 14px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #86efac;
+  }
+
+  .oauth-transition-brand,
+  .oauth-transition-compiling,
+  .oauth-transition-footer {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: rgba(186, 230, 253, .92);
+  }
+
+  .oauth-transition-error {
+    margin: 10px 0 0;
+    min-height: 20px;
+    font-size: 12px;
+    color: #fca5a5;
+  }
+</style>
 </head>
 
 <body>
@@ -124,6 +227,16 @@
       <div class="cardValue">Link WHOOP to Varacis</div>
     </a>
 
+    <a id="connectGarminBtn" class="glassCard whoopConnectCard" href="#" aria-label="Connect Garmin to Varacis">
+      <div class="cardLabel">CONNECT GARMIN /</div>
+      <div class="cardValue">Link Garmin to Varacis</div>
+    </a>
+
+    <a id="connectOuraBtn" class="glassCard whoopConnectCard" href="#" aria-label="Connect Oura to Varacis">
+      <div class="cardLabel">CONNECT OURA /</div>
+      <div class="cardValue">Link Oura to Varacis</div>
+    </a>
+
     <a class="glassCard" href="./adaptive-session-live.html" aria-label="Open athlete adaptive programming powered by POHE verified biometric data">
       <div class="cardLabel">connect data here for VERIFIED</div>
       <div class="cardValue">Athlete Adaptive Programming powered by Delta zone system POHE</div>
@@ -137,6 +250,23 @@
   </section>
 
 </main>
+
+<section id="oauthTransitionOverlay" class="oauth-transition-overlay" hidden aria-live="polite" aria-label="Syncing wearable and adaptive session data">
+  <div class="oauth-transition-card" role="status" aria-atomic="true">
+    <p class="oauth-transition-title">Delta Zone Initialization</p>
+    <div class="oauth-transition-steps">
+      <p id="oauthTransitionStep1" class="oauth-transition-line"></p>
+      <p id="oauthTransitionStep2" class="oauth-transition-line"></p>
+      <p id="oauthTransitionStep3" class="oauth-transition-line"></p>
+      <p id="oauthTransitionStep4" class="oauth-transition-line"></p>
+    </div>
+    <p class="oauth-transition-success">[ CONNECTING ]</p>
+    <p class="oauth-transition-brand">VARACIS POHE INTELLIGENCE™ — DECISION ENGINE ONLINE</p>
+    <p class="oauth-transition-compiling">&gt;&gt; syncing wearable onboarding...</p>
+    <p class="oauth-transition-footer">Powered by VARACIS POHE Intelligence™</p>
+    <p id="oauthTransitionError" class="oauth-transition-error" aria-live="assertive"></p>
+  </div>
+</section>
 
 <script>
   (function () {
@@ -187,6 +317,247 @@
         window.location.href = buildWhoopAuthUrl(athleteId);
       });
     }
+  })();
+</script>
+<script>
+  (function () {
+    var ONBOARDING_START_URL = 'https://www.varacis.com/api/onboarding/start';
+    var ONBOARDING_STATUS_URL = 'https://www.varacis.com/api/onboarding/status';
+    var PENDING_KEY = 'pendingOnboardingId';
+    var POLL_INTERVAL_MS = 2000;
+    var POLL_TIMEOUT_MS = 60000;
+
+    var connectGarminBtn = document.getElementById('connectGarminBtn');
+    var connectOuraBtn = document.getElementById('connectOuraBtn');
+
+    var overlay = document.getElementById('oauthTransitionOverlay');
+    var step1 = document.getElementById('oauthTransitionStep1');
+    var step2 = document.getElementById('oauthTransitionStep2');
+    var step3 = document.getElementById('oauthTransitionStep3');
+    var step4 = document.getElementById('oauthTransitionStep4');
+    var overlayError = document.getElementById('oauthTransitionError');
+
+    function waitMs(ms) {
+      return new Promise(function (resolve) {
+        window.setTimeout(resolve, ms);
+      });
+    }
+
+    function safeJsonParse(raw) {
+      try {
+        return JSON.parse(raw);
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function getPendingState() {
+      var raw = window.localStorage.getItem(PENDING_KEY);
+      if (!raw) return null;
+      var parsed = safeJsonParse(raw);
+      if (!parsed || !parsed.onboardingId || !parsed.provider) return null;
+      return {
+        onboardingId: String(parsed.onboardingId),
+        provider: String(parsed.provider).toLowerCase()
+      };
+    }
+
+    function setPendingState(onboardingId, provider) {
+      window.localStorage.setItem(PENDING_KEY, JSON.stringify({
+        onboardingId: String(onboardingId),
+        provider: String(provider).toLowerCase()
+      }));
+    }
+
+    function clearPendingState() {
+      window.localStorage.removeItem(PENDING_KEY);
+    }
+
+    function setLine(node, text, stateClass) {
+      if (!node) return;
+      node.textContent = text;
+      node.classList.remove('is-active', 'is-complete');
+      if (stateClass) node.classList.add(stateClass);
+    }
+
+    function showOverlay(provider) {
+      if (overlay) {
+        overlay.hidden = false;
+        overlay.classList.add('show');
+      }
+
+      var providerName = String(provider || '').toUpperCase();
+
+      setLine(step1, 'Resuming ' + providerName + ' onboarding...', 'is-complete');
+      setLine(step2, 'Checking connection status...', 'is-active');
+      setLine(step3, 'Waiting for wearable data handshake...', '');
+      setLine(step4, 'Preparing adaptive session...', '');
+      if (overlayError) overlayError.textContent = '';
+    }
+
+    function showOverlayError(message) {
+      if (!overlay) {
+        window.alert(message);
+        return;
+      }
+      if (overlayError) overlayError.textContent = message;
+      setLine(step2, 'Onboarding did not complete.', 'is-complete');
+      setLine(step3, 'Please retry connection from homepage.', 'is-active');
+      setLine(step4, '', '');
+    }
+
+    function setButtonBusy(button, busy) {
+      if (!button) return;
+      if (busy) {
+        button.setAttribute('aria-disabled', 'true');
+        button.style.pointerEvents = 'none';
+        button.style.opacity = '0.75';
+      } else {
+        button.removeAttribute('aria-disabled');
+        button.style.pointerEvents = '';
+        button.style.opacity = '';
+      }
+    }
+
+    function extractMemberId(payload) {
+      if (!payload || typeof payload !== 'object') return '';
+      return String(
+        payload.memberId ||
+        payload.member_id ||
+        (payload.member && (payload.member.id || payload.member.memberId || payload.member.member_id)) ||
+        ''
+      ).trim();
+    }
+
+    async function startProviderOnboarding(provider, button) {
+      setButtonBusy(button, true);
+
+      try {
+        var response = await fetch(ONBOARDING_START_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ provider: provider })
+        });
+
+        var payload = null;
+        try {
+          payload = await response.json();
+        } catch (jsonError) {
+          payload = null;
+        }
+
+        if (!response.ok) {
+          var errorMessage = (payload && (payload.error || payload.message)) || 'Unable to start onboarding.';
+          throw new Error(errorMessage);
+        }
+
+        var redirectUrl = payload && payload.redirectUrl ? String(payload.redirectUrl) : '';
+        var onboardingId = payload && payload.onboardingId ? String(payload.onboardingId) : '';
+
+        if (!redirectUrl || !onboardingId) {
+          throw new Error('Onboarding response missing redirectUrl or onboardingId.');
+        }
+
+        setPendingState(onboardingId, provider);
+        window.location.href = redirectUrl;
+      } catch (error) {
+        var message = (error && error.message) ? error.message : 'Unable to connect provider right now.';
+        window.alert(message);
+        setButtonBusy(button, false);
+      }
+    }
+
+    async function resumePendingOnboardingIfNeeded() {
+      var pending = getPendingState();
+      if (!pending) return;
+
+      showOverlay(pending.provider);
+
+      var startedAt = Date.now();
+
+      while ((Date.now() - startedAt) < POLL_TIMEOUT_MS) {
+        var statusUrl = new URL(ONBOARDING_STATUS_URL);
+        statusUrl.searchParams.set('onboardingId', pending.onboardingId);
+
+        try {
+          var response = await fetch(statusUrl.toString(), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+          });
+
+          var payload = null;
+          try {
+            payload = await response.json();
+          } catch (jsonError) {
+            payload = null;
+          }
+
+          if (!response.ok) {
+            setLine(step2, 'Status endpoint retrying...', 'is-active');
+            await waitMs(POLL_INTERVAL_MS);
+            continue;
+          }
+
+          var status = String((payload && payload.status) || '').toLowerCase();
+          var memberId = extractMemberId(payload);
+
+          if (status === 'ready') {
+            clearPendingState();
+            setLine(step2, 'Connection ready.', 'is-complete');
+            setLine(step3, 'Launching adaptive session...', 'is-complete');
+            setLine(step4, 'Redirecting now...', 'is-active');
+
+            var targetUrl = './adaptive-session-live.html';
+            if (memberId) {
+              targetUrl += '?memberId=' + encodeURIComponent(memberId);
+            }
+            window.location.href = targetUrl;
+            return;
+          }
+
+          if (status === 'connected' || status === 'metrics_pending') {
+            setLine(step2, 'Connected. Waiting for metrics...', 'is-complete');
+            setLine(step3, 'Status: ' + status + '...', 'is-active');
+            await waitMs(POLL_INTERVAL_MS);
+            continue;
+          }
+
+          if (status === 'expired' || status === 'failed') {
+            clearPendingState();
+            showOverlayError('Onboarding ' + status + '. Please reconnect your wearable.');
+            return;
+          }
+
+          setLine(step2, 'Status: ' + (status || 'pending') + '...', 'is-active');
+        } catch (error) {
+          setLine(step2, 'Network check retrying...', 'is-active');
+        }
+
+        await waitMs(POLL_INTERVAL_MS);
+      }
+
+      clearPendingState();
+      showOverlayError('Onboarding timed out after 60 seconds. Please reconnect and try again.');
+    }
+
+    if (connectGarminBtn) {
+      connectGarminBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+        startProviderOnboarding('garmin', connectGarminBtn);
+      });
+    }
+
+    if (connectOuraBtn) {
+      connectOuraBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+        startProviderOnboarding('oura', connectOuraBtn);
+      });
+    }
+
+    resumePendingOnboardingIfNeeded();
   })();
 </script>
 </body>
