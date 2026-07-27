@@ -346,7 +346,7 @@
     var ONBOARDING_STATUS_URL = 'https://www.varacis.com/api/onboarding/status';
     var PENDING_KEY = 'pendingOnboardingId';
     var POLL_INTERVAL_MS = 2000;
-    var POLL_TIMEOUT_MS = 60000;
+    var POLL_TIMEOUT_MS = 300000;
 
     var connectGarminBtn = document.getElementById('connectGarminBtn');
     var connectOuraBtn = document.getElementById('connectOuraBtn');
@@ -563,7 +563,7 @@
       }
 
       clearPendingState();
-      showOverlayError('Onboarding timed out after 60 seconds. Please reconnect and try again.');
+      showOverlayError('Onboarding timed out after 5 minutes. Please reconnect and try again.');
     }
 
     if (connectGarminBtn) {
