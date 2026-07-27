@@ -107,6 +107,27 @@
     font-size: 12px;
     color: #fca5a5;
   }
+
+  .whoopConnectCard:hover,
+  .providerConnectCard:hover {
+    border-color: rgba(134, 239, 172, .55);
+    box-shadow:
+      0 16px 38px rgba(0,0,0,.45),
+      0 0 20px rgba(134, 239, 172, .38),
+      0 0 8px rgba(134, 239, 172, .24) inset;
+    transition: border-color .25s ease, box-shadow .25s ease;
+  }
+
+  .whoopConnectCard:active,
+  .providerConnectCard:active,
+  .whoopConnectCard.is-loading,
+  .providerConnectCard.is-loading {
+    border-color: rgba(134, 239, 172, .75);
+    box-shadow:
+      0 16px 38px rgba(0,0,0,.45),
+      0 0 28px rgba(134, 239, 172, .5),
+      0 0 12px rgba(134, 239, 172, .32) inset;
+  }
 </style>
 </head>
 
@@ -222,19 +243,19 @@
       <div class="cardValue">Delta Zone System</div>
     </a>
 
-    <a id="connectWhoopBtn" class="glassCard whoopConnectCard" href="#" aria-label="Connect WHOOP to Varacis">
+    <a id="connectWhoopBtn" class="glassCard whoopConnectCard" href="#" aria-label="Connect WHOOP to Delta Zone">
       <div class="cardLabel">CONNECT WHOOP /</div>
-      <div class="cardValue">Link WHOOP to Varacis</div>
+      <div class="cardValue">Link WHOOP to Delta Zone</div>
     </a>
 
-    <a id="connectGarminBtn" class="glassCard whoopConnectCard" href="#" aria-label="Connect Garmin to Varacis">
+    <a id="connectGarminBtn" class="glassCard whoopConnectCard providerConnectCard" href="#" aria-label="Connect Garmin to Delta Zone">
       <div class="cardLabel">CONNECT GARMIN /</div>
-      <div class="cardValue">Link Garmin to Varacis</div>
+      <div class="cardValue">Link Garmin to Delta Zone</div>
     </a>
 
-    <a id="connectOuraBtn" class="glassCard whoopConnectCard" href="#" aria-label="Connect Oura to Varacis">
+    <a id="connectOuraBtn" class="glassCard whoopConnectCard providerConnectCard" href="#" aria-label="Connect Oura to Delta Zone">
       <div class="cardLabel">CONNECT OURA /</div>
-      <div class="cardValue">Link Oura to Varacis</div>
+      <div class="cardValue">Link Oura to Delta Zone</div>
     </a>
 
     <a class="glassCard" href="./adaptive-session-live.html" aria-label="Open athlete adaptive programming powered by POHE verified biometric data">
@@ -410,10 +431,12 @@
       if (!button) return;
       if (busy) {
         button.setAttribute('aria-disabled', 'true');
+        button.classList.add('is-loading');
         button.style.pointerEvents = 'none';
         button.style.opacity = '0.75';
       } else {
         button.removeAttribute('aria-disabled');
+        button.classList.remove('is-loading');
         button.style.pointerEvents = '';
         button.style.opacity = '';
       }
