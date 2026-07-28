@@ -527,9 +527,9 @@
           var status = String((payload && payload.status) || '').toLowerCase();
           var memberId = extractMemberId(payload);
 
-          if (status === 'ready') {
+          if (status === 'ready' || status === 'connected' || status === 'metrics_pending') {
             clearPendingState();
-            setLine(step2, 'Connection ready.', 'is-complete');
+            setLine(step2, 'Connection confirmed.', 'is-complete');
             setLine(step3, 'Launching adaptive session...', 'is-complete');
             setLine(step4, 'Redirecting now...', 'is-active');
 
@@ -539,13 +539,6 @@
             }
             window.location.href = targetUrl;
             return;
-          }
-
-          if (status === 'connected' || status === 'metrics_pending') {
-            setLine(step2, 'Connected. Waiting for metrics...', 'is-complete');
-            setLine(step3, 'Status: ' + status + '...', 'is-active');
-            await waitMs(POLL_INTERVAL_MS);
-            continue;
           }
 
           if (status === 'expired' || status === 'failed') {
