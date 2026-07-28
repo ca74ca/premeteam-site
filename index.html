@@ -291,63 +291,13 @@
 
 <script>
   (function () {
-    var USER_ID_STORAGE_KEY = 'adaptiveSessionLiveUserId';
-    var WHOOP_AUTH_URL = 'https://www.varacis.com/api/whoop-auth';
-
-    var connectWhoopBtn = document.getElementById('connectWhoopBtn');
-
-    if (!connectWhoopBtn) return;
-
-    function resolveAthleteId() {
-      var fromQuery = new URLSearchParams(window.location.search).get('whoopUserId');
-      if (fromQuery) return fromQuery;
-      var stored = window.localStorage.getItem(USER_ID_STORAGE_KEY);
-      if (stored) return stored;
-      return window.prompt('Enter your athlete ID:') || '';
-    }
-
-    function normalizeAthleteId() {
-      var athleteId = resolveAthleteId();
-      if (!athleteId) return '';
-      athleteId = athleteId.trim();
-      if (!athleteId) return '';
-      window.localStorage.setItem(USER_ID_STORAGE_KEY, athleteId);
-      return athleteId;
-    }
-
-    function buildWhoopAuthUrl(athleteId) {
-      var authUrl = new URL(WHOOP_AUTH_URL);
-      authUrl.searchParams.set('userId', athleteId);
-      authUrl.searchParams.set('memberId', athleteId);
-      authUrl.searchParams.set('member_id', athleteId);
-      authUrl.searchParams.set('whoopUserId', athleteId);
-      authUrl.searchParams.set('state', JSON.stringify({
-        userId: athleteId,
-        memberId: athleteId,
-        member_id: athleteId,
-        whoopUserId: athleteId
-      }));
-      return authUrl.toString();
-    }
-
-    if (connectWhoopBtn) {
-      connectWhoopBtn.addEventListener('click', function (event) {
-        event.preventDefault();
-        var athleteId = normalizeAthleteId();
-        if (!athleteId) return;
-        window.location.href = buildWhoopAuthUrl(athleteId);
-      });
-    }
-  })();
-</script>
-<script>
-  (function () {
     var ONBOARDING_START_URL = 'https://www.varacis.com/api/onboarding/start';
     var ONBOARDING_STATUS_URL = 'https://www.varacis.com/api/onboarding/status';
     var PENDING_KEY = 'pendingOnboardingId';
     var POLL_INTERVAL_MS = 2000;
     var POLL_TIMEOUT_MS = 300000;
 
+    var connectWhoopBtn = document.getElementById('connectWhoopBtn');
     var connectGarminBtn = document.getElementById('connectGarminBtn');
     var connectOuraBtn = document.getElementById('connectOuraBtn');
 
@@ -557,6 +507,13 @@
 
       clearPendingState();
       showOverlayError('Onboarding timed out after 5 minutes. Please reconnect and try again.');
+    }
+
+    if (connectWhoopBtn) {
+      connectWhoopBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+        startProviderOnboarding('whoop', connectWhoopBtn);
+      });
     }
 
     if (connectGarminBtn) {
