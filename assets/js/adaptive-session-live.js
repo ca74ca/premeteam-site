@@ -19,10 +19,23 @@ const sessionIntensity = document.getElementById('sessionIntensity');
 const sessionFocus = document.getElementById('sessionFocus');
 const sessionFinisher = document.getElementById('sessionFinisher');
 const sessionBlocks = document.getElementById('sessionBlocks');
-const engineScoreValue = document.getElementById('engineScoreValue');
-const streakScoreValue = document.getElementById('streakScoreValue');
-const deltaZoneScoreRing = document.getElementById('deltaZoneScoreRing');
-const deltaZoneScorePct = document.getElementById('deltaZoneScorePct');
+const decisionReadinessRing = document.getElementById('decisionReadinessRing');
+const decisionReadinessValue = document.getElementById('decisionReadinessValue');
+const decisionDayType = document.getElementById('decisionDayType');
+const decisionHeadline = document.getElementById('decisionHeadline');
+const decisionExplanation = document.getElementById('decisionExplanation');
+const decisionRecommendedTitle = document.getElementById('decisionRecommendedTitle');
+const decisionRecommendedSummary = document.getElementById('decisionRecommendedSummary');
+const decisionEngineScore = document.getElementById('decisionEngineScore');
+const decisionStreakScore = document.getElementById('decisionStreakScore');
+const decisionEngineStatus = document.getElementById('decisionEngineStatus');
+const decisionTrainingLoad = document.getElementById('decisionTrainingLoad');
+const decisionRecoveryFill = document.getElementById('decisionRecoveryFill');
+const decisionSleepFill = document.getElementById('decisionSleepFill');
+const decisionLoadFill = document.getElementById('decisionLoadFill');
+const decisionRecoveryValue = document.getElementById('decisionRecoveryValue');
+const decisionSleepValue = document.getElementById('decisionSleepValue');
+const decisionLoadValue = document.getElementById('decisionLoadValue');
 const copyWorkoutBtn = document.getElementById('copyWorkoutBtn');
 const coachPromptInput = document.getElementById('coachPromptInput');
 const sportInput = document.getElementById('sportInput');
@@ -153,6 +166,7 @@ let telemetryOverlayTimer = null;
 let telemetryPollTimer = null;
 let lastTelemetryAlert = { scenario: '', at: 0 };
 let fallbackGuidePanelShown = false;
+let latestHistoryRows = [];
 
 function sanitizeBlockText(text) {
   if (!text) return text;
@@ -1276,28 +1290,30 @@ function buildOauthPayoffState(adaptivePayload, historyPayload) {
   };
 }
 
-function setEngineScore(value) {
-  if (!engineScoreValue) return;
-  const parsed = Number(value);
-  engineScoreValue.textContent = Number.isFinite(parsed) ? parsed.toFixed(1) : '0.0';
+function clampPercent(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return 0;
+  return Math.max(0, Math.min(num, 100));
 }
 
-function setDeltaZoneScore(ratioValue) {
-  const ratio = Number(ratioValue);
-  const percent = Number.isFinite(ratio)
-    ? Math.max(0, Math.min(ratio * 100, 100))
-    : 0;
-
-  if (deltaZoneScorePct) {
-    deltaZoneScorePct.textContent = `${Math.round(percent)}%`;
-  }
-
-  if (!deltaZoneScoreRing) return;
-  const radius = Number(deltaZoneScoreRing.getAttribute('r') || 48);
+function setDecisionRing(scoreValue) {
+  const score = Number(scoreValue);
+  const normalized = Number.isFinite(score) ? score : 0;
+  const pct = clampPercent(normalized);
+  if (decisionReadinessValue) decisionReadinessValue.textContent = normalized.toFixed(1);
+  if (!decisionReadinessRing) return;
+  const radius = Number(decisionReadinessRing.getAttribute('r') || 48);
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference * (1 - (percent / 100));
-  deltaZoneScoreRing.style.strokeDasharray = `${circumference.toFixed(2)} ${circumference.toFixed(2)}`;
-  deltaZoneScoreRing.style.strokeDashoffset = offset.toFixed(2);
+  const offset = circumference * (1 - (pct / 100));
+  decisionReadinessRing.style.strokeDasharray = `${circumference.toFixed(2)} ${circumference.toFixed(2)}`;
+  decisionReadinessRing.style.strokeDashoffset = offset.toFixed(2);
+}
+
+function getPerformanceDayLabel(readiness) {
+  const value = String(readiness || '').toUpperCase();
+  if (value === 'HIGH') return 'Performance Day';
+  if (value === 'MODERATE' || value === 'LOW') return 'Recovery Day';
+  return 'Calibration Day';
 }
 
 function toDayStart(value) {
@@ -1329,9 +1345,50 @@ function computeConsecutiveDayStreak(rows = []) {
   return streak;
 }
 
-function setStreakScore(rows = []) {
-  if (!streakScoreValue) return;
-  streakScoreValue.textContent = String(computeConsecutiveDayStreak(rows));
+function setDecisionStreak(rows = []) {
+  if (!decisionStreakScore) return;
+  decisionStreakScore.textContent = String(computeConsecutiveDayStreak(rows));
+}
+
+function setFactorBar(fillEl, valueEl, rawValue) {
+  const numeric = Number(rawValue);
+  const safe = Number.isFinite(numeric) ? numeric : 0;
+  if (valueEl) valueEl.textContent = safe.toFixed(1);
+  if (fillEl) fillEl.style.setProperty('--pct', `${clampPercent(safe).toFixed(1)}%`);
+}
+
+function renderTrainingDecisionDashboard(payload) {
+  const readiness = String(payload?.readiness || 'UNKNOWN').toUpperCase();
+  const scoring = payload?.scoring || {};
+  const workoutContext = payload?.workout_context || {};
+  const session = payload?.session || {};
+  const sessionTitleText = session.session_title || 'Delta Zone session unavailable';
+  const sessionSummary = sanitizeBlockText(session.focus || 'Summary unavailable.');
+  const explanation = sanitizeBlockText(
+    session.final_statement || session.finisher || session.coach_note || sessionSummary
+  );
+  const headline = sanitizeBlockText(workoutContext.zone_classifier || sessionTitleText);
+  const engineStatusText = [workoutContext.zone_classifier, workoutContext.load_tier]
+    .filter(Boolean)
+    .join(' • ') || 'Unavailable';
+  const trainingLoadValue = Number.isFinite(Number(scoring.load_penalty))
+    ? Number(scoring.load_penalty).toFixed(1)
+    : formatNumberOrZero(scoring.load_component, 1);
+
+  if (decisionDayType) decisionDayType.textContent = getPerformanceDayLabel(readiness);
+  if (decisionHeadline) decisionHeadline.textContent = headline || 'Training decision unavailable';
+  if (decisionExplanation) decisionExplanation.textContent = explanation || 'No additional coaching note returned.';
+  if (decisionRecommendedTitle) decisionRecommendedTitle.textContent = `Recommended session: ${sessionTitleText}`;
+  if (decisionRecommendedSummary) decisionRecommendedSummary.textContent = sessionSummary || 'Summary unavailable.';
+  if (decisionEngineScore) decisionEngineScore.textContent = formatNumberOrZero(scoring.readiness_score, 1);
+  if (decisionEngineStatus) decisionEngineStatus.textContent = engineStatusText;
+  if (decisionTrainingLoad) decisionTrainingLoad.textContent = trainingLoadValue;
+
+  setDecisionRing(scoring.readiness_score);
+  setDecisionStreak(latestHistoryRows);
+  setFactorBar(decisionRecoveryFill, decisionRecoveryValue, scoring.recovery_component);
+  setFactorBar(decisionSleepFill, decisionSleepValue, scoring.sleep_component);
+  setFactorBar(decisionLoadFill, decisionLoadValue, scoring.load_component);
 }
 
 function formatNumberOrZero(value, digits = 1) {
@@ -1596,8 +1653,7 @@ function renderAdaptiveSession(payload) {
   if (readinessScoreValue) {
     readinessScoreValue.textContent = formatNumberOrZero(scoring.readiness_score, 1);
   }
-  setEngineScore(scoring.readiness_score);
-  setDeltaZoneScore(workoutContext.delta_zone_ratio ?? scoring.delta_zone_ratio);
+  renderTrainingDecisionDashboard(payload);
   if (zoneClassifierChip) {
     zoneClassifierChip.textContent = workoutContext.zone_classifier || 'Zone Classifier Unavailable';
   }
@@ -1717,7 +1773,8 @@ function renderWhoopSnapshot(payload) {
 
 function renderHistory(items) {
   const rows = Array.isArray(items) ? items : [];
-  setStreakScore(rows);
+  latestHistoryRows = rows;
+  setDecisionStreak(rows);
   if (historyList) historyList.innerHTML = '';
 
   if (!rows.length) {
