@@ -1962,9 +1962,8 @@ async function loadLiveData(options = {}) {
     const hasWhoopData = hasWhoopDataPresent(whoopPayload);
     const historyPayload = historyResult.status === 'fulfilled' ? historyResult.value : null;
     const whoopAuthError = whoopPayload ? getWhoopAuthError(whoopPayload) : '';
-    setAthleteName(hasWhoopData
-      ? resolveAthleteName(whoopPayload, adaptiveSession, historyPayload, whoopUserId)
-      : getUnknownAthleteLabel());
+    const resolvedAthleteName = resolveAthleteName(whoopPayload, adaptiveSession, historyPayload, whoopUserId);
+    setAthleteName(resolvedAthleteName || getUnknownAthleteLabel());
     setFallbackGuideVisibility(!hasWhoopData);
 
     if (whoopResult.status === 'fulfilled') {
