@@ -2,7 +2,6 @@ const whoopUserIdInput = document.getElementById('whoopUserIdInput');
 const showWhoopRawToggle = document.getElementById('showWhoopRawToggle');
 const refreshBtn = document.getElementById('refreshBtn');
 const reconnectBtn = document.getElementById('reconnectBtn');
-const coachAgentBtn = document.getElementById('coachAgentBtn');
 const WHOOP_AUTH_URL = 'https://www.varacis.com/api/whoop-auth';
 
 const statusText = document.getElementById('statusText');
@@ -1029,6 +1028,19 @@ function applyDivisionWorkflowPreset() {
   setWorkflowMeta(`Workflow preset: ${selectedDivisionWorkflowId}`);
 }
 
+function getTodayLocalIsoDate() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function initializeBookingDateInput() {
+  if (!bookingDateInput) return;
+  bookingDateInput.value = getTodayLocalIsoDate();
+}
+
 function resolveAthleteName(whoopPayload, adaptivePayload, historyPayload, whoopUserId) {
   const historyFirst = Array.isArray(historyPayload) ? historyPayload[0] : null;
   const candidates = [
@@ -1681,58 +1693,6 @@ async function loadWhoopRaw() {
   }
 }
 
-async function runCoachAgent() {
-  const memberId = getCurrentWhoopUserId();
-  const coachPrompt = coachPromptInput?.value?.trim();
-  const sport = sportInput?.value?.trim() || 'functional-fitness';
-  const bookingDate = bookingDateInput?.value || '2026-04-21';
-  const durationMinutes = Number(bookingDurationInput?.value || 45);
-
-  if (!coachPrompt) {
-    setStatus('warn', 'Coach prompt required', 'Enter a coach prompt before running the AI Coach agent.');
-    return;
-  }
-
-  const url = makeUrl('/api/coach-prompt-agent');
-  const body = {
-    member_id: memberId,
-    coach_prompt: coachPrompt,
-    sport,
-    workflow_id: selectedDivisionWorkflowId || undefined,
-    workflow: selectedDivisionWorkflowId || undefined,
-    workflow_template: selectedDivisionWorkflowId || undefined,
-    booking: {
-      date: bookingDate,
-      duration_minutes: durationMinutes
-    },
-    previous_workflow_id: latestCoachWorkflowId || undefined,
-    last_session_snapshot: latestCoachResult?.session_output || undefined
-  };
-
-  if (coachAgentBtn) coachAgentBtn.disabled = true;
-  setWorkflowMeta('Workflow ID: submitting coach prompt...');
-  setStatus('warn', 'AI Coach running', 'Generating a custom session from coach prompt...');
-
-  try {
-    const result = await postJson(url, body, { timeoutMs: 45000 });
-    console.log('[adaptive-session-live] coach request body:', JSON.stringify(body, null, 2));
-    console.log('[adaptive-session-live] raw coach response:', JSON.stringify(result, null, 2));
-
-    if (!result || typeof result !== 'object' || !Object.keys(result).length) {
-      setStatus('warn', 'AI Coach returned empty result', 'No content was returned. Try a more specific prompt or regenerate the base session first.');
-      setWorkflowMeta('Workflow ID: not returned (empty response)');
-      return;
-    }
-
-    renderCoachSession(result);
-  } catch (error) {
-    setStatus('bad', 'AI Coach failed', error.message || 'Unable to run coach prompt agent.');
-    setWorkflowMeta('Workflow ID: generation failed');
-  } finally {
-    if (coachAgentBtn) coachAgentBtn.disabled = false;
-  }
-}
-
 async function loadLiveData(options = {}) {
   const { forceFresh = false, showOauthTransition = false } = options;
   const whoopUserId = getCurrentWhoopUserId();
@@ -1961,6 +1921,7 @@ if (fallbackGuideOrb) {
 }
 
 initUserId();
+initializeBookingDateInput();
 applyDivisionWorkflowPreset();
 if (!selectedDivisionWorkflowId) {
   setWorkflowMeta('Workflow ID: not generated');
@@ -1973,10 +1934,6 @@ if (isOauthReturn()) {
   cleanupOauthParamsFromUrl();
 }
 scheduleTelemetryPolling();
-
-if (coachAgentBtn) {
-  coachAgentBtn.addEventListener('click', runCoachAgent);
-}
 
 if (copyWorkoutBtn) {
   copyWorkoutBtn.addEventListener('click', copyWorkoutToClipboard);
