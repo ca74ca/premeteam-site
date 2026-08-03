@@ -1086,16 +1086,39 @@ function initializeBookingDateInput() {
 
 function resolveAthleteName(whoopPayload, adaptivePayload, historyPayload, whoopUserId) {
   const historyFirst = Array.isArray(historyPayload) ? historyPayload[0] : null;
+  const whoopProfile = whoopPayload?.profile && typeof whoopPayload.profile === 'object'
+    ? whoopPayload.profile
+    : (whoopPayload?.data?.profile && typeof whoopPayload.data.profile === 'object'
+      ? whoopPayload.data.profile
+      : (whoopPayload?.whoop_data?.profile && typeof whoopPayload.whoop_data.profile === 'object'
+        ? whoopPayload.whoop_data.profile
+        : {}));
+  const whoopFullName = firstNonEmptyValue([
+    whoopProfile.fullName,
+    [whoopProfile.firstName, whoopProfile.lastName].filter(Boolean).join(' ')
+  ]);
   const candidates = [
     adaptivePayload?.athlete_name,
     adaptivePayload?.member_name,
     adaptivePayload?.name,
     adaptivePayload?.profile?.name,
     adaptivePayload?.session?.athlete_name,
+    adaptivePayload?.session?.member_name,
+    adaptivePayload?.member_context?.name,
+    adaptivePayload?.member_context?.full_name,
+    adaptivePayload?.member_context?.athlete_name,
+    adaptivePayload?.member_context?.member_name,
+    adaptivePayload?.whoop_data?.profile?.fullName,
+    [adaptivePayload?.whoop_data?.profile?.firstName, adaptivePayload?.whoop_data?.profile?.lastName].filter(Boolean).join(' '),
+    whoopFullName,
     whoopPayload?.athlete_name,
     whoopPayload?.member_name,
     whoopPayload?.name,
     whoopPayload?.profile?.name,
+    whoopPayload?.data?.profile?.fullName,
+    [whoopPayload?.data?.profile?.firstName, whoopPayload?.data?.profile?.lastName].filter(Boolean).join(' '),
+    whoopPayload?.whoop_data?.profile?.fullName,
+    [whoopPayload?.whoop_data?.profile?.firstName, whoopPayload?.whoop_data?.profile?.lastName].filter(Boolean).join(' '),
     whoopPayload?.user?.display_name,
     whoopPayload?.user?.name,
     historyFirst?.athlete_name,
