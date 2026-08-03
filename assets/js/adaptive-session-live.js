@@ -1,6 +1,7 @@
 const whoopUserIdInput = document.getElementById('whoopUserIdInput');
 const showWhoopRawToggle = document.getElementById('showWhoopRawToggle');
 const refreshBtn = document.getElementById('refreshBtn');
+const generateSessionBtn = document.getElementById('generateSessionBtn');
 const reconnectBtn = document.getElementById('reconnectBtn');
 const WHOOP_AUTH_URL = 'https://www.varacis.com/api/whoop-auth';
 
@@ -1694,7 +1695,8 @@ async function loadWhoopRaw() {
 }
 
 async function loadLiveData(options = {}) {
-  const { forceFresh = false, showOauthTransition = false } = options;
+  const { forceFresh = false, showOauthTransition = false, coachPrompt = '' } = options;
+  const normalizedCoachPrompt = String(coachPrompt || '').trim();
   const whoopUserId = getCurrentWhoopUserId();
   const includeFallback = Boolean(showWhoopRawToggle?.checked);
   const cacheBust = forceFresh ? Date.now() : undefined;
@@ -1707,7 +1709,8 @@ async function loadLiveData(options = {}) {
 
   const adaptiveUrl = makeUrl('/api/get-adaptive-session', {
     whoopUserId,
-    bust: cacheBust
+    bust: cacheBust,
+    coach_prompt: normalizedCoachPrompt || undefined
   });
   const whoopUrl = makeUrl('/api/whoop-data', {
     whoopUserId,
@@ -1721,8 +1724,17 @@ async function loadLiveData(options = {}) {
 
   console.log('🔄 loadLiveData:', { adaptiveUrl, whoopUrl, historyUrl });
   refreshBtn.disabled = true;
+  if (generateSessionBtn) generateSessionBtn.disabled = true;
   if (reconnectBtn) reconnectBtn.disabled = true;
-  setStatus('warn', forceFresh ? 'Generating new session' : 'Syncing', forceFresh ? 'Requesting a fresh WHOOP pull and new session insert...' : 'Loading adaptive session, WHOOP snapshot, and history...');
+  setStatus(
+    'warn',
+    forceFresh ? 'Generating new session' : 'Syncing',
+    normalizedCoachPrompt
+      ? 'Generating session from coach prompt and live physiology...'
+      : (forceFresh
+          ? 'Requesting a fresh WHOOP pull and new session insert...'
+          : 'Loading adaptive session, WHOOP snapshot, and history...')
+  );
 
   try {
     const adaptiveRequest = fetchJson(adaptiveUrl)
@@ -1807,6 +1819,7 @@ async function loadLiveData(options = {}) {
     renderHistory([]);
   } finally {
     refreshBtn.disabled = false;
+    if (generateSessionBtn) generateSessionBtn.disabled = false;
     if (reconnectBtn) reconnectBtn.disabled = false;
     await oauthTransition.finish();
   }
@@ -1856,6 +1869,13 @@ function attachButtonGlow() {
 
 if (refreshBtn) {
   refreshBtn.addEventListener('click', () => loadLiveData({ forceFresh: true }));
+}
+
+if (generateSessionBtn) {
+  generateSessionBtn.addEventListener('click', () => {
+    const promptText = String(coachPromptInput?.value || '').trim();
+    loadLiveData({ forceFresh: true, coachPrompt: promptText });
+  });
 }
 
 if (reconnectBtn) {
