@@ -1260,6 +1260,38 @@
     opacity: 1;
   }
 
+  .oauth-transition-payoff {
+    margin: 12px 0 4px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(125, 211, 252, .34);
+    background: linear-gradient(160deg, rgba(14, 165, 233, .16), rgba(59, 130, 246, .1));
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .28s ease, transform .28s ease;
+  }
+
+  .oauth-transition-payoff.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .oauth-transition-payoff-headline {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.3;
+    color: #e0f2fe;
+    letter-spacing: .02em;
+    font-weight: 700;
+  }
+
+  .oauth-transition-payoff-verdict {
+    margin: 8px 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: rgba(186, 230, 253, .9);
+  }
+
   .oauth-transition-footer {
     margin: 0;
     font-size: 11px;
@@ -1625,6 +1657,10 @@
       <p class="oauth-transition-success">[ COMPLETE ]</p>
       <p class="oauth-transition-brand">VARACIS POHE INTELLIGENCE™ — DECISION ENGINE ONLINE</p>
       <p class="oauth-transition-compiling">&gt;&gt; compiling adaptive session...</p>
+      <div id="oauthTransitionPayoff" class="oauth-transition-payoff" hidden>
+        <p id="oauthTransitionPayoffHeadline" class="oauth-transition-payoff-headline"></p>
+        <p id="oauthTransitionPayoffVerdict" class="oauth-transition-payoff-verdict"></p>
+      </div>
       <p class="oauth-transition-footer">Powered by VARACIS POHE Intelligence™</p>
     </div>
   </section>

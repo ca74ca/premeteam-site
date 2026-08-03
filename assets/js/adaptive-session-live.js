@@ -98,6 +98,9 @@ const oauthTransitionStep4Text = document.getElementById('oauthTransitionStep4Te
 const oauthTransitionSuccess = document.querySelector('.oauth-transition-success');
 const oauthTransitionBrand = document.querySelector('.oauth-transition-brand');
 const oauthTransitionCompiling = document.querySelector('.oauth-transition-compiling');
+const oauthTransitionPayoff = document.getElementById('oauthTransitionPayoff');
+const oauthTransitionPayoffHeadline = document.getElementById('oauthTransitionPayoffHeadline');
+const oauthTransitionPayoffVerdict = document.getElementById('oauthTransitionPayoffVerdict');
 
 const STORAGE_KEY = 'adaptiveSessionLiveUserId';
 const APP_USER_STORAGE_KEY = 'adaptiveSessionLiveAppUserId';
@@ -138,6 +141,7 @@ const OAUTH_TRANSITION_MIN_STEP_MS = 1200;
 const OAUTH_TRANSITION_MIN_TOTAL_MS = 7400;
 const OAUTH_TRANSITION_SUCCESS_STAGGER_MS = 500;
 const OAUTH_TRANSITION_SUCCESS_HOLD_MS = 1800;
+const OAUTH_TRANSITION_PAYOFF_HOLD_MS = 2100;
 
 let latestTelemetryOverrides = {};
 let latestTargetZone = null;
@@ -254,6 +258,12 @@ function createOauthTransitionController(enabled) {
     if (oauthTransitionSuccess) oauthTransitionSuccess.classList.remove('show');
     if (oauthTransitionBrand) oauthTransitionBrand.classList.remove('show');
     if (oauthTransitionCompiling) oauthTransitionCompiling.classList.remove('show');
+    if (oauthTransitionPayoff) {
+      oauthTransitionPayoff.classList.remove('show');
+      oauthTransitionPayoff.hidden = true;
+    }
+    if (oauthTransitionPayoffHeadline) oauthTransitionPayoffHeadline.textContent = '';
+    if (oauthTransitionPayoffVerdict) oauthTransitionPayoffVerdict.textContent = '';
   };
 
   const typeLine = async (step, text) => {
@@ -335,6 +345,18 @@ function createOauthTransitionController(enabled) {
     await waitMs(OAUTH_TRANSITION_SUCCESS_HOLD_MS);
   };
 
+  const runPayoffBeat = async (payoff) => {
+    if (!payoff?.enabled || !oauthTransitionPayoff || !oauthTransitionPayoffHeadline || !oauthTransitionPayoffVerdict) {
+      return;
+    }
+
+    oauthTransitionPayoffHeadline.textContent = payoff.headline || 'Rested. Recovered. Ready to push the limits.';
+    oauthTransitionPayoffVerdict.textContent = payoff.verdict || 'Status: AWAITING SIGNAL';
+    oauthTransitionPayoff.hidden = false;
+    oauthTransitionPayoff.classList.add('show');
+    await waitMs(OAUTH_TRANSITION_PAYOFF_HOLD_MS);
+  };
+
   return {
     start() {
       Object.keys(stepRefs).forEach((key) => resetLine(Number(key)));
@@ -366,11 +388,13 @@ function createOauthTransitionController(enabled) {
       }
     },
 
-    async finish() {
+    async finish(options = {}) {
+      const payoff = options?.payoff || null;
       await sequencePromise.catch(() => {});
       await Promise.allSettled(Array.from(pendingCompletionPromises));
       await settleStepFour();
       await runSuccessBeat();
+      await runPayoffBeat(payoff);
       const totalElapsedMs = transitionStartedAt ? Date.now() - transitionStartedAt : 0;
       const totalRemaining = Math.max(0, OAUTH_TRANSITION_MIN_TOTAL_MS - totalElapsedMs);
       if (totalRemaining > 0) {
@@ -1201,6 +1225,57 @@ function formatNumber(value, digits = 0) {
   return Number(value).toFixed(digits);
 }
 
+function stripHtml(value) {
+  return String(value || '').replace(/<[^>]+>/g, '').trim();
+}
+
+function normalizeHistoryRows(historyPayload) {
+  if (Array.isArray(historyPayload)) return historyPayload;
+  if (Array.isArray(historyPayload?.rows)) return historyPayload.rows;
+  if (Array.isArray(historyPayload?.items)) return historyPayload.items;
+  if (Array.isArray(historyPayload?.history)) return historyPayload.history;
+  return [];
+}
+
+function isFirstTimeOnboardingSession(adaptivePayload, historyPayload) {
+  const source = String(
+    adaptivePayload?.session_generation_source
+      || adaptivePayload?.session?.session_generation_source
+      || adaptivePayload?.source
+      || ''
+  ).toLowerCase();
+  if (source !== 'whoop_public_onboarding') return false;
+
+  const rows = normalizeHistoryRows(historyPayload);
+  return rows.length <= 1;
+}
+
+function getOverlayReadinessVerdict(adaptivePayload) {
+  const session = adaptivePayload?.session || {};
+  const finalStatement = sanitizeBlockText(session.final_statement || session.finisher || '').trim();
+  if (finalStatement) return finalStatement;
+
+  const statusTextValue = stripHtml(mapIntensityToStatus(session.intensity));
+  if (statusTextValue && statusTextValue !== '-') {
+    return `Status: ${statusTextValue}`;
+  }
+
+  const readiness = String(adaptivePayload?.readiness || '').trim().toUpperCase();
+  return readiness ? `Readiness: ${readiness}` : 'Status: AWAITING SIGNAL';
+}
+
+function buildOauthPayoffState(adaptivePayload, historyPayload) {
+  if (!isFirstTimeOnboardingSession(adaptivePayload, historyPayload)) {
+    return null;
+  }
+
+  return {
+    enabled: true,
+    headline: 'Rested. Recovered. Ready to push the limits.',
+    verdict: getOverlayReadinessVerdict(adaptivePayload)
+  };
+}
+
 function setEngineScore(value) {
   if (!engineScoreValue) return;
   const parsed = Number(value);
@@ -1766,6 +1841,7 @@ async function loadLiveData(options = {}) {
   const includeFallback = Boolean(showWhoopRawToggle?.checked);
   const cacheBust = forceFresh ? Date.now() : undefined;
   const oauthTransition = createOauthTransitionController(showOauthTransition);
+  let oauthPayoffState = null;
   oauthTransition.start();
 
   window.localStorage.setItem(STORAGE_KEY, whoopUserId);
@@ -1848,6 +1924,8 @@ async function loadLiveData(options = {}) {
       renderHistory([]);
     }
 
+    oauthPayoffState = buildOauthPayoffState(adaptiveSession, historyPayload);
+
     const source = sourceFromAdaptivePayload(adaptiveSession);
     const sourceText = source === 'whoop' ? 'Live WHOOP' : 'Fallback';
     const historyCount = historyResult.status === 'fulfilled' && Array.isArray(historyResult.value)
@@ -1886,7 +1964,7 @@ async function loadLiveData(options = {}) {
     refreshBtn.disabled = false;
     if (generateSessionBtn) generateSessionBtn.disabled = false;
     if (reconnectBtn) reconnectBtn.disabled = false;
-    await oauthTransition.finish();
+    await oauthTransition.finish({ payoff: oauthPayoffState });
   }
 }
 
