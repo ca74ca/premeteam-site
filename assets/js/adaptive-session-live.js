@@ -19,6 +19,10 @@ const sessionIntensity = document.getElementById('sessionIntensity');
 const sessionFocus = document.getElementById('sessionFocus');
 const sessionFinisher = document.getElementById('sessionFinisher');
 const sessionBlocks = document.getElementById('sessionBlocks');
+const engineScoreValue = document.getElementById('engineScoreValue');
+const streakScoreValue = document.getElementById('streakScoreValue');
+const deltaZoneScoreRing = document.getElementById('deltaZoneScoreRing');
+const deltaZoneScorePct = document.getElementById('deltaZoneScorePct');
 const copyWorkoutBtn = document.getElementById('copyWorkoutBtn');
 const coachPromptInput = document.getElementById('coachPromptInput');
 const sportInput = document.getElementById('sportInput');
@@ -1197,6 +1201,64 @@ function formatNumber(value, digits = 0) {
   return Number(value).toFixed(digits);
 }
 
+function setEngineScore(value) {
+  if (!engineScoreValue) return;
+  const parsed = Number(value);
+  engineScoreValue.textContent = Number.isFinite(parsed) ? parsed.toFixed(1) : '0.0';
+}
+
+function setDeltaZoneScore(ratioValue) {
+  const ratio = Number(ratioValue);
+  const percent = Number.isFinite(ratio)
+    ? Math.max(0, Math.min(ratio * 100, 100))
+    : 0;
+
+  if (deltaZoneScorePct) {
+    deltaZoneScorePct.textContent = `${Math.round(percent)}%`;
+  }
+
+  if (!deltaZoneScoreRing) return;
+  const radius = Number(deltaZoneScoreRing.getAttribute('r') || 48);
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference * (1 - (percent / 100));
+  deltaZoneScoreRing.style.strokeDasharray = `${circumference.toFixed(2)} ${circumference.toFixed(2)}`;
+  deltaZoneScoreRing.style.strokeDashoffset = offset.toFixed(2);
+}
+
+function toDayStart(value) {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return null;
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function computeConsecutiveDayStreak(rows = []) {
+  const dayKeys = [];
+  for (const row of rows) {
+    const rawDate = row?.createdAt || row?.created_at || row?.timestamp || row?.date;
+    const day = toDayStart(rawDate);
+    if (!day) continue;
+    dayKeys.push(day.getTime());
+  }
+  if (!dayKeys.length) return 0;
+
+  const uniqueDesc = Array.from(new Set(dayKeys)).sort((a, b) => b - a);
+  let streak = 1;
+  for (let i = 1; i < uniqueDesc.length; i += 1) {
+    const dayDiff = Math.round((uniqueDesc[i - 1] - uniqueDesc[i]) / 86400000);
+    if (dayDiff === 1) {
+      streak += 1;
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+function setStreakScore(rows = []) {
+  if (!streakScoreValue) return;
+  streakScoreValue.textContent = String(computeConsecutiveDayStreak(rows));
+}
+
 function formatNumberOrZero(value, digits = 1) {
   const number = Number(value);
   return Number.isFinite(number) ? number.toFixed(digits) : (0).toFixed(digits);
@@ -1459,6 +1521,8 @@ function renderAdaptiveSession(payload) {
   if (readinessScoreValue) {
     readinessScoreValue.textContent = formatNumberOrZero(scoring.readiness_score, 1);
   }
+  setEngineScore(scoring.readiness_score);
+  setDeltaZoneScore(workoutContext.delta_zone_ratio ?? scoring.delta_zone_ratio);
   if (zoneClassifierChip) {
     zoneClassifierChip.textContent = workoutContext.zone_classifier || 'Zone Classifier Unavailable';
   }
@@ -1578,6 +1642,7 @@ function renderWhoopSnapshot(payload) {
 
 function renderHistory(items) {
   const rows = Array.isArray(items) ? items : [];
+  setStreakScore(rows);
   if (historyList) historyList.innerHTML = '';
 
   if (!rows.length) {

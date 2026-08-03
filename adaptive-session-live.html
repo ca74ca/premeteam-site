@@ -598,6 +598,106 @@
     min-width: 0;
   }
 
+  .session-score-stack {
+    margin-top: 14px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .session-score-card {
+    border-radius: 14px;
+    padding: 12px;
+    display: grid;
+    gap: 6px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: linear-gradient(150deg, var(--glassA), var(--glassB));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.26), 0 8px 24px rgba(0,0,0,.18);
+    backdrop-filter: blur(8px) saturate(130%);
+    -webkit-backdrop-filter: blur(8px) saturate(130%);
+  }
+
+  .session-score-card small {
+    color: rgba(255,255,255,.72);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .session-score-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: rgba(255,255,255,.96);
+  }
+
+  .session-score-subtext {
+    margin: 0;
+    font-size: 12px;
+    color: rgba(255,255,255,.76);
+    line-height: 1.35;
+  }
+
+  .session-score-value {
+    margin: 0;
+    font-size: 34px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .score-card-engine {
+    --glassA: rgba(245,158,11,.26);
+    --glassB: rgba(180,83,9,.16);
+  }
+
+  .score-card-streak {
+    --glassA: rgba(167,139,250,.24);
+    --glassB: rgba(109,40,217,.15);
+  }
+
+  .score-card-delta {
+    --glassA: rgba(125,211,252,.22);
+    --glassB: rgba(14,116,144,.14);
+  }
+
+  .delta-ring-wrap {
+    display: grid;
+    justify-items: center;
+    margin: 2px 0;
+  }
+
+  .delta-ring {
+    width: 120px;
+    height: 120px;
+    transform: rotate(-90deg);
+  }
+
+  .delta-ring-track {
+    fill: none;
+    stroke: rgba(255,255,255,.24);
+    stroke-width: 10;
+  }
+
+  .delta-ring-progress {
+    fill: none;
+    stroke: #7dd3fc;
+    stroke-width: 10;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px rgba(125,211,252,.45));
+    transition: stroke-dashoffset .35s ease;
+  }
+
+  .delta-ring-center {
+    margin-top: -84px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #e0f2fe;
+    font-variant-numeric: tabular-nums;
+  }
+
   textarea,
   input[type="date"],
   input[type="number"] {
@@ -1297,6 +1397,35 @@
         <ul id="sessionBlocks" class="blocks">
           <li class="block-item">Waiting for session blocks...</li>
         </ul>
+
+        <section class="session-score-stack" aria-label="Today session scoring cards">
+          <article class="session-score-card score-card-engine" aria-label="Engine score card">
+            <small>Engine Score</small>
+            <p class="session-score-title">ENGINE SCORE</p>
+            <p id="engineScoreValue" class="session-score-value">0.0</p>
+            <p class="session-score-subtext">System confidence in today&apos;s plan.</p>
+          </article>
+
+          <article class="session-score-card score-card-streak" aria-label="Streak score card">
+            <small>Streak Score</small>
+            <p class="session-score-title">STREAK SCORE</p>
+            <p id="streakScoreValue" class="session-score-value">0</p>
+            <p class="session-score-subtext">Consecutive days trained.</p>
+          </article>
+
+          <article class="session-score-card score-card-delta" aria-label="Delta zone score card">
+            <small>Delta Zone Score</small>
+            <p class="session-score-title">DELTA ZONE SCORE</p>
+            <div class="delta-ring-wrap">
+              <svg class="delta-ring" viewBox="0 0 120 120" role="img" aria-label="Delta zone percentage ring">
+                <circle class="delta-ring-track" cx="60" cy="60" r="48"></circle>
+                <circle id="deltaZoneScoreRing" class="delta-ring-progress" cx="60" cy="60" r="48"></circle>
+              </svg>
+              <div id="deltaZoneScorePct" class="delta-ring-center">0%</div>
+            </div>
+            <p class="session-score-subtext">Share of work performed in Delta Zone.</p>
+          </article>
+        </section>
       </article>
 
       <article class="card" aria-label="Physiology and history panel">
