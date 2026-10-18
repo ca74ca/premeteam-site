@@ -1138,3 +1138,653 @@ body{
     opacity:1 !important;
   }
 }
+
+/* New home page styles */
+.topNav{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:1300;
+  background:rgba(5,6,10,.85);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.1);
+  padding:16px 0;
+}
+
+.topNavInner{
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.topNavLogo{
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.92);
+  text-decoration:none;
+  white-space:nowrap;
+}
+
+.topNavLinks{
+  display:flex;
+  align-items:center;
+  gap:24px;
+  flex-wrap:wrap;
+}
+
+.topNavLink{
+  font-size:13px;
+  letter-spacing:.05em;
+  color:rgba(255,255,255,.75);
+  text-decoration:none;
+  white-space:nowrap;
+  transition:color .2s ease;
+}
+
+.topNavLink:hover{
+  color:rgba(255,255,255,.95);
+}
+
+.topNavLinkClient{
+  padding:8px 16px;
+  border-radius:6px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.2);
+}
+
+.stage{
+  padding-top:120px;
+}
+
+.hero{
+  max-width:900px;
+  margin:0 auto 80px;
+  text-align:center;
+}
+
+.hero h1{
+  margin:0 0 20px;
+  font-size:clamp(32px, 5vw, 56px);
+  line-height:1.1;
+  font-weight:700;
+  color:rgba(255,255,255,.95);
+  letter-spacing:.02em;
+}
+
+.heroSubhead{
+  margin:0 0 32px;
+  font-size:18px;
+  line-height:1.6;
+  color:rgba(255,255,255,.8);
+  max-width:700px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.heroCtas{
+  display:flex;
+  gap:16px;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+
+.heroCtaBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px 32px;
+  border-radius:8px;
+  font-size:15px;
+  font-weight:600;
+  letter-spacing:.02em;
+  text-decoration:none;
+  transition:transform .2s ease, box-shadow .2s ease;
+  min-height:52px;
+}
+
+.heroCtaPrimary{
+  background:linear-gradient(135deg, rgba(0,190,255,.32), rgba(255,0,220,.28));
+  border:1px solid rgba(255,255,255,.4);
+  color:rgba(255,255,255,.98);
+  box-shadow:0 12px 28px rgba(0,0,0,.3);
+}
+
+.heroCtaPrimary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 16px 36px rgba(0,0,0,.4);
+}
+
+.heroCtaSecondary{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.3);
+  color:rgba(255,255,255,.95);
+}
+
+.heroCtaSecondary:hover{
+  transform:translateY(-2px);
+  background:rgba(255,255,255,.12);
+}
+
+.heroSubtext{
+  font-size:14px;
+  color:rgba(255,255,255,.65);
+  margin:0;
+}
+
+.heroSubtextLink{
+  color:rgba(0,190,255,.9);
+  text-decoration:none;
+  border-bottom:1px solid rgba(0,190,255,.4);
+}
+
+.heroSubtextLink:hover{
+  color:rgba(0,190,255,1);
+  border-bottom-color:rgba(0,190,255,.7);
+}
+
+.sectionHeading{
+  font-size:clamp(28px, 4vw, 42px);
+  line-height:1.2;
+  font-weight:700;
+  color:rgba(255,255,255,.92);
+  margin:0 0 24px;
+  text-align:center;
+  letter-spacing:.02em;
+}
+
+.sectionIntro{
+  font-size:17px;
+  line-height:1.7;
+  color:rgba(255,255,255,.8);
+  max-width:800px;
+  margin:0 auto 32px;
+  text-align:center;
+}
+
+.howItWorks,
+.whatIsHyrox,
+.whoThisIsFor,
+.whyDeltaZone,
+.meetCoach,
+.testimonials,
+.faq,
+.emailCapture,
+.ctaSection{
+  max-width:1100px;
+  margin:0 auto 100px;
+  padding:0 20px;
+}
+
+.howItWorksGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+  gap:32px;
+}
+
+.howItWorksCard{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;
+  padding:28px 24px;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+
+.howItWorksNumber{
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  background:linear-gradient(135deg, rgba(0,190,255,.25), rgba(255,0,220,.2));
+  border:1px solid rgba(255,255,255,.3);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  font-weight:700;
+  color:rgba(255,255,255,.95);
+  margin-bottom:16px;
+}
+
+.howItWorksCard h3{
+  font-size:20px;
+  font-weight:600;
+  color:rgba(255,255,255,.92);
+  margin:0 0 12px;
+}
+
+.howItWorksCard p{
+  font-size:15px;
+  line-height:1.6;
+  color:rgba(255,255,255,.75);
+  margin:0;
+}
+
+.hyroxTable{
+  margin:32px 0;
+  overflow-x:auto;
+}
+
+.hyroxTable table{
+  width:100%;
+  border-collapse:collapse;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;
+  overflow:hidden;
+}
+
+.hyroxTable th,
+.hyroxTable td{
+  padding:14px 16px;
+  text-align:left;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.hyroxTable th{
+  background:rgba(255,255,255,.06);
+  font-weight:600;
+  color:rgba(255,255,255,.92);
+  font-size:14px;
+  letter-spacing:.02em;
+}
+
+.hyroxTable td{
+  color:rgba(255,255,255,.8);
+  font-size:14px;
+}
+
+.hyroxTable tbody tr:last-child td{
+  border-bottom:none;
+}
+
+.hyroxNotes{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;
+  padding:24px;
+  margin-top:32px;
+}
+
+.hyroxNotes h3{
+  font-size:18px;
+  font-weight:600;
+  color:rgba(255,255,255,.92);
+  margin:0 0 16px;
+}
+
+.hyroxNotes ul{
+  margin:0;
+  padding-left:20px;
+  color:rgba(255,255,255,.8);
+  line-height:1.7;
+}
+
+.hyroxNotes li{
+  margin-bottom:12px;
+}
+
+.hyroxSource{
+  margin:16px 0 0;
+  font-size:13px;
+  color:rgba(255,255,255,.6);
+  font-style:italic;
+}
+
+.twoColSection{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:48px;
+  align-items:start;
+}
+
+.twoColLeft ul{
+  margin:16px 0;
+  padding-left:20px;
+  color:rgba(255,255,255,.8);
+  line-height:1.8;
+}
+
+.twoColLeft li{
+  margin-bottom:12px;
+}
+
+.twoColLeft p{
+  color:rgba(255,255,255,.75);
+  line-height:1.7;
+}
+
+.calloutBox{
+  background:rgba(0,190,255,.08);
+  border:1px solid rgba(0,190,255,.3);
+  border-radius:12px;
+  padding:24px;
+  color:rgba(255,255,255,.9);
+  line-height:1.7;
+}
+
+.calloutBox a{
+  color:rgba(0,190,255,1);
+  text-decoration:none;
+  border-bottom:1px solid rgba(0,190,255,.5);
+}
+
+.calloutBox a:hover{
+  border-bottom-color:rgba(0,190,255,.9);
+}
+
+.whyDeltaZoneGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+  gap:32px;
+  margin-top:32px;
+}
+
+.whyDeltaZoneCard{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;
+  padding:24px;
+}
+
+.whyDeltaZoneCard h3{
+  font-size:18px;
+  font-weight:600;
+  color:rgba(255,255,255,.92);
+  margin:0 0 12px;
+}
+
+.whyDeltaZoneCard p{
+  font-size:15px;
+  line-height:1.6;
+  color:rgba(255,255,255,.75);
+  margin:0;
+}
+
+.coachContent{
+  display:grid;
+  grid-template-columns:300px 1fr;
+  gap:40px;
+  align-items:start;
+  margin-top:32px;
+}
+
+.coachPlaceholder{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:12px;
+  padding:32px;
+  text-align:center;
+  color:rgba(255,255,255,.6);
+  font-size:14px;
+  min-height:300px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.coachBio{
+  color:rgba(255,255,255,.8);
+  line-height:1.7;
+  font-size:16px;
+}
+
+.coachBio p{
+  margin:0 0 16px;
+}
+
+.coachCredentials,
+.coachLinks{
+  color:rgba(255,255,255,.65);
+  font-size:14px;
+  font-style:italic;
+}
+
+.testimonialsGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+  gap:32px;
+  margin-top:32px;
+}
+
+.testimonialCard{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;
+  padding:24px;
+}
+
+.testimonialCard p{
+  color:rgba(255,255,255,.8);
+  line-height:1.7;
+  margin:0;
+}
+
+.testimonialsNote{
+  margin-top:24px;
+  text-align:center;
+  color:rgba(255,255,255,.6);
+  font-size:14px;
+  font-style:italic;
+}
+
+.faqGrid{
+  display:grid;
+  gap:24px;
+  margin-top:32px;
+}
+
+.faqItem{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;
+  padding:24px;
+}
+
+.faqItem h3{
+  font-size:17px;
+  font-weight:600;
+  color:rgba(255,255,255,.92);
+  margin:0 0 12px;
+}
+
+.faqItem p{
+  font-size:15px;
+  line-height:1.7;
+  color:rgba(255,255,255,.8);
+  margin:0;
+}
+
+.emailCapture{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:16px;
+  padding:48px 32px;
+  text-align:center;
+}
+
+.emailCaptureForm{
+  max-width:600px;
+  margin:0 auto;
+}
+
+.emailCaptureFields{
+  display:grid;
+  grid-template-columns:1fr 1fr auto;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.emailCaptureInput{
+  padding:14px 16px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);
+  color:rgba(255,255,255,.95);
+  font-size:15px;
+  font-family:inherit;
+}
+
+.emailCaptureInput::placeholder{
+  color:rgba(255,255,255,.5);
+}
+
+.emailCaptureBtn{
+  padding:14px 28px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.4);
+  background:linear-gradient(135deg, rgba(0,190,255,.32), rgba(255,0,220,.28));
+  color:rgba(255,255,255,.98);
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  transition:transform .2s ease, box-shadow .2s ease;
+  white-space:nowrap;
+}
+
+.emailCaptureBtn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(0,0,0,.3);
+}
+
+.emailCaptureSmallPrint{
+  font-size:13px;
+  color:rgba(255,255,255,.6);
+  margin:0;
+}
+
+.emailCaptureSmallPrint a{
+  color:rgba(0,190,255,.9);
+  text-decoration:none;
+}
+
+.ctaSection{
+  text-align:center;
+  padding:60px 20px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+}
+
+.ctaSection h2{
+  font-size:clamp(28px, 4vw, 42px);
+  font-weight:700;
+  color:rgba(255,255,255,.92);
+  margin:0 0 32px;
+}
+
+.siteFooter{
+  background:rgba(5,6,10,.95);
+  border-top:1px solid rgba(255,255,255,.1);
+  padding:48px 20px;
+  margin-top:100px;
+}
+
+.footerInner{
+  max-width:1100px;
+  margin:0 auto;
+  text-align:center;
+}
+
+.footerLinks{
+  display:flex;
+  justify-content:center;
+  gap:24px;
+  flex-wrap:wrap;
+  margin-bottom:24px;
+}
+
+.footerLinks a{
+  font-size:14px;
+  color:rgba(255,255,255,.7);
+  text-decoration:none;
+  transition:color .2s ease;
+}
+
+.footerLinks a:hover{
+  color:rgba(255,255,255,.95);
+}
+
+.footerDisclaimer{
+  font-size:13px;
+  line-height:1.7;
+  color:rgba(255,255,255,.65);
+  max-width:700px;
+  margin:0 auto 16px;
+}
+
+.footerPowered{
+  font-size:12px;
+  color:rgba(255,255,255,.5);
+  margin:0;
+}
+
+@media (max-width: 768px){
+  .topNavInner{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .topNavLinks{
+    gap:16px;
+  }
+
+  .hero h1{
+    font-size:32px;
+  }
+
+  .heroSubhead{
+    font-size:16px;
+  }
+
+  .heroCtas{
+    flex-direction:column;
+    width:100%;
+  }
+
+  .heroCtaBtn{
+    width:100%;
+  }
+
+  .howItWorksGrid,
+  .whyDeltaZoneGrid,
+  .testimonialsGrid{
+    grid-template-columns:1fr;
+  }
+
+  .twoColSection{
+    grid-template-columns:1fr;
+    gap:32px;
+  }
+
+  .coachContent{
+    grid-template-columns:1fr;
+    gap:24px;
+  }
+
+  .emailCaptureFields{
+    grid-template-columns:1fr;
+  }
+
+  .emailCaptureBtn{
+    width:100%;
+  }
+
+  .siteFooter{
+    padding:36px 20px;
+  }
+
+  .footerLinks{
+    flex-direction:column;
+    gap:16px;
+  }
+}

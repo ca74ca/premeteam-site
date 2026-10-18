@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HYROX Coaching Prices & Plans | Delta Zone System</title>
+<meta name="description" content="Compare the 4-Week HYROX Program and 1-on-1 coaching tiers. See what's included and find the right plan for your first or next race." />
+<meta property="og:title" content="HYROX Coaching Prices & Plans | Delta Zone System" />
+<meta property="og:description" content="Compare the 4-Week HYROX Program and 1-on-1 coaching tiers. See what's included and find the right plan for your first or next race." />
+<meta property="og:type" content="website" />
+<link rel="icon" type="image/png" href="./assets/favicon.png" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+  .pricingPage{
+    max-width:1200px;
+    margin:0 auto;
+    padding:120px 20px 60px;
+  }
+
+  .pricingHero{
+    text-align:center;
+    margin-bottom:60px;
+  }
+
+  .pricingHero h1{
+    font-size:clamp(32px, 5vw, 48px);
+    font-weight:700;
+    color:rgba(255,255,255,.95);
+    margin:0 0 16px;
+    letter-spacing:.02em;
+  }
+
+  .pricingHero p{
+    font-size:18px;
+    color:rgba(255,255,255,.8);
+    margin:0;
+  }
+
+  .comparisonTable{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;
+    overflow:hidden;
+    margin-bottom:60px;
+  }
+
+  .comparisonTable table{
+    width:100%;
+    border-collapse:collapse;
+  }
+
+  .comparisonTable th,
+  .comparisonTable td{
+    padding:16px 20px;
+    text-align:left;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+
+  .comparisonTable thead th{
+    background:rgba(255,255,255,.06);
+    font-weight:600;
+    color:rgba(255,255,255,.92);
+    font-size:16px;
+  }
+
+  .comparisonTable tbody td{
+    color:rgba(255,255,255,.8);
+    font-size:15px;
+  }
+
+  .comparisonTable tbody tr:last-child td{
+    border-bottom:none;
+  }
+
+  .comparisonTable .priceCell{
+    font-size:20px;
+    font-weight:700;
+    color:rgba(0,190,255,.95);
+  }
+
+  .coachingTiers{
+    margin-bottom:60px;
+  }
+
+  .coachingTiers h2{
+    font-size:clamp(28px, 4vw, 36px);
+    font-weight:700;
+    color:rgba(255,255,255,.92);
+    margin:0 0 32px;
+    text-align:center;
+  }
+
+  .tiersTable{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;
+    overflow-x:auto;
+  }
+
+  .tiersTable table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:800px;
+  }
+
+  .tiersTable th,
+  .tiersTable td{
+    padding:14px 16px;
+    text-align:left;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+
+  .tiersTable thead th{
+    background:rgba(255,255,255,.06);
+    font-weight:600;
+    color:rgba(255,255,255,.92);
+    font-size:14px;
+  }
+
+  .tiersTable tbody td{
+    color:rgba(255,255,255,.8);
+    font-size:14px;
+    vertical-align:top;
+  }
+
+  .tiersTable tbody tr:last-child td{
+    border-bottom:none;
+  }
+
+  .tiersTable .tierName{
+    font-weight:600;
+    color:rgba(255,255,255,.95);
+    font-size:15px;
+  }
+
+  .tiersTable .tierPrice{
+    font-weight:600;
+    color:rgba(0,190,255,.95);
+  }
+
+  .whichIsRight{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;
+    padding:40px 32px;
+    margin-bottom:60px;
+  }
+
+  .whichIsRight h2{
+    font-size:clamp(24px, 4vw, 32px);
+    font-weight:700;
+    color:rgba(255,255,255,.92);
+    margin:0 0 24px;
+    text-align:center;
+  }
+
+  .whichIsRight ul{
+    margin:0;
+    padding:0;
+    list-style:none;
+    display:grid;
+    gap:16px;
+    max-width:900px;
+    margin:0 auto;
+  }
+
+  .whichIsRight li{
+    color:rgba(255,255,255,.85);
+    line-height:1.7;
+    font-size:15px;
+  }
+
+  .whichIsRight li strong{
+    color:rgba(255,255,255,.95);
+  }
+
+  .refundPolicy{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;
+    padding:32px;
+    text-align:center;
+    margin-bottom:60px;
+  }
+
+  .refundPolicy h2{
+    font-size:20px;
+    font-weight:600;
+    color:rgba(255,255,255,.92);
+    margin:0 0 12px;
+  }
+
+  .refundPolicy p{
+    font-size:15px;
+    color:rgba(255,255,255,.8);
+    margin:0;
+    line-height:1.7;
+  }
+
+  .pricingCta{
+    text-align:center;
+    padding:48px 32px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;
+  }
+
+  .pricingCta h2{
+    font-size:clamp(24px, 4vw, 32px);
+    font-weight:700;
+    color:rgba(255,255,255,.92);
+    margin:0 0 24px;
+  }
+
+  .pricingCta .heroCtas{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+
+  @media (max-width: 768px){
+    .pricingPage{
+      padding-top:100px;
+    }
+
+    .comparisonTable,
+    .tiersTable{
+      overflow-x:auto;
+    }
+
+    .pricingCta .heroCtas{
+      flex-direction:column;
+    }
+
+    .pricingCta .heroCtaBtn{
+      width:100%;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="bg" id="bgWrap">
+  <video id="bgVid" class="bgVideo" muted loop playsinline preload="none" data-src-desktop="./assets/delta_homepage_3.mp4" data-src-mobile="./assets/mobile_video_1.mp4"></video>
+  <div class="bgOverlay"></div>
+  <div class="bgGlow"></div>
+</div>
+
+<script>
+  (function(){
+    function setImageFallback(){
+      var wrap = document.getElementById('bgWrap');
+      if(wrap){ wrap.classList.add('bgImageFallback'); }
+    }
+
+    var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if(isMobile){ setImageFallback(); }
+
+    var v2 = document.getElementById('bgVid');
+    if(!v2){ return; }
+
+    var src = isMobile ? v2.getAttribute('data-src-mobile') : v2.getAttribute('data-src-desktop');
+    if(!src){ return; }
+
+    var sourceEl = document.createElement('source');
+    sourceEl.src = src;
+    sourceEl.type = 'video/mp4';
+    v2.appendChild(sourceEl);
+
+    v2.autoplay = true;
+    v2.muted = true;
+    v2.defaultMuted = true;
+    v2.setAttribute('muted', '');
+    v2.setAttribute('playsinline', '');
+    v2.setAttribute('autoplay', '');
+
+    function tryPlay(){
+      var p = v2.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(function(){ setImageFallback(); });
+      }
+    }
+
+    v2.addEventListener('loadeddata', tryPlay, { once: true });
+    v2.load();
+    tryPlay();
+  })();
+</script>
+
+<nav class="topNav" aria-label="Main navigation">
+  <div class="topNavInner">
+    <a href="./" class="topNavLogo">Delta Zone System</a>
+    <div class="topNavLinks">
+      <a href="./pricing.html" class="topNavLink">Pricing</a>
+      <a href="./individual-modules.html" class="topNavLink">Master The Station™</a>
+      <a href="./get-the-411.html" class="topNavLink">FAQ</a>
+      <a href="./members-lounge.html" class="topNavLink topNavLinkClient">Client Login</a>
+    </div>
+  </div>
+</nav>
+
+<main class="pricingPage">
+
+  <section class="pricingHero">
+    <h1>Two ways to train. Pick the one that fits you.</h1>
+    <p>Start on your own with the 4-Week Program, or get a coach in your corner.</p>
+  </section>
+
+  <!-- COMPARISON TABLE -->
+  <section class="comparisonTable">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>4-Week Foundation Program</th>
+          <th>1-on-1 Coaching</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Price</strong></td>
+          <td class="priceCell">$39 one-time</td>
+          <td class="priceCell">From $129/mo</td>
+        </tr>
+        <tr>
+          <td><strong>Best for</strong></td>
+          <td>Beginners who want a clear plan and can train on their own</td>
+          <td>Anyone who wants a plan built around them, plus accountability</td>
+        </tr>
+        <tr>
+          <td><strong>Length</strong></td>
+          <td>4 weeks, yours forever (instant download)</td>
+          <td>Month to month</td>
+        </tr>
+        <tr>
+          <td><strong>Sessions</strong></td>
+          <td>4–5 per week</td>
+          <td>4–6 per week, depending on tier</td>
+        </tr>
+        <tr>
+          <td><strong>Strength + running + station work</strong></td>
+          <td>✓</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td><strong>Easier and harder options</strong></td>
+          <td>✓</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td><strong>Recovery and mobility guidance</strong></td>
+          <td>✓</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td><strong>Plan built around your schedule, level and race date</strong></td>
+          <td>—</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td><strong>Coach check-ins</strong></td>
+          <td>—</td>
+          <td>✓ Weekly</td>
+        </tr>
+        <tr>
+          <td><strong>Wearable data review (WHOOP / Garmin / Oura)</strong></td>
+          <td>—</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td><strong>How to start</strong></td>
+          <td><a href="./hyrox-foundation-program.html" style="color:rgba(0,190,255,.95);text-decoration:none;">Start the 4-Week Program</a></td>
+          <td><a href="https://tally.so/r/3q4PNJ5" target="_blank" rel="noopener noreferrer" style="color:rgba(0,190,255,.95);text-decoration:none;">Apply for 1-on-1 Coaching</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- COACHING TIERS -->
+  <section class="coachingTiers">
+    <h2>Coaching Tiers</h2>
+    <p style="text-align:center;color:rgba(255,255,255,.8);margin:0 0 32px;max-width:800px;margin-left:auto;margin-right:auto;">All tiers are 1-on-1, start with an application and an assessment, include weekly check-ins, and use the Delta Zone method. What changes is <strong>who it's for</strong> and <strong>what we focus on</strong>.</p>
+    <div class="tiersTable">
+      <table>
+        <thead>
+          <tr>
+            <th>Tier</th>
+            <th>Who it's for</th>
+            <th>Main focus</th>
+            <th>Sessions / week</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="tierName">HYROX Beginner</td>
+            <td>First race, new to training, or switching from CrossFit, gym or running</td>
+            <td>Build your engine (aerobic base), running form, learning every station, confidence when tired</td>
+            <td>4–5</td>
+            <td class="tierPrice">$129/mo</td>
+          </tr>
+          <tr>
+            <td class="tierName">HYROX Strength Prep</td>
+            <td>Newer lifters and runners who feel weak on sleds, lunges and carries</td>
+            <td>Strength, sled power, good movement, durability, before harder race work</td>
+            <td>4–5</td>
+            <td class="tierPrice">$149/mo</td>
+          </tr>
+          <tr>
+            <td class="tierName">HYROX Doubles</td>
+            <td>Pairs racing together (men's, women's or mixed)</td>
+            <td>Splitting the work, changeovers, recovery windows, team race plan</td>
+            <td>4–5</td>
+            <td class="tierPrice">$249/mo per pair</td>
+          </tr>
+          <tr>
+            <td class="tierName">HYROX Race Prep</td>
+            <td>Anyone with a race booked in the next 8–12 weeks</td>
+            <td>Race simulations, pacing plan, stations under fatigue, peaking and tapering for race day</td>
+            <td>4–5</td>
+            <td class="tierPrice">$169/mo</td>
+          </tr>
+          <tr>
+            <td class="tierName">HYROX Pro</td>
+            <td>Experienced racers chasing age-group podiums or racing Pro weights</td>
+            <td>Threshold work, lactate clearance, running economy, station speed</td>
+            <td>4–6</td>
+            <td class="tierPrice">$199/mo</td>
+          </tr>
+          <tr>
+            <td class="tierName">HYROX Elite</td>
+            <td>Highly competitive athletes after their best possible time</td>
+            <td>Season planning, threshold development, daily adaptive programming, detailed analytics</td>
+            <td>5–6</td>
+            <td class="tierPrice">$249/mo</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- WHICH IS RIGHT FOR ME -->
+  <section class="whichIsRight">
+    <h2>Which is right for me?</h2>
+    <ul>
+      <li><strong>"I'm brand new and want to try it on my own."</strong> → <a href="./hyrox-foundation-program.html" style="color:rgba(0,190,255,.95);text-decoration:none;">4-Week Foundation Program</a></li>
+      <li><strong>"I'm brand new and want someone to guide me and keep me on track."</strong> → <a href="./hyrox-beginner.html" style="color:rgba(0,190,255,.95);text-decoration:none;">HYROX Beginner coaching</a></li>
+      <li><strong>"Running is OK, but sleds, carries and lunges crush me."</strong> → <a href="./hyrox-strength-prep.html" style="color:rgba(0,190,255,.95);text-decoration:none;">HYROX Strength Prep</a></li>
+      <li><strong>"I'm racing with a friend or partner."</strong> → <a href="./hyrox-doubles.html" style="color:rgba(0,190,255,.95);text-decoration:none;">HYROX Doubles</a></li>
+      <li><strong>"I've booked a race and it's coming up fast."</strong> → <a href="./hyrox-race-prep.html" style="color:rgba(0,190,255,.95);text-decoration:none;">HYROX Race Prep</a></li>
+      <li><strong>"I've raced before and want a faster time or a podium."</strong> → <a href="./hyrox-pro.html" style="color:rgba(0,190,255,.95);text-decoration:none;">HYROX Pro</a></li>
+      <li><strong>"I'm competitive and want the most detailed coaching, all year."</strong> → <a href="./hyrox-elite.html" style="color:rgba(0,190,255,.95);text-decoration:none;">HYROX Elite</a></li>
+    </ul>
+    <p style="text-align:center;margin-top:24px;color:rgba(255,255,255,.75);">Still not sure? Start with the <a href="#email-capture" style="color:rgba(0,190,255,.95);text-decoration:none;">free Week 1 Starter Plan</a>, or email <a href="mailto:support@deltazonesystem.com" style="color:rgba(0,190,255,.95);text-decoration:none;">support@deltazonesystem.com</a> and Tito will point you in the right direction.</p>
+  </section>
+
+  <!-- REFUND POLICY -->
+  <section class="refundPolicy">
+    <h2>Refund Policy</h2>
+    <p>All sales are final. We recommend starting with the free Week 1 Starter Plan to experience the Delta Zone System training before purchasing.</p>
+  </section>
+
+  <!-- CTA -->
+  <section class="pricingCta">
+    <h2>Ready to get started?</h2>
+    <div class="heroCtas">
+      <a class="heroCtaBtn heroCtaPrimary" href="./hyrox-foundation-program.html">Start the 4-Week Program – $39</a>
+      <a class="heroCtaBtn heroCtaSecondary" href="https://tally.so/r/3q4PNJ5" target="_blank" rel="noopener noreferrer">Apply for 1-on-1 Coaching</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="siteFooter">
+  <div class="footerInner">
+    <div class="footerLinks">
+      <a href="./privacy-policy.html">Privacy</a>
+      <a href="./terms.html">Terms</a>
+      <a href="./refund-policy.html">Refund Policy</a>
+      <a href="mailto:support@deltazonesystem.com">Contact</a>
+    </div>
+    <p class="footerDisclaimer">Coached by Tito Nunez, official HYROX Coach. Delta Zone System is an official HYROX affiliate.</p>
+    <p class="footerPowered">Powered by <span style="opacity:0.7;">VARACIS POHE Intelligence™</span></p>
+  </div>
+</footer>
+
+</body>
+</html>

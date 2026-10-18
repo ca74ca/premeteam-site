@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Terms of Service | Delta Zone System</title>
+<link rel="icon" type="image/png" href="./assets/favicon.png" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+  .legalPage{
+    max-width:800px;
+    margin:0 auto;
+    padding:120px 20px 60px;
+  }
+
+  .legalPage h1{
+    font-size:clamp(32px, 5vw, 42px);
+    font-weight:700;
+    color:rgba(255,255,255,.95);
+    margin:0 0 24px;
+  }
+
+  .legalPage h2{
+    font-size:24px;
+    font-weight:600;
+    color:rgba(255,255,255,.92);
+    margin:32px 0 16px;
+  }
+
+  .legalPage p{
+    font-size:16px;
+    line-height:1.8;
+    color:rgba(255,255,255,.8);
+    margin:0 0 16px;
+  }
+
+  .legalPage ul{
+    margin:16px 0;
+    padding-left:24px;
+    color:rgba(255,255,255,.8);
+    line-height:1.8;
+  }
+
+  .legalPage li{
+    margin-bottom:12px;
+  }
+
+  .legalPage a{
+    color:rgba(0,190,255,.95);
+    text-decoration:none;
+    border-bottom:1px solid rgba(0,190,255,.4);
+  }
+
+  .legalPage a:hover{
+    border-bottom-color:rgba(0,190,255,.8);
+  }
+
+  .lastUpdated{
+    font-size:14px;
+    color:rgba(255,255,255,.6);
+    margin-bottom:32px;
+  }
+
+  .reviewNote{
+    background:rgba(255,200,0,.15);
+    border:1px solid rgba(255,200,0,.4);
+    border-radius:8px;
+    padding:20px;
+    margin-bottom:32px;
+    font-size:15px;
+    color:rgba(255,255,255,.9);
+  }
+
+  .reviewNote strong{
+    color:rgba(255,255,255,1);
+  }
+</style>
+</head>
+
+<body>
+
+<div class="bg" id="bgWrap">
+  <video id="bgVid" class="bgVideo" muted loop playsinline preload="none" data-src-desktop="./assets/delta_homepage_3.mp4" data-src-mobile="./assets/mobile_video_1.mp4"></video>
+  <div class="bgOverlay"></div>
+  <div class="bgGlow"></div>
+</div>
+
+<script>
+  (function(){
+    function setImageFallback(){
+      var wrap = document.getElementById('bgWrap');
+      if(wrap){ wrap.classList.add('bgImageFallback'); }
+    }
+
+    var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if(isMobile){ setImageFallback(); }
+
+    var v2 = document.getElementById('bgVid');
+    if(!v2){ return; }
+
+    var src = isMobile ? v2.getAttribute('data-src-mobile') : v2.getAttribute('data-src-desktop');
+    if(!src){ return; }
+
+    var sourceEl = document.createElement('source');
+    sourceEl.src = src;
+    sourceEl.type = 'video/mp4';
+    v2.appendChild(sourceEl);
+
+    v2.autoplay = true;
+    v2.muted = true;
+    v2.defaultMuted = true;
+    v2.setAttribute('muted', '');
+    v2.setAttribute('playsinline', '');
+    v2.setAttribute('autoplay', '');
+
+    function tryPlay(){
+      var p = v2.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(function(){ setImageFallback(); });
+      }
+    }
+
+    v2.addEventListener('loadeddata', tryPlay, { once: true });
+    v2.load();
+    tryPlay();
+  })();
+</script>
+
+<nav class="topNav" aria-label="Main navigation">
+  <div class="topNavInner">
+    <a href="./" class="topNavLogo">Delta Zone System</a>
+    <div class="topNavLinks">
+      <a href="./pricing.html" class="topNavLink">Pricing</a>
+      <a href="./individual-modules.html" class="topNavLink">Master The Station™</a>
+      <a href="./get-the-411.html" class="topNavLink">FAQ</a>
+      <a href="./members-lounge.html" class="topNavLink topNavLinkClient">Client Login</a>
+    </div>
+  </div>
+</nav>
+
+<main class="legalPage">
+
+  <h1>Terms of Service</h1>
+  <p class="lastUpdated">Last updated: October 18, 2026</p>
+
+  <div class="reviewNote">
+    <strong>TEMPLATE FOR REVIEW:</strong> This is a basic terms of service template. Tito should have this reviewed by a qualified attorney and customized to reflect the actual services offered, liability limitations appropriate for fitness coaching, and any state-specific requirements.
+  </div>
+
+  <h2>Acceptance of Terms</h2>
+  <p>By accessing and using deltazonesystem.com and our services, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.</p>
+
+  <h2>Description of Services</h2>
+  <p>Delta Zone System provides fitness training programs and coaching services designed to prepare athletes for HYROX races. Our services include:</p>
+  <ul>
+    <li>Digital training programs (4-Week Foundation Program)</li>
+    <li>1-on-1 coaching services at various tiers</li>
+    <li>Training resources and methodology guidance</li>
+    <li>Wearable device integrations for personalized coaching</li>
+  </ul>
+
+  <h2>Medical Disclaimer and Assumption of Risk</h2>
+  <p><strong>IMPORTANT:</strong> By using Delta Zone System services, you acknowledge and agree that:</p>
+  <ul>
+    <li>You should consult with a physician before beginning any exercise program, especially if you have any pre-existing health conditions</li>
+    <li>You assume all risks associated with participating in any fitness training program</li>
+    <li>Delta Zone System and its coaches are not liable for any injuries, health problems, or damages that may result from your participation in our programs</li>
+    <li>The training programs and advice provided are general in nature and not a substitute for professional medical advice</li>
+    <li>You are responsible for exercising within your own limits and stopping if you experience pain, discomfort, or any concerning symptoms</li>
+  </ul>
+
+  <h2>User Responsibilities</h2>
+  <p>You agree to:</p>
+  <ul>
+    <li>Provide accurate and complete information when registering for services</li>
+    <li>Use the services only for lawful purposes</li>
+    <li>Not share, resell, or distribute program materials without permission</li>
+    <li>Maintain the confidentiality of your account credentials</li>
+    <li>Follow all safety guidelines and instructions provided in training materials</li>
+  </ul>
+
+  <h2>Payment and Subscriptions</h2>
+  <ul>
+    <li>All prices are in USD and subject to change with notice</li>
+    <li>Payment for the 4-Week Foundation Program is a one-time fee</li>
+    <li>Coaching services are billed monthly on a recurring basis</li>
+    <li>You may cancel coaching subscriptions at any time; cancellation takes effect at the end of the current billing period</li>
+    <li>No refunds will be issued for partial months or unused services (see our <a href="./refund-policy.html">Refund Policy</a>)</li>
+  </ul>
+
+  <h2>Intellectual Property</h2>
+  <p>All content on deltazonesystem.com, including training programs, methodology, text, graphics, logos, and software, is the property of Delta Zone System LLC and is protected by copyright and other intellectual property laws. You may not copy, reproduce, distribute, or create derivative works without our express written permission.</p>
+
+  <h2>License to Use Materials</h2>
+  <p>When you purchase a training program or coaching service, you receive a personal, non-transferable license to use the materials solely for your own training purposes. You may not share, resell, or publicly distribute the materials.</p>
+
+  <h2>Termination</h2>
+  <p>We reserve the right to terminate or suspend your access to our services at any time, without notice, for conduct that we believe violates these Terms of Service or is harmful to other users, us, or third parties.</p>
+
+  <h2>Limitation of Liability</h2>
+  <p>To the fullest extent permitted by law, Delta Zone System LLC and its coaches shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses resulting from your use of our services.</p>
+
+  <h2>Changes to Terms</h2>
+  <p>We reserve the right to modify these Terms of Service at any time. We will notify users of any material changes by posting the updated terms on this page and updating the "Last updated" date. Your continued use of our services after changes constitutes acceptance of the new terms.</p>
+
+  <h2>Governing Law</h2>
+  <p>These Terms of Service shall be governed by and construed in accordance with the laws of the State of [TO BE DETERMINED], without regard to its conflict of law provisions.</p>
+
+  <h2>Contact Information</h2>
+  <p>If you have any questions about these Terms of Service, please contact us at:</p>
+  <p><a href="mailto:support@deltazonesystem.com">support@deltazonesystem.com</a></p>
+
+</main>
+
+<footer class="siteFooter">
+  <div class="footerInner">
+    <div class="footerLinks">
+      <a href="./privacy-policy.html">Privacy</a>
+      <a href="./terms.html">Terms</a>
+      <a href="./refund-policy.html">Refund Policy</a>
+      <a href="mailto:support@deltazonesystem.com">Contact</a>
+    </div>
+    <p class="footerDisclaimer">Coached by Tito Nunez, official HYROX Coach. Delta Zone System is an official HYROX affiliate.</p>
+    <p class="footerPowered">Powered by <span style="opacity:0.7;">VARACIS POHE Intelligence™</span></p>
+  </div>
+</footer>
+
+</body>
+</html>

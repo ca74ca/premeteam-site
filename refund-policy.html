@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Refund Policy | Delta Zone System</title>
+<link rel="icon" type="image/png" href="./assets/favicon.png" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+  .legalPage{
+    max-width:800px;
+    margin:0 auto;
+    padding:120px 20px 60px;
+  }
+
+  .legalPage h1{
+    font-size:clamp(32px, 5vw, 42px);
+    font-weight:700;
+    color:rgba(255,255,255,.95);
+    margin:0 0 24px;
+  }
+
+  .legalPage h2{
+    font-size:24px;
+    font-weight:600;
+    color:rgba(255,255,255,.92);
+    margin:32px 0 16px;
+  }
+
+  .legalPage p{
+    font-size:16px;
+    line-height:1.8;
+    color:rgba(255,255,255,.8);
+    margin:0 0 16px;
+  }
+
+  .legalPage ul{
+    margin:16px 0;
+    padding-left:24px;
+    color:rgba(255,255,255,.8);
+    line-height:1.8;
+  }
+
+  .legalPage li{
+    margin-bottom:12px;
+  }
+
+  .legalPage a{
+    color:rgba(0,190,255,.95);
+    text-decoration:none;
+    border-bottom:1px solid rgba(0,190,255,.4);
+  }
+
+  .legalPage a:hover{
+    border-bottom-color:rgba(0,190,255,.8);
+  }
+
+  .lastUpdated{
+    font-size:14px;
+    color:rgba(255,255,255,.6);
+    margin-bottom:32px;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="bg" id="bgWrap">
+  <video id="bgVid" class="bgVideo" muted loop playsinline preload="none" data-src-desktop="./assets/delta_homepage_3.mp4" data-src-mobile="./assets/mobile_video_1.mp4"></video>
+  <div class="bgOverlay"></div>
+  <div class="bgGlow"></div>
+</div>
+
+<script>
+  (function(){
+    function setImageFallback(){
+      var wrap = document.getElementById('bgWrap');
+      if(wrap){ wrap.classList.add('bgImageFallback'); }
+    }
+
+    var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if(isMobile){ setImageFallback(); }
+
+    var v2 = document.getElementById('bgVid');
+    if(!v2){ return; }
+
+    var src = isMobile ? v2.getAttribute('data-src-mobile') : v2.getAttribute('data-src-desktop');
+    if(!src){ return; }
+
+    var sourceEl = document.createElement('source');
+    sourceEl.src = src;
+    sourceEl.type = 'video/mp4';
+    v2.appendChild(sourceEl);
+
+    v2.autoplay = true;
+    v2.muted = true;
+    v2.defaultMuted = true;
+    v2.setAttribute('muted', '');
+    v2.setAttribute('playsinline', '');
+    v2.setAttribute('autoplay', '');
+
+    function tryPlay(){
+      var p = v2.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(function(){ setImageFallback(); });
+      }
+    }
+
+    v2.addEventListener('loadeddata', tryPlay, { once: true });
+    v2.load();
+    tryPlay();
+  })();
+</script>
+
+<nav class="topNav" aria-label="Main navigation">
+  <div class="topNavInner">
+    <a href="./" class="topNavLogo">Delta Zone System</a>
+    <div class="topNavLinks">
+      <a href="./pricing.html" class="topNavLink">Pricing</a>
+      <a href="./individual-modules.html" class="topNavLink">Master The Station™</a>
+      <a href="./get-the-411.html" class="topNavLink">FAQ</a>
+      <a href="./members-lounge.html" class="topNavLink topNavLinkClient">Client Login</a>
+    </div>
+  </div>
+</nav>
+
+<main class="legalPage">
+
+  <h1>Refund Policy</h1>
+  <p class="lastUpdated">Last updated: October 18, 2026</p>
+
+  <h2>All Sales Final</h2>
+  <p>All purchases of Delta Zone System products and coaching services are final. We do not offer refunds, returns, or exchanges for any reason.</p>
+
+  <h2>4-Week Foundation Program</h2>
+  <p>The 4-Week Foundation Program is a digital download delivered immediately upon purchase. Because of the nature of digital products, all sales are final once you receive access to the program materials.</p>
+
+  <h2>Coaching Services</h2>
+  <p>Monthly coaching subscriptions are billed at the beginning of each billing cycle. All coaching payments are non-refundable. You may cancel your coaching subscription at any time, and cancellation will take effect at the end of your current billing cycle. No partial refunds will be provided for unused days within a billing period.</p>
+
+  <h2>Try Before You Buy</h2>
+  <p>We strongly encourage you to start with our free Week 1 Starter Plan before purchasing. This gives you a no-risk way to experience the Delta Zone System training methodology and determine if it's the right fit for you.</p>
+
+  <p>You can download the free Week 1 Starter Plan on our <a href="./">home page</a>.</p>
+
+  <h2>Questions?</h2>
+  <p>If you have any questions about this refund policy or need assistance, please contact us at <a href="mailto:support@deltazonesystem.com">support@deltazonesystem.com</a>.</p>
+
+</main>
+
+<footer class="siteFooter">
+  <div class="footerInner">
+    <div class="footerLinks">
+      <a href="./privacy-policy.html">Privacy</a>
+      <a href="./terms.html">Terms</a>
+      <a href="./refund-policy.html">Refund Policy</a>
+      <a href="mailto:support@deltazonesystem.com">Contact</a>
+    </div>
+    <p class="footerDisclaimer">Coached by Tito Nunez, official HYROX Coach. Delta Zone System is an official HYROX affiliate.</p>
+    <p class="footerPowered">Powered by <span style="opacity:0.7;">VARACIS POHE Intelligence™</span></p>
+  </div>
+</footer>
+
+</body>
+</html>
