@@ -170,6 +170,90 @@
   .socialRow .glassCard{
     width:100%;
   }
+
+  .weeklyCheckinSection{
+    max-width:800px;
+    margin:0 auto 50px;
+    padding:0 20px;
+  }
+
+  .weeklyCheckinCard{
+    text-decoration:none;
+    color:var(--text);
+    padding:28px 32px;
+    border-radius:18px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    background:linear-gradient(135deg, rgba(9, 20, 34, .85), rgba(5, 14, 26, .72));
+    border:1px solid rgba(134,239,172,.48);
+    box-shadow:0 16px 38px rgba(0,0,0,.45), 0 0 20px rgba(134,239,172,.28);
+    backdrop-filter:blur(12px) saturate(150%);
+    -webkit-backdrop-filter:blur(12px) saturate(150%);
+    opacity:0;
+    animation:fadeUp 900ms ease forwards;
+    animation-delay:.08s;
+  }
+
+  .weeklyCheckinCard:hover{
+    border-color:rgba(134,239,172,.65);
+    box-shadow:0 22px 54px rgba(0,0,0,.55), 0 0 28px rgba(134,239,172,.42);
+    transition:border-color .25s ease, box-shadow .25s ease;
+  }
+
+  .weeklyCheckinTitle{
+    font-size:11px;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:rgba(134,239,172,.95);
+    margin:0 0 12px;
+    font-weight:600;
+  }
+
+  .weeklyCheckinText{
+    font-size:15px;
+    line-height:1.65;
+    color:rgba(255,255,255,.84);
+    margin:0 0 22px;
+    max-width:600px;
+  }
+
+  .weeklyCheckinBtn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:14px 28px;
+    border-radius:999px;
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.96);
+    background:linear-gradient(135deg, rgba(134,239,172,.26), rgba(74,222,128,.20));
+    border:1px solid rgba(134,239,172,.42);
+    font-weight:600;
+    transition:all .22s ease;
+  }
+
+  .weeklyCheckinBtn:hover{
+    background:linear-gradient(135deg, rgba(134,239,172,.36), rgba(74,222,128,.28));
+    border-color:rgba(134,239,172,.65);
+    box-shadow:0 0 18px rgba(134,239,172,.32);
+  }
+
+  @media (max-width:768px){
+    .weeklyCheckinCard{
+      padding:24px 20px;
+    }
+    
+    .weeklyCheckinText{
+      font-size:14px;
+    }
+    
+    .weeklyCheckinBtn{
+      width:100%;
+    }
+  }
 </style>
 </head>
 
@@ -239,6 +323,14 @@
   <section class="membersHero">
     <h1>Client & Members Area</h1>
     <p>Connect your wearables, access adaptive programming, and manage your client account.</p>
+  </section>
+
+  <section class="weeklyCheckinSection" aria-label="Weekly check-in">
+    <a class="weeklyCheckinCard" href="https://tally.so/r/VpEXDy" target="_blank" rel="noopener" aria-label="Submit your weekly check-in">
+      <div class="weeklyCheckinTitle">Weekly Check-in</div>
+      <p class="weeklyCheckinText">2 minutes, every Sunday by 6 PM ET. Tell me how your week went and I'll send your note within 24 hours.</p>
+      <span class="weeklyCheckinBtn">Start my check-in</span>
+    </a>
   </section>
 
   <section class="socialRow" aria-label="Client tools and connections">
