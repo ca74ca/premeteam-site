@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Privacy Policy | Delta Zone System</title>
+<link rel="icon" type="image/png" href="./assets/favicon.png" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+  .legalPage{
+    max-width:800px;
+    margin:0 auto;
+    padding:120px 20px 60px;
+  }
+
+  .legalPage h1{
+    font-size:clamp(32px, 5vw, 42px);
+    font-weight:700;
+    color:rgba(255,255,255,.95);
+    margin:0 0 24px;
+  }
+
+  .legalPage h2{
+    font-size:24px;
+    font-weight:600;
+    color:rgba(255,255,255,.92);
+    margin:32px 0 16px;
+  }
+
+  .legalPage p{
+    font-size:16px;
+    line-height:1.8;
+    color:rgba(255,255,255,.8);
+    margin:0 0 16px;
+  }
+
+  .legalPage ul{
+    margin:16px 0;
+    padding-left:24px;
+    color:rgba(255,255,255,.8);
+    line-height:1.8;
+  }
+
+  .legalPage li{
+    margin-bottom:12px;
+  }
+
+  .legalPage a{
+    color:rgba(0,190,255,.95);
+    text-decoration:none;
+    border-bottom:1px solid rgba(0,190,255,.4);
+  }
+
+  .legalPage a:hover{
+    border-bottom-color:rgba(0,190,255,.8);
+  }
+
+  .lastUpdated{
+    font-size:14px;
+    color:rgba(255,255,255,.6);
+    margin-bottom:32px;
+  }
+
+  .reviewNote{
+    background:rgba(255,200,0,.15);
+    border:1px solid rgba(255,200,0,.4);
+    border-radius:8px;
+    padding:20px;
+    margin-bottom:32px;
+    font-size:15px;
+    color:rgba(255,255,255,.9);
+  }
+
+  .reviewNote strong{
+    color:rgba(255,255,255,1);
+  }
+</style>
+</head>
+
+<body>
+
+<div class="bg" id="bgWrap">
+  <video id="bgVid" class="bgVideo" muted loop playsinline preload="none" data-src-desktop="./assets/delta_homepage_3.mp4" data-src-mobile="./assets/mobile_video_1.mp4"></video>
+  <div class="bgOverlay"></div>
+  <div class="bgGlow"></div>
+</div>
+
+<script>
+  (function(){
+    function setImageFallback(){
+      var wrap = document.getElementById('bgWrap');
+      if(wrap){ wrap.classList.add('bgImageFallback'); }
+    }
+
+    var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if(isMobile){ setImageFallback(); }
+
+    var v2 = document.getElementById('bgVid');
+    if(!v2){ return; }
+
+    var src = isMobile ? v2.getAttribute('data-src-mobile') : v2.getAttribute('data-src-desktop');
+    if(!src){ return; }
+
+    var sourceEl = document.createElement('source');
+    sourceEl.src = src;
+    sourceEl.type = 'video/mp4';
+    v2.appendChild(sourceEl);
+
+    v2.autoplay = true;
+    v2.muted = true;
+    v2.defaultMuted = true;
+    v2.setAttribute('muted', '');
+    v2.setAttribute('playsinline', '');
+    v2.setAttribute('autoplay', '');
+
+    function tryPlay(){
+      var p = v2.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(function(){ setImageFallback(); });
+      }
+    }
+
+    v2.addEventListener('loadeddata', tryPlay, { once: true });
+    v2.load();
+    tryPlay();
+  })();
+</script>
+
+<nav class="topNav" aria-label="Main navigation">
+  <div class="topNavInner">
+    <a href="./" class="topNavLogo">Delta Zone System</a>
+    <div class="topNavLinks">
+      <a href="./pricing.html" class="topNavLink">Pricing</a>
+      <a href="./individual-modules.html" class="topNavLink">Master The Station™</a>
+      <a href="./get-the-411.html" class="topNavLink">FAQ</a>
+      <a href="./members-lounge.html" class="topNavLink topNavLinkClient">Client Login</a>
+    </div>
+  </div>
+</nav>
+
+<main class="legalPage">
+
+  <h1>Privacy Policy</h1>
+  <p class="lastUpdated">Last updated: October 18, 2026</p>
+
+  <div class="reviewNote">
+    <strong>TEMPLATE FOR REVIEW:</strong> This is a basic privacy policy template. Tito should have this reviewed by a qualified attorney and customized to reflect actual data practices, especially regarding wearable data collection through WHOOP, Garmin, and Oura integrations, payment processing through Stripe, form submissions through Tally, and any email service provider used.
+  </div>
+
+  <h2>Introduction</h2>
+  <p>Delta Zone System LLC ("we," "us," or "our") operates deltazonesystem.com. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.</p>
+
+  <h2>Information We Collect</h2>
+  <p>We collect information that you provide directly to us, including:</p>
+  <ul>
+    <li><strong>Contact Information:</strong> Name, email address, and other contact details you provide when signing up for programs or coaching</li>
+    <li><strong>Payment Information:</strong> Payment details processed securely through our payment processor (Stripe)</li>
+    <li><strong>Wearable Device Data:</strong> If you connect WHOOP, Garmin, or Oura devices, we collect health and fitness data including heart rate, activity, sleep, and recovery metrics</li>
+    <li><strong>Training Data:</strong> Information about your workouts, performance metrics, and progress</li>
+    <li><strong>Communications:</strong> Messages you send us and responses to surveys or questionnaires</li>
+  </ul>
+
+  <h2>How We Use Your Information</h2>
+  <p>We use the information we collect to:</p>
+  <ul>
+    <li>Provide, maintain, and improve our coaching services and training programs</li>
+    <li>Process your transactions and send related information</li>
+    <li>Analyze wearable device data to provide personalized coaching and adaptive training recommendations</li>
+    <li>Send you technical notices, updates, security alerts, and support messages</li>
+    <li>Respond to your comments, questions, and customer service requests</li>
+    <li>Send you promotional communications about our services (you may opt out at any time)</li>
+  </ul>
+
+  <h2>How We Share Your Information</h2>
+  <p>We do not sell your personal information. We may share your information with:</p>
+  <ul>
+    <li><strong>Service Providers:</strong> Third-party vendors who perform services on our behalf, such as payment processing (Stripe), wearable data integration (WHOOP, Garmin, Oura via VARACIS), form processing (Tally), and email services</li>
+    <li><strong>Legal Requirements:</strong> If required by law or to protect our rights, property, or safety</li>
+    <li><strong>Business Transfers:</strong> In connection with any merger, sale of company assets, or acquisition</li>
+  </ul>
+
+  <h2>Wearable Device Data</h2>
+  <p>When you connect your WHOOP, Garmin, or Oura device, you grant us permission to access data from that device. This data is used solely for providing personalized coaching and adaptive training recommendations. You can disconnect your wearable device at any time through your account settings.</p>
+
+  <h2>Data Security</h2>
+  <p>We use reasonable administrative, technical, and physical security measures to protect your personal information. However, no method of transmission over the Internet or electronic storage is 100% secure.</p>
+
+  <h2>Your Rights and Choices</h2>
+  <p>You have the right to:</p>
+  <ul>
+    <li>Access, update, or delete your personal information</li>
+    <li>Opt out of promotional emails by following the unsubscribe instructions in those emails</li>
+    <li>Disconnect wearable devices from your account</li>
+    <li>Request a copy of the personal information we hold about you</li>
+  </ul>
+
+  <h2>Children's Privacy</h2>
+  <p>Our services are not directed to individuals under 16 years of age. We do not knowingly collect personal information from children under 16. If you believe we have collected information from a child under 16, please contact us immediately.</p>
+
+  <h2>Changes to This Privacy Policy</h2>
+  <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.</p>
+
+  <h2>Contact Us</h2>
+  <p>If you have questions about this Privacy Policy, please contact us at:</p>
+  <p><a href="mailto:support@deltazonesystem.com">support@deltazonesystem.com</a></p>
+
+</main>
+
+<footer class="siteFooter">
+  <div class="footerInner">
+    <div class="footerLinks">
+      <a href="./privacy-policy.html">Privacy</a>
+      <a href="./terms.html">Terms</a>
+      <a href="./refund-policy.html">Refund Policy</a>
+      <a href="mailto:support@deltazonesystem.com">Contact</a>
+    </div>
+    <p class="footerDisclaimer">Coached by Tito Nunez, official HYROX Coach. Delta Zone System is an official HYROX affiliate.</p>
+    <p class="footerPowered">Powered by <span style="opacity:0.7;">VARACIS POHE Intelligence™</span></p>
+  </div>
+</footer>
+
+</body>
+</html>
