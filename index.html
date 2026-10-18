@@ -361,17 +361,22 @@
   <section class="meetCoach" aria-label="Meet your coach">
     <h2 class="sectionHeading">Meet your coach</h2>
     <div class="coachContent">
+      <!-- Photo placeholder hidden until real photo is added
       <div class="coachPlaceholder">[[PLACEHOLDER: Photo of Tito coaching or racing. Real photo only.]]</div>
-      <div class="coachBio">
+      -->
+      <div class="coachBio" style="grid-column: 1 / -1;">
         <p>Tito Nunez is the founder of Delta Zone System. He has spent 25 years coaching people from every background, from runners and lifters to complete beginners. He built Delta Zone System to close "the gap": the moment when tiredness takes over and your form, pace and confidence fall apart.</p>
-        <p class="coachCredentials">[[PLACEHOLDER: Named certifications, and the official HYROX coach / Training Club / affiliate name and link, ONLY if verified. Remove this line if not.]]</p>
+        <p class="coachCredentials">Official HYROX Coach with 25 years of coaching experience. Delta Zone System is an official HYROX affiliate.</p>
+        <!-- Social links placeholder - add when ready
         <p class="coachLinks">[[PLACEHOLDER: Instagram / TikTok links.]]</p>
+        -->
       </div>
     </div>
   </section>
 
   <!-- TESTIMONIALS -->
-  <section class="testimonials" aria-label="Testimonials" style="display:none;">
+  <!-- Testimonials section hidden until real testimonials are available
+  <section class="testimonials" aria-label="Testimonials">
     <h2 class="sectionHeading">Real people, real first races</h2>
     <div class="testimonialsGrid">
       <article class="testimonialCard">
@@ -386,6 +391,7 @@
     </div>
     <p class="testimonialsNote">(Do not publish this section until there are at least 2 real testimonials. Hide it until then.)</p>
   </section>
+  -->
 
   <!-- FAQ -->
   <section class="faq" aria-label="Frequently asked questions">
@@ -425,7 +431,9 @@
   <!-- EMAIL CAPTURE -->
   <section class="emailCapture" id="email-capture" aria-label="Get your free Week 1 plan">
     <h2 class="sectionHeading">Your first week of HYROX training, free.</h2>
-    <p class="sectionIntro">Three beginner-friendly workouts plus a simple tracker, sent straight to your inbox, so you can see how the Delta Zone System feels before you commit.</p>
+    <p class="sectionIntro">Three beginner-friendly workouts plus a simple tracker. Download it now and see how the Delta Zone System feels before you commit.</p>
+    
+    <!-- Email capture form - connect to Klaviyo or Tally when ready
     <form class="emailCaptureForm" action="ENDPOINT_PLACEHOLDER" method="POST">
       <div class="emailCaptureFields">
         <input type="text" name="first_name" placeholder="First name" required class="emailCaptureInput" />
@@ -434,6 +442,13 @@
       </div>
       <p class="emailCaptureSmallPrint">No spam. Unsubscribe anytime. <a href="./privacy-policy.html">Privacy Policy</a></p>
     </form>
+    -->
+    
+    <!-- Temporary direct download link until email form is connected -->
+    <div style="text-align: center;">
+      <a class="emailCaptureBtn" href="./pdfs/delta_zone_week1_starter_program_BRANDED.pdf" download style="display: inline-block; text-decoration: none;">Download Week 1 Free</a>
+      <p class="emailCaptureSmallPrint" style="margin-top: 16px;">Direct download. No email required (for now).</p>
+    </div>
   </section>
 
   <!-- CTA SECTION -->
