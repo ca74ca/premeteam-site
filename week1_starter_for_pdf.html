@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delta Zone System - Week 1 Starter Plan</title>
+    <style>
+        @page {
+            size: Letter;
+            margin: 0.75in;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 3px solid #0ea5e9;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0c4a6e;
+            margin: 0 0 8px 0;
+            letter-spacing: 0.5px;
+        }
+        
+        .header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0369a1;
+            margin: 0;
+        }
+        
+        .header .tagline {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 6px;
+            font-style: italic;
+        }
+        
+        h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0c4a6e;
+            margin: 20px 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0369a1;
+            margin: 12px 0 6px 0;
+        }
+        
+        p {
+            margin: 8px 0;
+            font-size: 11px;
+        }
+        
+        ul {
+            margin: 6px 0;
+            padding-left: 20px;
+            font-size: 11px;
+        }
+        
+        li {
+            margin: 4px 0;
+        }
+        
+        .welcome {
+            background: #f0f9ff;
+            padding: 16px;
+            border-left: 4px solid #0ea5e9;
+            margin: 16px 0;
+            font-size: 11px;
+        }
+        
+        .rpe-scale {
+            background: #fef3c7;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            font-size: 10px;
+        }
+        
+        .rpe-scale strong {
+            color: #92400e;
+        }
+        
+        .session {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 14px;
+            margin: 14px 0;
+            page-break-inside: avoid;
+        }
+        
+        .session-header {
+            background: #0ea5e9;
+            color: white;
+            padding: 8px 12px;
+            margin: -14px -14px 12px -14px;
+            border-radius: 7px 7px 0 0;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        
+        .goal {
+            font-style: italic;
+            color: #475569;
+            font-size: 11px;
+            margin-bottom: 10px;
+        }
+        
+        .exercise-list {
+            margin: 10px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+        
+        .exercise-list li {
+            margin: 8px 0 8px 20px;
+            position: relative;
+        }
+        
+        .exercise-list li:before {
+            content: "→";
+            position: absolute;
+            left: -18px;
+            color: #0ea5e9;
+            font-weight: bold;
+        }
+        
+        .exercise-name {
+            font-weight: 600;
+            color: #0c4a6e;
+        }
+        
+        .rpe {
+            color: #dc2626;
+            font-weight: 600;
+            font-size: 10px;
+        }
+        
+        .easier {
+            color: #059669;
+            font-size: 10px;
+            font-style: italic;
+        }
+        
+        .note {
+            background: #eff6ff;
+            padding: 10px;
+            border-left: 3px solid #3b82f6;
+            margin: 10px 0;
+            font-size: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 10px;
+        }
+        
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 6px 8px;
+            text-align: left;
+        }
+        
+        th {
+            background: #e0f2fe;
+            font-weight: 600;
+            color: #0c4a6e;
+        }
+        
+        .cta {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+        
+        .cta h3 {
+            color: white;
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #0c4a6e;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 6px;
+            font-size: 11px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 2px solid #cbd5e1;
+            font-size: 10px;
+            color: #64748b;
+        }
+        
+        .footer strong {
+            color: #0c4a6e;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        @media print {
+            body {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>DELTA ZONE SYSTEM</h1>
+        <h2>Week 1 Starter Plan for Complete Beginners</h2>
+        <p class="tagline">Your first week of HYROX training</p>
+    </div>
+
+    <div class="welcome">
+        <p><strong>Welcome!</strong> This is your first week training with Delta Zone System. These sessions are designed for someone who is new to working out or getting back into fitness after a break. You'll learn the basics of pacing, simple strength movements, and get your first taste of HYROX stations.</p>
+        
+        <p><strong>What you'll need:</strong> Comfortable shoes for walking/jogging • Light dumbbells (5-15 lb / 2-7 kg) • Access to a rower or SkiErg (optional—substitutes provided) • A wall and a medicine ball (optional—substitutes provided)</p>
+    </div>
+
+    <div class="rpe-scale">
+        <strong>The RPE Scale (How hard to work):</strong><br>
+        • RPE 3-4 = Easy, can chat comfortably<br>
+        • RPE 5-6 = Working, can talk in short sentences<br>
+        • RPE 6-7 = Moderately hard, breathing harder but sustainable<br>
+        • RPE 8+ = Hard (not used this week)<br>
+        <br>
+        <strong>This week, nothing should feel harder than RPE 6-7.</strong> If it does, slow down, take breaks, or use the easier options.
+    </div>
+
+    <div class="session">
+        <div class="session-header">SESSION 1: Easy Run/Walk + Mobility (30 min)</div>
+        <p class="goal"><strong>Goal:</strong> Build your aerobic base with easy movement.</p>
+        
+        <h4>Warm-up (5 min)</h4>
+        <p>Walk at a comfortable pace</p>
+        
+        <h4>Main Set (20 min)</h4>
+        <p>10 rounds of:</p>
+        <ul class="exercise-list">
+            <li>1 min: Easy jog (or brisk walk if jogging isn't comfortable yet)</li>
+            <li>1 min: Walk</li>
+        </ul>
+        <p><span class="rpe">RPE: 4-5</span> — You should be able to talk the whole time</p>
+        
+        <h4>Cool-down (5 min)</h4>
+        <p>Slow walk • Gentle stretches: calves, hip flexors, hamstrings (hold each 20-30 sec)</p>
+        
+        <div class="note">
+            <strong>Note:</strong> If 1 minute of jogging is too much, start with 30 seconds jog / 90 seconds walk. The goal is to move continuously for 20 minutes, not to go fast.
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="session">
+        <div class="session-header">SESSION 2: Introduction to Strength (35 min)</div>
+        <p class="goal"><strong>Goal:</strong> Learn basic strength movements that build HYROX readiness.</p>
+        
+        <h4>Warm-up (5 min)</h4>
+        <p>10 arm circles each direction • 10 air squats • 10 walking lunges • 5 inchworms</p>
+        
+        <h4>Main Set (25 min)</h4>
+        <p>Complete 3 rounds, resting 90 seconds between rounds:</p>
+        
+        <ul class="exercise-list">
+            <li><span class="exercise-name">Goblet Squats</span> — 10 reps<br>
+            <span class="rpe">RPE: 5-6</span> • <span class="easier">Easier: Bodyweight squats to a chair</span></li>
+            
+            <li><span class="exercise-name">Push-ups</span> — 8 reps<br>
+            <span class="rpe">RPE: 6</span> • <span class="easier">Easier: Hands on a bench or counter</span></li>
+            
+            <li><span class="exercise-name">Bent-Over Dumbbell Rows</span> — 8 reps each arm<br>
+            <span class="rpe">RPE: 5-6</span></li>
+            
+            <li><span class="exercise-name">Reverse Lunges</span> — 8 reps each leg<br>
+            <span class="rpe">RPE: 5</span> • <span class="easier">Easier: Hold a wall for balance</span></li>
+            
+            <li><span class="exercise-name">Plank Hold</span> — 20-30 seconds<br>
+            <span class="rpe">RPE: 6</span> • <span class="easier">Easier: Plank on your knees</span></li>
+        </ul>
+        
+        <h4>Cool-down (5 min)</h4>
+        <p>Walk slowly for 2 minutes • Stretch: hip flexors, chest, shoulders</p>
+        
+        <div class="note">
+            <strong>Note:</strong> Focus on smooth, controlled movement. Rest as needed between exercises.
+        </div>
+    </div>
+
+    <div class="session">
+        <div class="session-header">SESSION 3: Rest Day or Easy Walk</div>
+        <p class="goal"><strong>Goal:</strong> Let your body recover.</p>
+        
+        <p><strong>Option 1:</strong> Complete Rest — Take the day off completely</p>
+        <p><strong>Option 2:</strong> Easy 20-Minute Walk — Very gentle walk at conversation pace (RPE 3)</p>
+        
+        <div class="note">
+            Think of this as active recovery, not a workout.
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="session">
+        <div class="session-header">SESSION 4: Station Introduction (40 min)</div>
+        <p class="goal"><strong>Goal:</strong> Get your first feel for three HYROX stations.</p>
+        
+        <h4>Warm-up (8 min)</h4>
+        <p>5 min easy walk or bike • 10 air squats • 10 small two-foot jumps • 5 slow inchworms</p>
+        
+        <h4>Main Set (28 min)</h4>
+        <p>Complete 4 rounds with 90 seconds rest between rounds:</p>
+        
+        <ul class="exercise-list">
+            <li><span class="exercise-name">Rowing</span> — 2 minutes easy<br>
+            Focus on smooth rhythm, not power • Stroke rate: 20-22 strokes per minute<br>
+            <span class="rpe">RPE: 5-6</span> • <span class="easier">No rower? 2 min bike or assault bike</span></li>
+            
+            <li><span class="exercise-name">Wall Balls</span> — 15 reps<br>
+            Hold medicine ball (6-10 lb) at chest • Squat down • Stand up and throw to target ~8 feet high<br>
+            <span class="rpe">RPE: 6</span> • <span class="easier">No ball? Bodyweight squats + overhead press with light dumbbell</span></li>
+            
+            <li><span class="exercise-name">SkiErg</span> — 90 seconds easy<br>
+            Stand tall, pull handles down using your core and arms • Don't rush the return<br>
+            <span class="rpe">RPE: 5</span> • <span class="easier">No SkiErg? 90 sec jumping jacks or high knees at easy pace</span></li>
+            
+            <li><span class="exercise-name">Easy Walk or Jog</span> — 2 minutes<br>
+            Recover at conversation pace • <span class="rpe">RPE: 4</span></li>
+        </ul>
+        
+        <h4>Cool-down (4 min)</h4>
+        <p>Walk 2 minutes • Stretch: quads, shoulders, hamstrings</p>
+        
+        <div class="note">
+            <strong>Note:</strong> This is your introduction to HYROX stations. Don't worry about speed or weight—just learn the movements and how they feel when you're already a little tired.
+        </div>
+    </div>
+
+    <h3 style="margin-top: 24px;">Your Training Tracker</h3>
+    <p style="font-size: 10px;">Use this simple tracker to record what you did. Writing it down helps you see progress.</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Session</th>
+                <th>Completed?</th>
+                <th>How It Felt (1-10)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Mon</td>
+                <td>Session 1 - Run/Walk</td>
+                <td>☐</td>
+                <td>___</td>
+            </tr>
+            <tr>
+                <td>Tue</td>
+                <td>Session 2 - Strength</td>
+                <td>☐</td>
+                <td>___</td>
+            </tr>
+            <tr>
+                <td>Wed</td>
+                <td>Session 3 - Rest</td>
+                <td>☐</td>
+                <td>___</td>
+            </tr>
+            <tr>
+                <td>Thu</td>
+                <td>Session 4 - Stations</td>
+                <td>☐</td>
+                <td>___</td>
+            </tr>
+            <tr>
+                <td>Fri</td>
+                <td>Rest</td>
+                <td>☐</td>
+                <td>___</td>
+            </tr>
+            <tr>
+                <td>Sat</td>
+                <td>Optional Easy Walk</td>
+                <td>☐</td>
+                <td>___</td>
+            </tr>
+            <tr>
+                <td>Sun</td>
+                <td>Rest</td>
+                <td>☐</td>
+                <td>___</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="font-size: 10px; margin: 12px 0;">
+        <strong>Tips:</strong> It's okay to skip a day if you need to • Partial credit counts! • If you're very sore, take an extra rest day • Aim for 4 days of activity this week
+    </div>
+
+    <div class="cta">
+        <h3>What Comes Next?</h3>
+        <p style="margin: 0 0 12px 0; font-size: 12px;">This is Week 1—your introduction to the Delta Zone method. Ready for more?</p>
+        
+        <a href="https://deltazonesystem.com/hyrox-foundation-program.html" class="cta-button">Get the 4-Week Program — $39</a>
+        <a href="https://tally.so/r/3q4PNJ5" class="cta-button">Apply for 1-on-1 Coaching</a>
+        
+        <p style="margin: 12px 0 0 0; font-size: 11px;">The full 4-week program builds on this foundation with structured progression, all 8 HYROX stations, running + strength combined sessions, heart rate zone training, and race-day preparation.</p>
+    </div>
+
+    <div class="footer">
+        <p><strong>Questions?</strong> Email support@deltazonesystem.com</p>
+        <p><strong>deltazonesystem.com</strong> • <strong>Instagram:</strong> @deltazonetraining</p>
+        <p style="margin-top: 10px;">Coached by Tito Nunez, HYROX Performance Coach<br>Delta Zone System is a HYROX Training Club</p>
+    </div>
+</body>
+</html>
