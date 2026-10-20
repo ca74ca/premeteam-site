@@ -1846,3 +1846,9 @@ figure.testimonialCard{margin:0;display:flex;flex-direction:column;gap:16px;bord
 /* Titles visible instantly; rest of hero keeps its fade */
 .hero:has(.heroTitles){opacity:1;animation:none}
 .hero:has(.heroTitles)>*:not(.heroTitles){opacity:0;animation:fadeUp 900ms ease forwards;animation-delay:2s}
+
+.coachPhoto.coachHeadshot{object-position:46% 35%}
+.coachMedia{display:flex;flex-direction:column;gap:12px;min-width:0}
+.coachGallery{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.coachGallery img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:center 40%;border-radius:12px;border:1px solid rgba(255,255,255,.2);display:block}
+@media (max-width:768px){.coachMedia{max-width:420px;width:100%;margin:0 auto}}
