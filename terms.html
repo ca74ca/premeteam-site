@@ -1,6 +1,19 @@
 <!doctype html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FQZFC1W8RK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FQZFC1W8RK');
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a[href*="buy.stripe.com"]');
+    if (a) { gtag('event', 'begin_checkout', {currency: 'USD', value: 39, link_url: a.href, transport_type: 'beacon'}); }
+  });
+</script>
+
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Terms of Service | Delta Zone System</title>
