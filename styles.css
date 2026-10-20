@@ -1843,3 +1843,6 @@ figure.testimonialCard{margin:0;display:flex;flex-direction:column;gap:16px;bord
 .heroTitles{margin:0 0 18px;font-size:15px;line-height:1.5;color:rgba(255,255,255,.9);letter-spacing:.02em}
 .heroTitles strong{font-weight:700;white-space:nowrap}
 @media (max-width:600px){.heroTitles{font-size:14px}.heroTitlesSep{display:none}.heroTitles strong{display:block}.dzClubTag{font-size:10.5px!important;margin-left:6px!important}}
+/* Titles visible instantly; rest of hero keeps its fade */
+.hero:has(.heroTitles){opacity:1;animation:none}
+.hero:has(.heroTitles)>*:not(.heroTitles){opacity:0;animation:fadeUp 900ms ease forwards;animation-delay:2s}
