@@ -1801,3 +1801,11 @@ body{
 .pageLogo{display:inline-block;margin:0 auto 16px;}
 .pageLogo img{display:block;width:200px;max-width:60vw;height:auto;margin:0 auto;}
 @media (max-width:768px){.topNavLogo img{height:36px;}}
+
+/* Client testimonials */
+.testimonials .testimonialsGrid{max-width:960px;margin-left:auto;margin-right:auto;}
+figure.testimonialCard{margin:0;display:flex;flex-direction:column;gap:16px;border-color:rgba(80,140,255,.35);box-shadow:0 0 24px rgba(60,120,255,.12);}
+.testimonialPhoto{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,.2);display:block;}
+.testimonialCard blockquote{margin:0;}
+.testimonialCard blockquote p+p{margin-top:12px;}
+.testimonialName{font-weight:700;color:#7fb0ff;letter-spacing:.02em;}
