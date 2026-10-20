@@ -484,22 +484,36 @@
     <h2 class="sectionHeading">Your first week of HYROX training, free.</h2>
     <p class="sectionIntro">Three beginner-friendly workouts plus a simple tracker. Download it now and see how the Delta Zone System feels before you commit.</p>
     
-    <!-- Email capture form - connect to Klaviyo or Tally when ready
-    <form class="emailCaptureForm" action="ENDPOINT_PLACEHOLDER" method="POST">
+    <form class="emailCaptureForm" id="week1Form" novalidate>
       <div class="emailCaptureFields">
-        <input type="text" name="first_name" placeholder="First name" required class="emailCaptureInput" />
-        <input type="email" name="email" placeholder="Email" required class="emailCaptureInput" />
+        <input type="text" name="first_name" placeholder="First name" required class="emailCaptureInput" autocomplete="given-name" />
+        <input type="email" name="email" placeholder="Email" required class="emailCaptureInput" autocomplete="email" />
         <button type="submit" class="emailCaptureBtn">Send Me Week 1 Free</button>
       </div>
-      <p class="emailCaptureSmallPrint">No spam. Unsubscribe anytime. <a href="./privacy-policy.html">Privacy Policy</a></p>
+      <p class="emailCaptureSmallPrint">By signing up, you agree to receive emails from Delta Zone System with your Week 1 plan, training tips and offers. Unsubscribe anytime. <a href="./privacy-policy.html">Privacy Policy</a></p>
+      <p class="emailCaptureSmallPrint" id="week1Error" role="alert" style="display:none;color:#ff8080;"></p>
     </form>
-    -->
-    
-    <!-- Temporary direct download link until email form is connected -->
-    <div style="text-align: center;">
-      <a class="emailCaptureBtn" href="./pdfs/delta_zone_week1_starter_program_BRANDED.pdf" download style="display: inline-block; text-decoration: none;">Download Week 1 Free</a>
-      <p class="emailCaptureSmallPrint" style="margin-top: 16px;">Direct download. No email required (for now).</p>
+    <div id="week1Thanks" style="display:none;text-align:center;" aria-live="polite">
+      <p class="sectionIntro">Thanks! You're in. Your Week 1 Starter Plan is ready:</p>
+      <a class="emailCaptureBtn" href="./pdfs/delta_zone_week1_starter_program_BRANDED.pdf" download style="display:inline-block;text-decoration:none;">Download Week 1 Free</a>
     </div>
+    <script>
+    (function(){
+      var f=document.getElementById('week1Form');
+      f.addEventListener('submit',function(e){
+        e.preventDefault();
+        var err=document.getElementById('week1Error'),btn=f.querySelector('button');
+        var email=f.email.value.trim(),name=f.first_name.value.trim();
+        if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){err.textContent='Please enter a valid email.';err.style.display='block';return;}
+        err.style.display='none';btn.disabled=true;btn.textContent='Sending...';
+        var attrs={email:email};if(name){attrs.first_name=name;}
+        fetch('https://a.klaviyo.com/client/subscriptions/?company_id=Wewhws',{method:'POST',headers:{'Content-Type':'application/json',revision:'2024-10-15'},
+          body:JSON.stringify({data:{type:'subscription',attributes:{custom_source:'deltazonesystem.com Week 1 form',profile:{data:{type:'profile',attributes:attrs}}},relationships:{list:{data:{type:'list',id:'Uu4WcK'}}}}})})
+        .then(function(r){if(!r.ok)throw 0;f.style.display='none';document.getElementById('week1Thanks').style.display='block';})
+        .catch(function(){err.textContent='Something went wrong. Please try again.';err.style.display='block';btn.disabled=false;btn.textContent='Send Me Week 1 Free';});
+      });
+    })();
+    </script>
   </section>
 
   <!-- CTA SECTION -->
