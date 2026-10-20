@@ -10,9 +10,17 @@
   gtag('config', 'G-FQZFC1W8RK');
   document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('a[href*="buy.stripe.com"]');
-    if (a) { gtag('event', 'begin_checkout', {currency: 'USD', value: 39, link_url: a.href, transport_type: 'beacon'}); }
+    if (a) { gtag('event', 'begin_checkout', {currency: 'USD', value: 39, link_url: a.href, transport_type: 'beacon'}); if (typeof fbq==='function') { fbq('track','InitiateCheckout',{value:39,currency:'USD'}); } }
   });
 </script>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1458510962847256');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1458510962847256&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel Code -->
 
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -528,7 +536,7 @@
         var attrs={email:email};if(name){attrs.first_name=name;}
         fetch('https://a.klaviyo.com/client/subscriptions/?company_id=Wewhws',{method:'POST',headers:{'Content-Type':'application/json',revision:'2024-10-15'},
           body:JSON.stringify({data:{type:'subscription',attributes:{custom_source:'deltazonesystem.com Week 1 form',profile:{data:{type:'profile',attributes:attrs}}},relationships:{list:{data:{type:'list',id:'Uu4WcK'}}}}})})
-        .then(function(r){if(!r.ok)throw 0;if(window.gtag){gtag('event','generate_lead',{form_name:'week1_starter'});}f.style.display='none';document.getElementById('week1Thanks').style.display='block';})
+        .then(function(r){if(!r.ok)throw 0;if(window.gtag){gtag('event','generate_lead',{form_name:'week1_starter'});}if(typeof fbq==='function'){fbq('track','Lead');}f.style.display='none';document.getElementById('week1Thanks').style.display='block';})
         .catch(function(){err.textContent='Something went wrong. Please try again.';err.style.display='block';btn.disabled=false;btn.textContent='Send Me Week 1 Free';});
       });
     })();
