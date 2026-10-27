@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FQZFC1W8RK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FQZFC1W8RK');
+</script>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1458510962847256');
+fbq('track', 'PageView');
+fbq('track', 'Purchase', {value: 39.00, currency: 'USD'});
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1458510962847256&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel Code -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Welcome — Download Your Foundation Program | Delta Zone System</title>
+<meta name="description" content="Thanks for joining Delta Zone System. Download your 4-Week HYROX Foundation Program and start training today." />
+<meta name="robots" content="noindex" />
+<meta property="og:title" content="Welcome — Download Your Foundation Program | Delta Zone System" />
+<meta property="og:description" content="Thanks for joining Delta Zone System. Download your 4-Week HYROX Foundation Program and start training today." />
+<meta property="og:type" content="website" />
+<link rel="icon" href="./favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="./assets/favicon.png" />
+<link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+  .stage{
+    justify-content:flex-start;
+    padding-top:80px;
+    gap:18px;
+  }
+
+  .backLink{
+    position:fixed;
+    top:22px;
+    left:22px;
+    z-index:1300;
+    font-size:13px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--muted);
+    text-decoration:none;
+    padding:10px 6px;
+    min-height:44px;
+    display:inline-flex;
+    align-items:center;
+  }
+
+  .backLink:hover{ color:var(--text); }
+
+  .programShell{
+    width:min(920px, 100%);
+    padding:0 20px 40px;
+    display:grid;
+    gap:18px;
+  }
+
+  .programHero,
+  .programCard,
+  .programCta,
+  .upsellCard{
+    border-radius:18px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)),
+      radial-gradient(420px 140px at 18% 18%, rgba(0,190,255,.12), transparent 55%),
+      radial-gradient(420px 140px at 82% 78%, rgba(255,0,220,.10), transparent 55%),
+      var(--glass2);
+    border:1px solid rgba(255,255,255,.16);
+    box-shadow:0 18px 44px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.10);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    opacity:0;
+    animation:fadeUp 900ms ease forwards;
+  }
+
+  .programHero{
+    padding:30px 28px;
+    animation-delay:.12s;
+  }
+
+  .programHero h1{
+    margin:0 0 10px;
+    font-size:clamp(26px, 4vw, 48px);
+    line-height:1.05;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.86);
+    text-shadow:
+      0 0 4px rgba(255,255,255,.28),
+      0 0 16px rgba(0,190,255,.35),
+      0 0 26px rgba(255,0,220,.20);
+  }
+
+  .programHero p{
+    margin:0;
+    max-width:700px;
+    color:rgba(255,255,255,.78);
+    line-height:1.7;
+    font-size:15px;
+  }
+
+  .programEyebrow{
+    margin:0 0 10px;
+    font-size:12px;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .programCta{
+    padding:28px;
+    text-align:center;
+    animation-delay:.24s;
+  }
+
+  .programCta h2{
+    margin:0 0 8px;
+    font-size:26px;
+    color:rgba(255,255,255,.94);
+  }
+
+  .programCta p{
+    margin:0 0 18px;
+    color:rgba(255,255,255,.74);
+    line-height:1.6;
+  }
+
+  .programCtaBtn{
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:48px;
+    padding:14px 28px;
+    border-radius:999px;
+    font-size:13px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.96);
+    background:linear-gradient(135deg, rgba(0,190,255,.28), rgba(255,0,220,.22));
+    border:1px solid rgba(255,255,255,.34);
+    box-shadow:0 12px 26px rgba(0,0,0,.26);
+    transition:transform .18s ease, background .18s ease, border-color .18s ease;
+  }
+
+  .programCtaBtn:hover{
+    transform:translateY(-2px);
+    background:linear-gradient(135deg, rgba(0,190,255,.34), rgba(255,0,220,.28));
+    border-color:rgba(255,255,255,.46);
+  }
+
+  .programCard{
+    padding:24px 22px;
+  }
+
+  .programCard h2{
+    margin:0 0 14px;
+    font-size:20px;
+    color:rgba(255,255,255,.92);
+  }
+
+  .stepsList{
+    margin:0;
+    padding:0;
+    list-style:none;
+    display:grid;
+    gap:14px;
+  }
+
+  .stepsList li{
+    display:grid;
+    grid-template-columns:36px 1fr;
+    gap:12px;
+    align-items:start;
+    color:rgba(255,255,255,.84);
+    line-height:1.55;
+  }
+
+  .stepNum{
+    width:36px;
+    height:36px;
+    border-radius:999px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.08em;
+    color:rgba(255,255,255,.96);
+    background:linear-gradient(135deg, rgba(0,190,255,.32), rgba(255,0,220,.22));
+    border:1px solid rgba(255,255,255,.28);
+  }
+
+  .faqList{
+    margin:0;
+    padding:0;
+    list-style:none;
+    display:grid;
+    gap:16px;
+  }
+
+  .faqList dt{
+    margin:0 0 4px;
+    font-weight:700;
+    color:rgba(255,255,255,.92);
+  }
+
+  .faqList dd{
+    margin:0;
+    color:rgba(255,255,255,.78);
+    line-height:1.6;
+  }
+
+  .contactLinks{
+    margin:0;
+    padding:0;
+    list-style:none;
+    display:grid;
+    gap:10px;
+    color:rgba(255,255,255,.84);
+  }
+
+  .contactLinks a{
+    color:rgba(120,220,255,.95);
+    text-decoration:none;
+  }
+
+  .contactLinks a:hover{ text-decoration:underline; }
+
+  .upsellCard{
+    padding:28px;
+    text-align:center;
+    border-color:rgba(134,239,172,.42);
+    box-shadow:0 18px 44px rgba(0,0,0,.45), 0 0 22px rgba(134,239,172,.18), inset 0 1px 0 rgba(255,255,255,.10);
+    animation-delay:.84s;
+  }
+
+  .upsellCard h2{
+    margin:0 0 10px;
+    font-size:26px;
+    color:rgba(255,255,255,.94);
+  }
+
+  .upsellCard p{
+    margin:0 0 18px;
+    color:rgba(255,255,255,.78);
+    line-height:1.65;
+  }
+
+  .upsellBtn{
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:48px;
+    padding:14px 28px;
+    border-radius:999px;
+    font-size:13px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:rgba(255,255,255,.96);
+    background:linear-gradient(135deg, rgba(134,239,172,.26), rgba(74,222,128,.20));
+    border:1px solid rgba(134,239,172,.42);
+    transition:transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+  }
+
+  .upsellBtn:hover{
+    transform:translateY(-2px);
+    background:linear-gradient(135deg, rgba(134,239,172,.36), rgba(74,222,128,.28));
+    border-color:rgba(134,239,172,.65);
+    box-shadow:0 0 18px rgba(134,239,172,.32);
+  }
+
+  .checkinCard{
+    padding:24px 22px;
+    text-align:center;
+    animation-delay:.72s;
+  }
+
+  .checkinCard p{
+    margin:0 0 16px;
+    color:rgba(255,255,255,.78);
+    line-height:1.6;
+  }
+
+  .programGrid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:18px;
+  }
+
+  .programGrid .programCard:nth-child(1){ animation-delay:.36s; }
+  .programGrid .programCard:nth-child(2){ animation-delay:.48s; }
+  .programGrid .programCard:nth-child(3){ animation-delay:.60s; }
+
+  @media (max-width: 768px){
+    .programShell{ padding:0 16px 36px; }
+    .programGrid{ grid-template-columns:1fr; }
+    .programHero,
+    .programCard,
+    .programCta,
+    .upsellCard,
+    .checkinCard{ padding:22px 18px; }
+    .programCtaBtn,
+    .upsellBtn{ width:100%; }
+  }
+</style>
+</head>
+
+<body>
+<div class="dzLogoBar" style="padding:12px 16px;text-align:left;"><a href="/" aria-label="Delta Zone System home" style="display:inline-block;"><img src="/assets/img/logo.png" srcset="/assets/img/logo.png 1x, /assets/img/logo@2x.png 2x" width="400" height="236" alt="Delta Zone System" style="display:block;height:44px;width:auto;" /></a><span class="dzClubTag" style="display:inline-block;vertical-align:middle;margin-left:10px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:none;color:rgba(255,255,255,.85);white-space:nowrap;">HYROX Training Club</span></div>
+
+<div class="bg" id="bgWrap">
+  <video id="bgVid" class="bgVideo" muted loop playsinline preload="none" data-src-desktop="./assets/delta_homepage_3.mp4" data-src-mobile="./assets/mobile_video_1.mp4"></video>
+  <div class="bgOverlay"></div>
+  <div class="bgGlow"></div>
+</div>
+
+<script>
+  (function(){
+    function setImageFallback(){
+      var wrap = document.getElementById('bgWrap');
+      if(wrap){ wrap.classList.add('bgImageFallback'); }
+    }
+
+    var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if(isMobile){ setImageFallback(); }
+
+    var v2 = document.getElementById('bgVid');
+    if(!v2){ return; }
+
+    var src = isMobile ? v2.getAttribute('data-src-mobile') : v2.getAttribute('data-src-desktop');
+    if(!src){ return; }
+
+    var sourceEl = document.createElement('source');
+    sourceEl.src = src;
+    sourceEl.type = 'video/mp4';
+    v2.appendChild(sourceEl);
+
+    v2.autoplay = true;
+    v2.muted = true;
+    v2.defaultMuted = true;
+    v2.setAttribute('muted', '');
+    v2.setAttribute('playsinline', '');
+    v2.setAttribute('autoplay', '');
+
+    function tryPlay(){
+      var p = v2.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(function(){ setImageFallback(); });
+      }
+    }
+
+    v2.addEventListener('loadeddata', tryPlay, { once: true });
+    v2.load();
+    tryPlay();
+  })();
+</script>
+
+<a class="backLink" href="./index.html">&larr; Home</a>
+
+<main class="stage">
+  <section class="programShell" aria-label="Welcome to your Foundation Program">
+    <section class="programHero">
+      <p class="programEyebrow">You're in</p>
+      <h1>Welcome to Delta Zone System</h1>
+      <p>Thanks for grabbing the 4-Week HYROX Foundation Program. Download it below, then follow the Start Here steps so your first week is locked in.</p>
+    </section>
+
+    <section class="programCta">
+      <p class="programEyebrow">Your program</p>
+      <h2>Download the 4-Week Foundation Program</h2>
+      <p>PDF · Lifetime access · Save it somewhere you can open at the gym</p>
+      <a class="programCtaBtn" href="./pdfs/delta_zone_system_4_week_program_polished.pdf" download target="_blank" rel="noopener noreferrer" aria-label="Download the 4-Week HYROX Foundation Program PDF">Download Your Program (PDF)</a>
+    </section>
+
+    <section class="programGrid">
+      <article class="programCard">
+        <p class="programEyebrow">Start here</p>
+        <h2>Your first 3 steps</h2>
+        <ol class="stepsList">
+          <li>
+            <span class="stepNum">1</span>
+            <span><strong>Download the PDF</strong> and save it to your phone or laptop.</span>
+          </li>
+          <li>
+            <span class="stepNum">2</span>
+            <span><strong>Read Week 1 Day 1</strong> and skim the equipment list so you know what you need.</span>
+          </li>
+          <li>
+            <span class="stepNum">3</span>
+            <span><strong>Schedule your first 3 sessions this week</strong> on your calendar. Consistency beats intensity.</span>
+          </li>
+        </ol>
+      </article>
+
+      <article class="programCard">
+        <p class="programEyebrow">Questions</p>
+        <h2>Quick FAQ</h2>
+        <dl class="faqList">
+          <div>
+            <dt>Where is my receipt?</dt>
+            <dd>Stripe emails a receipt to the address you used at checkout. Check spam if you don't see it.</dd>
+          </div>
+          <div>
+            <dt>What equipment do I need?</dt>
+            <dd>Wall ball, sled, SkiErg, rower, and dumbbells. A HYROX Training Club or well-equipped CrossFit gym works well.</dd>
+          </div>
+          <div>
+            <dt>Can I get help if I'm stuck?</dt>
+            <dd>Email support@deltazonesystem.com or DM @deltazonetraining on Instagram. For weekly coaching feedback, use the check-in below.</dd>
+          </div>
+        </dl>
+      </article>
+
+      <article class="programCard">
+        <p class="programEyebrow">Contact</p>
+        <h2>Talk to us</h2>
+        <ul class="contactLinks">
+          <li>Email: <a href="mailto:support@deltazonesystem.com">support@deltazonesystem.com</a></li>
+          <li>Instagram: <a href="https://www.instagram.com/deltazonetraining/" target="_blank" rel="noopener noreferrer">@deltazonetraining</a></li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="programCard checkinCard">
+      <p class="programEyebrow">Stay accountable</p>
+      <h2>Weekly check-in</h2>
+      <p>2 minutes, every Sunday by 6 PM ET. Tell Tito how your week went and he'll send a note within 24 hours.</p>
+      <a class="programCtaBtn" href="https://tally.so/r/VpEXDy" target="_blank" rel="noopener noreferrer" aria-label="Submit your weekly check-in">Start my weekly check-in</a>
+    </section>
+
+    <section class="upsellCard" aria-label="Want more coaching?">
+      <p class="programEyebrow">Next level</p>
+      <h2>Want more coaching?</h2>
+      <p>Get 1-on-1 programming, weekly check-ins and direct access to Tito Nunez, HYROX Performance Coach.</p>
+      <a class="upsellBtn" href="https://tally.so/r/q4PNJ5" target="_blank" rel="noopener noreferrer" aria-label="Apply for 1-on-1 coaching from $129 per month">Apply for Coaching (from $129/mo)</a>
+    </section>
+  </section>
+</main>
+
+<footer class="siteFooter">
+  <div class="footerInner">
+    <div class="footerLinks">
+      <a href="./privacy-policy.html">Privacy</a>
+      <a href="./terms.html">Terms</a>
+      <a href="./refund-policy.html">Refund Policy</a>
+      <a href="mailto:support@deltazonesystem.com">Contact</a>
+    </div>
+    <p class="footerDisclaimer">Coached by Tito Nunez, HYROX Performance Coach. Delta Zone System is a HYROX Training Club.</p>
+    <p class="footerDisclaimer"><a href="https://www.instagram.com/deltazonetraining/" target="_blank" rel="noopener" style="color: inherit;">Instagram: @deltazonetraining</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
